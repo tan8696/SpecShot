@@ -1,0 +1,21 @@
+{
+  "slug": "uk-passport-photo",
+  "country": "United Kingdom",
+  "document": "Passport",
+  "aliases": ["UK passport photo", "British passport photo"],
+  "print": { "width_mm": 35, "height_mm": 45, "dpi": 300 },
+  "digital": { "width_px": 413, "height_px": 531, "format": "jpeg" },
+  "head": { "height_mm_min": 29, "height_mm_max": 34 },
+  "eye_line": { "from_bottom_pct_min": 30, "from_bottom_pct_max": 60 },
+  "background": { "color": "#FFFFFF", "tolerance": 25 },
+  "rules": [
+    "Neutral expression, mouth closed, eyes open and clearly visible",
+    "No head covering except for religious or medical reasons",
+    "Plain background in a light colour (white, cream, ivory, or light grey)",
+    "No shadows on the face or background",
+    "Photo must be less than 1 month old"
+  ],
+  "source_url": "https://www.gov.uk/government/publications/photographic-standards/photo-standards-accessible",
+  "verified": true,
+  "verified_on": "2026-09-05"
+}

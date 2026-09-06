@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "specshot-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "specshot-static",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve@latest", "out", "-l", "4173"],
+      "port": 4173
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "slug": "canada-passport-photo",
+  "country": "Canada",
+  "document": "Passport",
+  "aliases": [
+    "Canadian passport photo"
+  ],
+  "print": {
+    "width_mm": 50,
+    "height_mm": 70,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 591,
+    "height_px": 827,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 31,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Neutral expression, mouth closed, eyes open and clearly visible",
+    "Plain white or light-coloured background",
+    "No shadows, glare, or flash reflections",
+    "NOT YET VERIFIED: IRCC's printed-photo guidance does not publish an eye-line position, so the range below is the full plausible span, not a confirmed target. Do not ship until confirmed against a primary source."
+  ],
+  "source_url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/photos.html",
+  "verified": false,
+  "verified_on": null
+}

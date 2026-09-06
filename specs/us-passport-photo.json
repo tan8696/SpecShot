@@ -1,0 +1,41 @@
+{
+  "slug": "us-passport-photo",
+  "country": "United States",
+  "document": "Passport",
+  "aliases": [
+    "US passport photo",
+    "American passport photo"
+  ],
+  "print": {
+    "width_mm": 51,
+    "height_mm": 51,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 602,
+    "height_px": 602,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 25,
+    "height_mm_max": 35
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "2 x 2 inch (51 x 51 mm) photo, taken within the last 6 months",
+    "Neutral expression or natural smile, both eyes open",
+    "Plain white or off-white background",
+    "No glasses",
+    "NOT YET VERIFIED: travel.state.gov does not publish an eye-line position from the bottom of the photo, so the range below is the full plausible span, not a confirmed target. Do not ship until confirmed against a primary source."
+  ],
+  "source_url": "https://travel.state.gov/content/travel/en/passports/how-apply/photos.html",
+  "verified": false,
+  "verified_on": null
+}

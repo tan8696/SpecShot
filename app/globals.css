@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@source "./**/*.{ts,tsx}";
+@source "../components/**/*.{ts,tsx}";
+
+/* Class-based dark mode: a `dark` class on <html>, toggled by the theme-init
+   script in app/layout.tsx and by components/ThemeToggle.tsx, decides the
+   theme instead of only prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
