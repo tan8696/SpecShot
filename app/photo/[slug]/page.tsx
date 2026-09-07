@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { findSpec, loadSpecSlugs } from "@/lib/specs";
+import { SiteHeader } from "@/components/SiteHeader";
 
 /** One template, one page per verified spec — the actual distribution
  * channel: transactional queries like "Schengen visa photo size" that an AI
@@ -39,11 +40,7 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <p className="mb-2 text-sm">
-        <Link href="/photo" className="text-indigo-600 hover:underline dark:text-indigo-400">
-          All document specs
-        </Link>
-      </p>
+      <SiteHeader breadcrumb={{ label: "← All document specs", href: "/photo" }} />
 
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
         {spec.country} {spec.document} Photo Size

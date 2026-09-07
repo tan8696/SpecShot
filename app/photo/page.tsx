@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loadSpecs } from "@/lib/specs";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "ID Photo Requirements by Country & Document — SpecShot",
@@ -16,6 +17,7 @@ export default function SpecIndexPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      <SiteHeader />
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
         ID Photo Requirements
       </h1>

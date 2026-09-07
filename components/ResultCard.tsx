@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import type { Spec } from "@/lib/specs";
 import type { PipelineResult, Measurements } from "@/lib/engine/pipeline";
+import { planPrintSheet, renderPrintSheet, type SheetSize } from "@/lib/engine/printsheet";
 import { downloadBlob } from "@/lib/download";
 import { ComplianceChecklist } from "./ComplianceChecklist";
 import { AdGate } from "./AdGate";
@@ -30,7 +31,9 @@ export function ResultCard({
   const [unlocked, setUnlocked] = useState(false);
   const [showAdGate, setShowAdGate] = useState(false);
   const [showGuides, setShowGuides] = useState(true);
+  const [sheetSize, setSheetSize] = useState<SheetSize>("4x6");
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sheetPlan = planPrintSheet(sheetSize, spec.digital.width_px, spec.digital.height_px, spec.print.dpi);
 
   useLayoutEffect(() => {
     if (!result || !canvasRef.current) return;
@@ -59,6 +62,12 @@ export function ResultCard({
     setShowAdGate(false);
     setUnlocked(true);
     downloadBlob(result.blob, `${spec.slug}.${spec.digital.format === "png" ? "png" : "jpg"}`);
+  }
+
+  async function downloadPrintSheet() {
+    if (!result) return;
+    const blob = await renderPrintSheet(result.finalCanvas, sheetSize, spec.print.dpi);
+    downloadBlob(blob, `${spec.slug}-print-sheet-${sheetSize}.jpg`);
   }
 
   return (
@@ -116,6 +125,36 @@ export function ResultCard({
             >
               {unlocked ? "Download again" : "Watch ad — free"}
             </button>
+
+            {unlocked && (
+              <div className="space-y-2 border-t border-slate-200 pt-2 dark:border-slate-800">
+                <span className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                  Print sheet
+                </span>
+                <div className="flex gap-1 rounded-md bg-slate-100 p-1 dark:bg-slate-950">
+                  {(["4x6", "a4"] as const).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSheetSize(s)}
+                      className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors ${
+                        sheetSize === s
+                          ? "bg-indigo-500 text-white"
+                          : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
+                      }`}
+                    >
+                      {s === "4x6" ? "4×6 in" : "A4"}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={downloadPrintSheet}
+                  disabled={sheetPlan.count === 0}
+                  className="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-800 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                >
+                  Download print sheet ({sheetPlan.count} {sheetPlan.count === 1 ? "copy" : "copies"})
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -11,10 +11,10 @@ import { SignatureTool } from "./SignatureTool";
 
 type Mode = "id-photo" | "compress" | "signature";
 
-const TABS: { id: Mode; label: string }[] = [
-  { id: "id-photo", label: "ID Photo" },
-  { id: "compress", label: "Compress Photo" },
-  { id: "signature", label: "Signature Cleaner" },
+const TABS: { id: Mode; label: string; shortLabel: string }[] = [
+  { id: "id-photo", label: "ID Photo", shortLabel: "ID Photo" },
+  { id: "compress", label: "Compress Photo", shortLabel: "Compress" },
+  { id: "signature", label: "Signature Cleaner", shortLabel: "Signature" },
 ];
 
 export function AppShell({ specs }: { specs: Spec[] }) {
@@ -58,13 +58,14 @@ export function AppShell({ specs }: { specs: Spec[] }) {
             role="tab"
             aria-selected={mode === tab.id}
             onClick={() => setMode(tab.id)}
-            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
               mode === tab.id
                 ? "bg-indigo-500 text-white"
                 : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
-            {tab.label}
+            <span className="sm:hidden">{tab.shortLabel}</span>
+            <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
       </div>

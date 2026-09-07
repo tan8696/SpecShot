@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "SpecShot API for Visa Consultancies & Exam Coaching Centres",
@@ -17,11 +17,7 @@ const FEATURES = [
 export default function BusinessPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <p className="mb-2 text-sm">
-        <Link href="/" className="text-indigo-600 hover:underline dark:text-indigo-400">
-          ← Back to the tool
-        </Link>
-      </p>
+      <SiteHeader />
 
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
         Processing ID photos for clients by hand?
