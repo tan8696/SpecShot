@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["/", "/business/", "/photo/"].map((route) => ({
+  const staticRoutes = ["/", "/business/", "/photo/", "/privacy/", "/terms/"].map((route) => ({
     url: `${SITE_URL}${route}`,
     lastModified: new Date(),
   }));

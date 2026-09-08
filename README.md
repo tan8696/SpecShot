@@ -110,16 +110,41 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Yes, for production | Absolute base URL (e.g. `https://specshot.com`) used in `metadataBase`, `sitemap.xml`, and `robots.txt`. Falls back to a placeholder domain if unset — fine for local dev, wrong for a real deploy. |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No — only once AdSense-approved | Your AdSense publisher ID (`ca-pub-XXXXXXXXXXXXXXXX`). Unset, no AdSense script loads at all and the ad-gate shows its placeholder box. |
+| `NEXT_PUBLIC_ADSENSE_SLOT_ID` | No — only once AdSense-approved | The ad unit's slot ID, from the same AdSense dashboard. |
 
 ## Before you go live
 
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain on your host.
 - [ ] Replace the placeholder waitlist address in `components/WaitlistForm.tsx`
-      (`hello@specshot.example`) with a real, monitored inbox.
+      (`hello@specshot.example`) with a real, monitored inbox — and update
+      the same placeholder in `app/privacy/page.tsx` / `app/terms/page.tsx`.
 - [ ] Verify the US and Canada passport photo specs
       (`specs/us-passport-photo.json`, `specs/canada-passport-photo.json`)
       against their primary government sources and flip `"verified": true`
       once confirmed — they're excluded from production builds until then.
+
+### Getting AdSense approved
+
+Google reviews the actual live site, so this has to happen after deploying,
+not before. SpecShot ships with the policy prerequisites already in place —
+a Privacy Policy (`/privacy`), Terms of Service (`/terms`), real functioning
+tools, and clear navigation — but three things still need a human:
+
+- [ ] Apply at [adsense.google.com](https://www.google.com/adsense/) with the
+      live production URL — this can't be done on your behalf, it requires
+      your own Google account and Google's manual review.
+- [ ] Once approved, set `NEXT_PUBLIC_ADSENSE_CLIENT_ID` and
+      `NEXT_PUBLIC_ADSENSE_SLOT_ID` (above) and add
+      `public/ads.txt` containing the exact line AdSense's dashboard gives
+      you (`google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0`) —
+      not included here since a wrong/placeholder ID in that file is worse
+      than a missing one.
+- [ ] If you expect any EU/UK visitors, add a consent banner before ads
+      start showing to them (Google's EU User Consent Policy requires this
+      for personalized ads) — not built yet, flagging so it doesn't get
+      missed. [Funding Choices](https://fundingchoicesmessages.google.com/)
+      is Google's own free option.
 
 ## License
 

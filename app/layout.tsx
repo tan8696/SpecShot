@@ -8,6 +8,10 @@ import "./globals.css";
 // never build an invalid URL in local dev or a preview build.
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
 const DESCRIPTION = "Turn a selfie into an ID photo that meets an exact spec. Processed entirely in your browser.";
+// Unset until an AdSense account is approved — see README "Before you go
+// live". No ad script loads at all until then, so there's nothing to review
+// or accidentally serve broken/unapproved ad calls with.
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -51,6 +55,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Script id="theme-init" strategy="beforeInteractive">
           {THEME_INIT_SCRIPT}
         </Script>
+        {ADSENSE_CLIENT && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
         {children}
       </body>
     </html>

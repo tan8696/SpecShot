@@ -5,13 +5,19 @@ import { useModalTrap } from "./useModalTrap";
 
 const AD_SECONDS = 15;
 
+// Set both once an AdSense account is approved (see README) — until then
+// this renders the placeholder box below instead of an empty/broken ad slot.
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+const ADSENSE_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT_ID;
+
 type Phase = "prompt" | "playing" | "done";
 
 /**
- * Free-with-ads unlock. This is the placeholder ad slot — swap the "Ad plays
- * here" box for a real network's rewarded-ad tag (Google Ad Manager, AdMob
- * web, etc.) and call onComplete from that network's reward callback instead
- * of the countdown timer.
+ * Free-with-ads unlock. The gate (wait N seconds, then unlock) is our own
+ * UI, not something AdSense tracks — the <ins> below is a completely
+ * standard display ad unit, just shown while the timer runs. AdSense policy
+ * prohibits requiring a *click*, not simply displaying an ad during a wait;
+ * onComplete never depends on whether the ad was interacted with.
  */
 export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCancel: () => void }) {
   const [phase, setPhase] = useState<Phase>("prompt");
@@ -81,10 +87,13 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
               <span>Advertisement</span>
               <span aria-live="polite">{secondsLeft}s</span>
             </div>
-            {/* AD SLOT: real ad network markup/script goes here. */}
-            <div className="flex h-56 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950">
-              Ad plays here
-            </div>
+            {ADSENSE_CLIENT && ADSENSE_SLOT ? (
+              <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />
+            ) : (
+              <div className="flex h-56 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950">
+                Ad plays here — set NEXT_PUBLIC_ADSENSE_CLIENT_ID / _SLOT_ID
+              </div>
+            )}
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
               <div
                 className="h-full bg-indigo-500 transition-all duration-1000 ease-linear"
@@ -108,5 +117,32 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
         )}
       </div>
     </div>
+  );
+}
+
+/** A real Google AdSense display unit — the standard <ins class="adsbygoogle">
+ * snippet, just as React. Requires the loader script (app/layout.tsx) to
+ * already be on the page. */
+function AdUnit({ client, slot }: { client: string; slot: string }) {
+  const insRef = useRef<HTMLModElement>(null);
+
+  useEffect(() => {
+    try {
+      ((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle ??= []).push({});
+    } catch {
+      // Ad blocked or script not loaded yet — the box just stays empty.
+    }
+  }, []);
+
+  return (
+    <ins
+      ref={insRef}
+      className="adsbygoogle"
+      style={{ display: "block", minHeight: 224 }}
+      data-ad-client={client}
+      data-ad-slot={slot}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    />
   );
 }

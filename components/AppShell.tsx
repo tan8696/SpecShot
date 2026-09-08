@@ -82,6 +82,14 @@ export function AppShell({ specs }: { specs: Spec[] }) {
         <Link href="/business" className="hover:text-slate-700 dark:hover:text-slate-300">
           SpecShot for consultancies &amp; coaching centres
         </Link>
+        <span>·</span>
+        <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-slate-300">
+          Privacy
+        </Link>
+        <span>·</span>
+        <Link href="/terms" className="hover:text-slate-700 dark:hover:text-slate-300">
+          Terms
+        </Link>
       </footer>
     </div>
   );
