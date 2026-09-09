@@ -37,6 +37,11 @@ black box. SpecShot instead:
 |---|---|
 | 🪪 **ID Photo** | Auto crop to any supported document spec, with a visible crown/eye/chin guide overlay and a live compliance checklist. Generate several documents from one photo in a single pass. |
 | 🖨️ **Print sheets** | Tile 4–30 copies of your finished photo onto a 4×6in or A4 sheet with cut guides — the thing photo labs charge extra for. |
+| 📐 **Resize** | Exact pixels or by percent, with an aspect-ratio lock, on any image. |
+| ✂️ **Crop** | Drag a real selection rectangle over any photo, with aspect-ratio presets or exact numbers. |
+| ↻ **Rotate** | 90° steps and horizontal/vertical flip. |
+| 🔄 **Convert** | Switch between JPG, PNG, and WebP. |
+| 🏷️ **Watermark** | Stamp your own text or logo onto a photo — position, opacity, tiled or single. |
 | 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
 | ✍️ **Signature Cleaner** | Photograph a signature on paper; SpecShot crops to the ink, strips shadows, and outputs it at an exact pixel size for exam/visa portals. |
 | 📷 **Camera capture** | Take the photo directly in-browser with live face-framing guidance — no separate camera app needed. |

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { Spec } from "@/lib/specs";
 import { ThemeToggle } from "./ThemeToggle";
+import { ToolNav } from "./ToolNav";
 import { PhotoTool } from "./PhotoTool";
 import { CompressTool } from "./CompressTool";
 import { SignatureTool } from "./SignatureTool";
@@ -18,9 +19,12 @@ const TABS: { id: Mode; label: string; shortLabel: string }[] = [
 ];
 
 export function AppShell({ specs }: { specs: Spec[] }) {
-  const [mode, setMode] = useState<Mode>("id-photo");
+  const searchParams = useSearchParams();
   // Deep link from an SEO page's "create my photo" CTA: /?doc=uk-passport-photo
-  const initialSlug = useSearchParams().get("doc") ?? undefined;
+  const initialSlug = searchParams.get("doc") ?? undefined;
+  // Deep link from ToolNav's "Compress"/"Signature" entries: /?tool=compress
+  const initialTool = searchParams.get("tool");
+  const [mode, setMode] = useState<Mode>(initialTool === "compress" || initialTool === "signature" ? initialTool : "id-photo");
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -44,7 +48,10 @@ export function AppShell({ specs }: { specs: Spec[] }) {
             </p>
           </div>
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <ToolNav />
+          <ThemeToggle />
+        </div>
       </header>
 
       <div

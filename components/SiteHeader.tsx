@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
+import { ToolNav } from "./ToolNav";
 
 /** Shared logo/title header for the SEO landing pages (app/photo,
  * app/photo/[slug], app/business) — these have no other path back into the
@@ -33,7 +34,10 @@ export function SiteHeader({ breadcrumb }: { breadcrumb?: { label: string; href:
           )}
         </div>
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <ToolNav />
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

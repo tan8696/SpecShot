@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { loadSpecs } from "@/lib/specs";
+import { TOOLS } from "@/lib/tools";
 
 // Required for `output: "export"` — Next treats file-convention metadata
 // routes as dynamic-capable by default; this opts them into static export.
@@ -8,8 +9,15 @@ export const dynamic = "force-static";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["/", "/business/", "/photo/", "/privacy/", "/terms/"].map((route) => ({
+  const staticRoutes = ["/", "/business/", "/photo/", "/privacy/", "/terms/", "/tools/"].map((route) => ({
     url: `${SITE_URL}${route}`,
+    lastModified: new Date(),
+  }));
+
+  // Only tools with a real standalone route belong here — entries like
+  // "/?tool=compress" are query params on the homepage, not a distinct page.
+  const toolRoutes = TOOLS.filter((t) => t.href.startsWith("/") && !t.href.includes("?") && t.href !== "/").map((t) => ({
+    url: `${SITE_URL}${t.href}`,
     lastModified: new Date(),
   }));
 
@@ -21,5 +29,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: s.verified_on ? new Date(s.verified_on) : new Date(),
   }));
 
-  return [...staticRoutes, ...specRoutes];
+  return [...staticRoutes, ...toolRoutes, ...specRoutes];
 }
