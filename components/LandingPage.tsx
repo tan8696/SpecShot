@@ -83,10 +83,10 @@ export function LandingPage() {
       .finally(() => router.push("/photo-editor/"));
   }
 
-  // A hand-tweened scroll to the tool grid — slower and softer than the
-  // browser's built-in `scroll-behavior: smooth`, with the duration scaled to
-  // the distance and an ease-in-out curve. A wheel/touch from the visitor
-  // hands control straight back; honours prefers-reduced-motion.
+  // A hand-tweened scroll to the tool grid — a slow, dramatic glide (1.4–2.8s,
+  // scaled to distance) on an easeInOutQuint curve: long, deliberate build,
+  // equally long settle. A wheel/touch from the visitor hands control straight
+  // back; honours prefers-reduced-motion with an instant jump.
   function scrollToTools(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     const el = document.getElementById("tools");
@@ -101,8 +101,8 @@ export function LandingPage() {
       return;
     }
 
-    const duration = Math.min(1400, Math.max(700, Math.abs(dist) * 0.9));
-    const ease = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+    const duration = Math.min(2800, Math.max(1400, Math.abs(dist) * 1.8));
+    const ease = (p: number) => (p < 0.5 ? 16 * p * p * p * p * p : 1 - Math.pow(-2 * p + 2, 5) / 2);
 
     let cancelled = false;
     const stop = () => {
