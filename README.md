@@ -7,15 +7,19 @@
 ![Client-side only](https://img.shields.io/badge/backend-none-brightgreen)
 ![License](https://img.shields.io/badge/license-private-lightgrey)
 
-**Turn a selfie into an ID photo that actually meets the spec.** Upload a
-photo, SpecShot measures your head height, eye line, and background against
-a government's exact published requirements — the same way an examiner
-would — and shows you a pass/fail checklist before you download, not after
-you've already paid for prints that get rejected.
+**Turn a selfie into an ID photo that actually meets the spec — then keep
+going.** SpecShot began as an ID-photo compliance checker and grew into a
+full browser image studio: compress, resize, crop, convert, watermark, HEIC,
+image ↔ PDF, a photo editor, and more. Every tool shares one dark workspace
+and one rule — nothing you open is ever uploaded.
 
-Every measurement happens **in your browser**. No photo, cropped or
-otherwise, is ever uploaded anywhere — there's no backend, no API route, no
-account. Free to use, supported by a single short ad on download.
+For an ID photo specifically, SpecShot measures your head height, eye line,
+and background against a government's exact published requirements — the same
+way an examiner would — and shows you a pass/fail checklist before you
+download, not after you've already paid for prints that get rejected.
+
+Every pixel of processing happens **in your browser**. No backend, no API
+route, no account. Free to use, supported by a single short ad on download.
 
 ## Why this exists
 
@@ -49,20 +53,23 @@ black box. SpecShot instead:
 | 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
 | ✍️ **Signature Cleaner** | Photograph a signature on paper; SpecShot crops to the ink, strips shadows, and outputs it at an exact pixel size for exam/visa portals. |
 | 📷 **Camera capture** | Take the photo directly in-browser with live face-framing guidance — no separate camera app needed. |
-| 🌘 **Dark studio UI** | One focused dark workspace across every tool — no theme switching to think about. |
+| 🌘 **One dark studio** | Every tool shares the same layout: a stage, a controls panel, and a live readout of output size, dimensions and encode time. No theme toggle — one focused dark surface. |
+| 🔗 **Tools chain together** | Send a crop, resize or edit straight into the compressor — the handoff stays in the browser, no round-trip to disk. |
 | 📱 **Installable PWA** | Works offline after first load; add-to-home-screen on mobile. |
 | 🔍 **SEO spec pages** | Every verified document gets its own page with exact dimensions, cited to the government source. |
-| 🔒 **Private by construction** | Face detection and background removal run as WASM in your browser. There is no server that could see your photo, because there is no server. |
+| 🔒 **Private by construction** | Face detection and background removal run as WASM in your browser, and re-encoding strips EXIF/GPS metadata on the way out. There is no server that could see your photo, because there is no server. |
 | 📺 **Free, ad-supported** | One short ad unlocks a download. No account, no payment, no watermark on the final file. |
 
 ## Tech stack
 
 - **[Next.js 15](https://nextjs.org)** (App Router, static export — ships as plain HTML/JS/CSS, no Node server needed)
 - **React 19** + **TypeScript** (strict mode)
-- **Tailwind CSS v4** (Material-3-style dark palette, dark-only)
+- **Tailwind CSS v4** — Material-3-style dark palette, dark-only, one shared studio frame (`components/studioUi.tsx`)
+- **Geist + Inter** via `next/font`, **Material Symbols** for icons
 - **[MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe)** — face landmark detection
 - **[@imgly/background-removal](https://github.com/imgly/background-removal-js)** — in-browser background segmentation
-- **Vitest** — unit tests for the measurement/crop/compression math
+- **`heic2any`** (HEIC decode), **`pdf-lib`** / **`pdfjs-dist`** (PDF write/read), **`ogl`** (landing-page WebGL background) — all loaded only when used
+- **Vitest** — unit tests for the measurement/crop/compression/rotate math
 
 ## Getting started
 
@@ -93,10 +100,14 @@ npm run typecheck   # tsc --noEmit
 ## Project structure
 
 ```
-app/                 Routes: the tool itself, per-document SEO pages, /business
-components/          UI — PhotoTool, CompressTool, SignatureTool, ResultCard...
+app/                 Routes: landing page (/), tool hub (/app), one route per
+                      tool, per-document SEO pages, /business, /privacy, /terms
+components/          One dark "studio" per tool (studioUi.tsx = the shared frame);
+                      plus LandingPage, Scanner, PhotoTool, ResultCard, AdGate…
 lib/engine/          The actual math: crown detection, crop geometry, encoding,
-                      print sheets, watermarking — all pure, all unit-tested
+                      print sheets, watermarking, rotate/straighten — all pure,
+                      all unit-tested
+lib/handoff.ts       Passes an image from one tool to another, in the browser
 specs/               One JSON file per document, cited to a government source
 scripts/             Spec data validator (runs before every build)
 tests/               Vitest suite for lib/engine
