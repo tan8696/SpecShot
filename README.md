@@ -49,7 +49,7 @@ black box. SpecShot instead:
 | 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
 | ✍️ **Signature Cleaner** | Photograph a signature on paper; SpecShot crops to the ink, strips shadows, and outputs it at an exact pixel size for exam/visa portals. |
 | 📷 **Camera capture** | Take the photo directly in-browser with live face-framing guidance — no separate camera app needed. |
-| 🌗 **Dark / light theme** | Defaults to your OS preference, toggle persists. |
+| 🌘 **Dark studio UI** | One focused dark workspace across every tool — no theme switching to think about. |
 | 📱 **Installable PWA** | Works offline after first load; add-to-home-screen on mobile. |
 | 🔍 **SEO spec pages** | Every verified document gets its own page with exact dimensions, cited to the government source. |
 | 🔒 **Private by construction** | Face detection and background removal run as WASM in your browser. There is no server that could see your photo, because there is no server. |
@@ -59,7 +59,7 @@ black box. SpecShot instead:
 
 - **[Next.js 15](https://nextjs.org)** (App Router, static export — ships as plain HTML/JS/CSS, no Node server needed)
 - **React 19** + **TypeScript** (strict mode)
-- **Tailwind CSS v4** (class-based dark mode)
+- **Tailwind CSS v4** (Material-3-style dark palette, dark-only)
 - **[MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe)** — face landmark detection
 - **[@imgly/background-removal](https://github.com/imgly/background-removal-js)** — in-browser background segmentation
 - **Vitest** — unit tests for the measurement/crop/compression math
