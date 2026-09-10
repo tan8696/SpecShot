@@ -4,13 +4,16 @@
  * geometry.ts's CropRect shape rather than redefining it. */
 import type { CropRect } from "./geometry";
 
-export type AspectPreset = "free" | "1:1" | "4:3" | "3:2" | "16:9";
+export type AspectPreset = "free" | "1:1" | "4:5" | "3:2" | "4:3" | "16:9" | "9:16" | "2:1";
 
 export const ASPECT_RATIOS: Record<Exclude<AspectPreset, "free">, number> = {
   "1:1": 1,
-  "4:3": 4 / 3,
+  "4:5": 4 / 5,
   "3:2": 3 / 2,
+  "4:3": 4 / 3,
   "16:9": 16 / 9,
+  "9:16": 9 / 16,
+  "2:1": 2,
 };
 
 /** Keeps a rect fully inside [0,0,boundW,boundH] — shrinks before it shifts,
@@ -61,11 +64,13 @@ export function centeredCropForAspect(boundW: number, boundH: number, ratio: num
   return { x: (boundW - w) / 2, y: (boundH - h) / 2, w, h };
 }
 
-/** Canvas-dependent: crops img to rect (source-image pixel coordinates). */
-export function cropToCanvas(img: HTMLImageElement, rect: CropRect): HTMLCanvasElement {
+/** Canvas-dependent: crops a source (image or canvas) to rect, in the
+ * source's own pixel coordinates. Accepts a canvas so the Crop tool can crop
+ * a rotated/straightened working copy, not just the raw upload. */
+export function cropToCanvas(src: HTMLImageElement | HTMLCanvasElement, rect: CropRect): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(rect.w));
   canvas.height = Math.max(1, Math.round(rect.h));
-  canvas.getContext("2d")!.drawImage(img, rect.x, rect.y, rect.w, rect.h, 0, 0, canvas.width, canvas.height);
+  canvas.getContext("2d")!.drawImage(src, rect.x, rect.y, rect.w, rect.h, 0, 0, canvas.width, canvas.height);
   return canvas;
 }
