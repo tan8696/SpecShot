@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   compressToQuality,
   formatFromMime,
@@ -11,10 +12,11 @@ import {
 import { lockedDimension, dimensionsFromPercent, drawToSize } from "@/lib/engine/resize";
 import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
+import { stashHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type Mode = "pixels" | "percent";
@@ -23,6 +25,7 @@ const FORMATS: CompressFormat[] = ["jpeg", "png", "webp"];
 const PRESETS = [25, 50, 75, 100, 150, 200];
 
 export function ResizeTool() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -40,7 +43,6 @@ export function ResizeTool() {
   const [unlocked, setUnlocked] = useState(false);
   const [showAdGate, setShowAdGate] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -163,21 +165,13 @@ export function ResizeTool() {
     downloadBlob(result.blob, `${base}-resized.${ext}`);
   }
 
-  async function copyDataUri() {
-    if (!result || !unlocked) return;
-    try {
-      const dataUri = await new Promise<string>((res, rej) => {
-        const fr = new FileReader();
-        fr.onload = () => res(fr.result as string);
-        fr.onerror = () => rej(fr.error ?? new Error("read failed"));
-        fr.readAsDataURL(result.blob);
-      });
-      await navigator.clipboard.writeText(dataUri);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setError("The browser blocked clipboard access.");
-    }
+  async function pipeToCompressor() {
+    if (!result) return;
+    const ext = format === "jpeg" ? "jpg" : format;
+    const base = file?.name.replace(/\.[^.]+$/, "") || "image";
+    const handoff = new File([result.blob], `${base}-resized.${ext}`, { type: result.blob.type || `image/${format}` });
+    await stashHandoffImage(handoff).catch(() => {});
+    router.push("/app/?tool=compress");
   }
 
   function resetParams() {
@@ -420,27 +414,26 @@ export function ResizeTool() {
               <span className="material-symbols-outlined text-[18px]">download</span>
               {processing ? "Resizing…" : unlocked ? `Download again (${formatKb(resultKb)})` : "Watch ad to download — free"}
             </button>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={copyDataUri}
-                disabled={!unlocked}
-                title={unlocked ? "Copy the resized image as a data: URI" : "Unlocks after download"}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "content_copy"}</span>
-                {copied ? "Copied" : "Copy data URI"}
-              </button>
-              <button
-                onClick={resetParams}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-                Reset
-              </button>
-            </div>
+            <button
+              onClick={pipeToCompressor}
+              disabled={!result}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface-container-high px-4 py-2 text-xs font-medium text-secondary transition-colors hover:bg-surface-container-highest disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-[16px]">compress</span>
+              Send the resize to the compressor
+            </button>
+            <button
+              onClick={resetParams}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+              Reset settings
+            </button>
           </div>
         </div>
       </div>
+
+      <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}

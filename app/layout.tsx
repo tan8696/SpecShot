@@ -42,35 +42,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#6366f1",
+  themeColor: "#0e0e10",
 };
-
-// Runs before hydration so the correct theme applies on first paint — doing
-// this in a useEffect instead would flash the wrong theme for a frame.
-// Defaults to the visitor's OS preference; a saved manual choice wins after.
-const THEME_INIT_SCRIPT = `
-(function () {
-  try {
-    var stored = localStorage.getItem("theme");
-    var dark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.classList.toggle("dark", dark);
-  } catch (e) {}
-})();
-`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} ${inter.variable}`} suppressHydrationWarning>
+    // Dark-only: the studio palette IS the design, so `dark` is pinned on and
+    // there's no theme toggle or first-paint theme script any more.
+    <html lang="en" className={`dark ${geist.variable} ${inter.variable}`}>
       <head>
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
-      <body className="min-h-screen bg-white text-slate-900 antialiased dark:bg-[#05070f] dark:text-slate-100">
-        <Script id="theme-init" strategy="beforeInteractive">
-          {THEME_INIT_SCRIPT}
-        </Script>
+      <body className="min-h-screen bg-surface font-body text-on-surface antialiased">
         {ADSENSE_CLIENT && (
           <Script
             async

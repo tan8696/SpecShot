@@ -13,7 +13,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "queue";
 type Matte = "white" | "black";
@@ -418,6 +418,8 @@ export function ConvertTool() {
           </button>
         </div>
       </div>
+
+      <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && (

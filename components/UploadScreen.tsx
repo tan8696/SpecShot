@@ -42,8 +42,8 @@ export function UploadScreen({
 
   return (
     <div className="flex flex-col items-center py-16 text-center">
-      <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{heading}</h2>
-      <p className="mb-10 max-w-md text-sm text-slate-600 dark:text-slate-400">{subheading}</p>
+      <h2 className="mb-2 font-display text-2xl font-semibold tracking-tight text-on-surface">{heading}</h2>
+      <p className="mb-10 max-w-md text-sm text-on-surface-variant">{subheading}</p>
 
       <label
         onDragOver={(e) => {
@@ -56,23 +56,19 @@ export function UploadScreen({
           setDragOver(false);
           handle(e.dataTransfer.files);
         }}
-        className={`flex w-full max-w-xl cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-10 py-16 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-500/40 ${
+        className={`flex w-full max-w-xl cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-10 py-16 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 ${
           dragOver
-            ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10"
-            : "border-slate-300 bg-slate-50 hover:border-indigo-500/60 dark:border-slate-700 dark:bg-slate-950"
+            ? "border-primary bg-primary/10"
+            : "border-outline-variant/60 bg-surface-container-low hover:border-primary/60 hover:bg-surface-container"
         }`}
       >
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-400">
-          <rect x="3" y="4" width="18" height="16" rx="2" />
-          <circle cx="9" cy="10" r="1.5" />
-          <path d="M21 16l-5.5-5.5L3 20" />
-        </svg>
+        <span className="material-symbols-outlined text-[44px] text-outline">add_photo_alternate</span>
 
-        <span className="rounded-md bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm">
+        <span className="rounded-lg bg-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary-container shadow-sm">
           {dragOver ? "Drop it" : selectLabel}
         </span>
-        <span className="text-sm text-slate-500">or drag and drop {multiple ? "them" : "it"} here</span>
-        <span className="text-xs text-slate-400">{hint}</span>
+        <span className="text-sm text-on-surface-variant">or drag and drop {multiple ? "them" : "it"} here</span>
+        <span className="text-xs text-outline">{hint}</span>
 
         {/* sr-only, not hidden: display:none removes an input from the tab
             order entirely, which makes it unreachable by keyboard. */}

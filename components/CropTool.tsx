@@ -19,11 +19,11 @@ import { stashHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type Handle = "move" | "nw" | "ne" | "sw" | "se" | "n" | "s" | "e" | "w";
-type Guide = "thirds" | "golden" | "diagonal" | "none";
+type Guide = "thirds" | "none";
 
 const MIN_SIZE = 20;
 const CORNERS: Handle[] = ["nw", "ne", "sw", "se"];
@@ -41,10 +41,8 @@ const PRESETS: { id: AspectPreset; label: string; hint: string }[] = [
 ];
 
 const GUIDES: { id: Guide; label: string; icon: string }[] = [
-  { id: "thirds", label: "Thirds", icon: "grid_3x3" },
-  { id: "golden", label: "Golden", icon: "all_inclusive" },
-  { id: "diagonal", label: "Diagonals", icon: "close_fullscreen" },
-  { id: "none", label: "None", icon: "visibility_off" },
+  { id: "thirds", label: "Rule of thirds", icon: "grid_3x3" },
+  { id: "none", label: "No overlay", icon: "visibility_off" },
 ];
 
 function freeResize(start: CropRect, handle: Handle, dx: number, dy: number): CropRect {
@@ -101,7 +99,6 @@ export function CropTool() {
   const [unlocked, setUnlocked] = useState(false);
   const [showAdGate, setShowAdGate] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const stageCanvasRef = useRef<HTMLCanvasElement>(null);
   const imgBoxRef = useRef<HTMLDivElement>(null);
@@ -332,23 +329,6 @@ export function CropTool() {
     const handoff = new File([result.blob], `${base}-cropped.${ext}`, { type: result.blob.type || `image/${format}` });
     await stashHandoffImage(handoff).catch(() => {});
     router.push("/app/?tool=compress");
-  }
-
-  async function copyDataUri() {
-    if (!result || !unlocked) return;
-    try {
-      const dataUri = await new Promise<string>((res, rej) => {
-        const fr = new FileReader();
-        fr.onload = () => res(fr.result as string);
-        fr.onerror = () => rej(fr.error ?? new Error("read failed"));
-        fr.readAsDataURL(result.blob);
-      });
-      await navigator.clipboard.writeText(dataUri);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setError("The browser blocked clipboard access.");
-    }
   }
 
   function startOver() {
@@ -644,27 +624,18 @@ export function CropTool() {
               <span className="material-symbols-outlined text-[16px]">compress</span>
               Send the crop to the compressor
             </button>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={copyDataUri}
-                disabled={!unlocked}
-                title={unlocked ? "Copy the cropped image as a data: URI" : "Unlocks after download"}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "content_copy"}</span>
-                {copied ? "Copied" : "Copy data URI"}
-              </button>
-              <button
-                onClick={resetBounds}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-                Reset
-              </button>
-            </div>
+            <button
+              onClick={resetBounds}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+              Reset all bounds &amp; transforms
+            </button>
           </div>
         </div>
       </div>
+
+      <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
@@ -675,15 +646,7 @@ export function CropTool() {
 function GuideLines({ guide }: { guide: Guide }) {
   if (guide === "none") return null;
   const line = "pointer-events-none absolute bg-primary/35";
-  if (guide === "diagonal") {
-    return (
-      <svg className="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-        <line x1="0" y1="0" x2="100" y2="100" stroke="rgba(192,193,255,0.35)" strokeWidth="0.5" />
-        <line x1="100" y1="0" x2="0" y2="100" stroke="rgba(192,193,255,0.35)" strokeWidth="0.5" />
-      </svg>
-    );
-  }
-  const at = guide === "golden" ? ["38.2%", "61.8%"] : ["33.333%", "66.667%"];
+  const at = ["33.333%", "66.667%"];
   return (
     <>
       {at.map((p) => (

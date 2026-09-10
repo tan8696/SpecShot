@@ -2,21 +2,17 @@
 @source "./**/*.{ts,tsx}";
 @source "../components/**/*.{ts,tsx}";
 
-/* Class-based dark mode: a `dark` class on <html>, toggled by the theme-init
-   script in app/layout.tsx and by components/ThemeToggle.tsx, decides the
-   theme instead of only prefers-color-scheme. */
+/* The app is dark-only now (see app/layout.tsx — `dark` is always on <html>).
+   `dark:` utilities therefore always resolve; kept because much of the app
+   still uses the `slate dark:slate` pattern and the values are remapped
+   below rather than rewritten in every file. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Landing page (app/page.tsx) design system — a Material-3-style dark palette
-   plus the Geist/Inter families loaded in app/layout.tsx. Additive: these are
-   new utilities (bg-surface, text-primary, font-display …); nothing here
-   changes the slate-based styling the tool pages use. The landing page is
-   dark-only and references these literal values regardless of the `dark`
-   class. */
 @theme {
   --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
+  /* Material-3-style dark studio palette — the whole product's identity. */
   --color-surface: #131315;
   --color-surface-container-lowest: #0e0e10;
   --color-surface-container-low: #1c1b1d;
@@ -38,10 +34,53 @@
   --color-secondary-fixed: #c4e7ff;
   --color-tertiary: #ddb7ff;
   --color-tertiary-container: #b76dff;
+
+  /* --- Legacy palette remap ---------------------------------------------
+     Pre-studio components are written `bg-white dark:bg-slate-900`,
+     `text-slate-900 dark:text-white`, `bg-indigo-500 text-white`, etc. The
+     app is dark-only so the `dark:` half is what renders; these overrides
+     point that half (and the indigo accents) at the studio surfaces so the
+     older components match without touching every file. */
+  --color-white: #ffffff;
+  --color-slate-50: #201f26;
+  --color-slate-100: #e9e5eb;
+  --color-slate-200: #e3dfe7;
+  --color-slate-300: #cdcad9;
+  --color-slate-400: #c2bfd0;
+  --color-slate-500: #9d9bad;
+  --color-slate-600: #b3b1c2;
+  --color-slate-700: #3a3945;
+  --color-slate-800: #26252b;
+  --color-slate-900: #16151a;
+  --color-slate-950: #0e0e10;
+
+  --color-indigo-200: #d6d7ff;
+  --color-indigo-300: #c0c1ff;
+  --color-indigo-400: #8983ff;
+  --color-indigo-500: #6d5efc;
+  --color-indigo-600: #c0c1ff;
+  --color-indigo-700: #d6d7ff;
+
+  --color-emerald-300: #86efac;
+  --color-emerald-400: #4ade80;
+  --color-emerald-500: #22c55e;
+  --color-emerald-600: #4ade80;
+  --color-emerald-700: #4ade80;
+
+  --color-red-200: #ffd9d5;
+  --color-red-400: #ff9a91;
+  --color-red-500: #ff6b61;
+  --color-red-600: #ff9a91;
+  --color-red-700: #ffb0a8;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
 }
 
 /* Material Symbols base rule — the stylesheet <link> in app/layout.tsx pulls
-   the font file; this maps the class the landing page uses. */
+   the font file; this maps the class components use for icons. */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-weight: normal;

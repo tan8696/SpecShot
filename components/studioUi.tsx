@@ -44,3 +44,21 @@ export function StatPill({
 /** The outer dark card every studio panel sits in. */
 export const STUDIO_FRAME =
   "space-y-4 rounded-2xl bg-surface-container-lowest p-4 font-body text-on-surface shadow-2xl sm:p-6";
+
+/** Honest, always-true reassurance line for the studio tools — the real
+ * version of the mockups' "WASM / Zero Server" theatre. Canvas re-encoding
+ * drops EXIF/GPS as a side effect, so the metadata claim is free and true. */
+export function StudioPrivacyNote() {
+  return (
+    <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-outline">
+      <span className="inline-flex items-center gap-1.5">
+        <span className="material-symbols-outlined text-[14px] text-secondary">lock</span>
+        Runs in your browser — the file is never uploaded
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <span className="material-symbols-outlined text-[14px] text-secondary">location_off</span>
+        Camera &amp; location metadata (EXIF/GPS) removed on save
+      </span>
+    </p>
+  );
+}

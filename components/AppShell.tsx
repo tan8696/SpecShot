@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { Spec } from "@/lib/specs";
-import { ThemeToggle } from "./ThemeToggle";
 import { ToolNav } from "./ToolNav";
 import { PhotoTool } from "./PhotoTool";
 import { CompressTool } from "./CompressTool";
@@ -36,28 +35,26 @@ export function AppShell({ specs }: { specs: Spec[] }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-6 flex items-center justify-between gap-3 border-b border-slate-200 pb-6 dark:border-slate-800">
+      <header className="mb-6 flex items-center justify-between gap-3 border-b border-outline-variant/30 pb-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-500/15 font-bold text-indigo-600 dark:text-indigo-300">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container font-display text-sm font-bold text-on-primary-container">
             S
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">SpecShot</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Free, ad-supported. Nothing leaves your browser — photos are processed locally.
+            <h1 className="font-display text-xl font-semibold tracking-tight text-on-surface">SpecShot</h1>
+            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-on-surface-variant">
+              <span className="material-symbols-outlined text-[15px] text-secondary">lock</span>
+              Runs in your browser — nothing is uploaded.
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <ToolNav />
-          <ThemeToggle />
-        </div>
+        <ToolNav />
       </header>
 
       <div
         role="tablist"
         aria-label="Tool"
-        className="mb-6 inline-flex rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900"
+        className="mb-6 inline-flex rounded-lg border border-outline-variant/40 bg-surface-container-low p-1"
       >
         {TABS.map((tab) => (
           <button
@@ -67,8 +64,8 @@ export function AppShell({ specs }: { specs: Spec[] }) {
             onClick={() => setMode(tab.id)}
             className={`whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
               mode === tab.id
-                ? "bg-indigo-500 text-white"
-                : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
             }`}
           >
             <span className="sm:hidden">{tab.shortLabel}</span>
@@ -81,20 +78,20 @@ export function AppShell({ specs }: { specs: Spec[] }) {
       {mode === "compress" && <CompressTool />}
       {mode === "signature" && <SignatureTool />}
 
-      <footer className="mt-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-slate-200 pt-6 text-xs text-slate-500 dark:border-slate-800">
-        <Link href="/photo" className="hover:text-slate-700 dark:hover:text-slate-300">
+      <footer className="mt-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-outline-variant/30 pt-6 text-xs text-outline">
+        <Link href="/photo" className="transition-colors hover:text-on-surface">
           All document specs
         </Link>
         <span>·</span>
-        <Link href="/business" className="hover:text-slate-700 dark:hover:text-slate-300">
+        <Link href="/business" className="transition-colors hover:text-on-surface">
           SpecShot for consultancies &amp; coaching centres
         </Link>
         <span>·</span>
-        <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-slate-300">
+        <Link href="/privacy" className="transition-colors hover:text-on-surface">
           Privacy
         </Link>
         <span>·</span>
-        <Link href="/terms" className="hover:text-slate-700 dark:hover:text-slate-300">
+        <Link href="/terms" className="transition-colors hover:text-on-surface">
           Terms
         </Link>
       </footer>

@@ -16,7 +16,7 @@ import { takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type SizeMode = "quality" | "target";
 type Step = "upload" | "configure";
@@ -46,7 +46,6 @@ export function CompressTool() {
   const [split, setSplit] = useState(50);
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -167,23 +166,6 @@ export function CompressTool() {
     const ext = format === "jpeg" ? "jpg" : format;
     const base = file.name.replace(/\.[^.]+$/, "") || "photo";
     downloadBlob(result.blob, `${base}-compressed.${ext}`);
-  }
-
-  async function copyDataUri() {
-    if (!result || !unlocked) return;
-    try {
-      const dataUri = await new Promise<string>((res, rej) => {
-        const fr = new FileReader();
-        fr.onload = () => res(fr.result as string);
-        fr.onerror = () => rej(fr.error ?? new Error("read failed"));
-        fr.readAsDataURL(result.blob);
-      });
-      await navigator.clipboard.writeText(dataUri);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setError("The browser blocked clipboard access.");
-    }
   }
 
   function resetParams() {
@@ -514,27 +496,18 @@ export function CompressTool() {
               <span className="material-symbols-outlined text-[18px]">download</span>
               {processing ? "Compressing…" : unlocked ? `Download again (${formatKb(resultKb)})` : "Watch ad to download — free"}
             </button>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={copyDataUri}
-                disabled={!unlocked}
-                title={unlocked ? "Copy the compressed image as a data: URI" : "Unlocks after download"}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "content_copy"}</span>
-                {copied ? "Copied" : "Copy data URI"}
-              </button>
-              <button
-                onClick={resetParams}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-                Reset
-              </button>
-            </div>
+            <button
+              onClick={resetParams}
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+              Reset settings
+            </button>
           </div>
         </div>
       </div>
+
+      <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}

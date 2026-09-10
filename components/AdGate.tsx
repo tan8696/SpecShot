@@ -54,26 +54,26 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900"
+        className="w-full max-w-md rounded-2xl border border-outline-variant/40 bg-surface-container-low p-5 shadow-2xl"
       >
         {phase === "prompt" && (
           <>
-            <h2 className="mb-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="mb-2 font-display text-base font-semibold text-on-surface">
               Watch a short ad to unlock your download
             </h2>
-            <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
+            <p className="mb-4 text-sm text-on-surface-variant">
               SpecShot is free, supported by ads. No account, no payment — just {AD_SECONDS} seconds.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={onCancel}
-                className="flex-1 rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="flex-1 rounded-lg border border-outline-variant/50 px-4 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
               >
                 Cancel
               </button>
               <button
                 onClick={() => setPhase("playing")}
-                className="flex-1 rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400"
+                className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container"
               >
                 Watch ad
               </button>
@@ -83,20 +83,20 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
 
         {phase === "playing" && (
           <>
-            <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
+            <div className="mb-3 flex items-center justify-between text-xs text-outline">
               <span>Advertisement</span>
               <span aria-live="polite">{secondsLeft}s</span>
             </div>
             {ADSENSE_CLIENT && ADSENSE_SLOT ? (
               <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />
             ) : (
-              <div className="flex h-56 items-center justify-center rounded-md border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950">
+              <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-sm text-outline">
                 Ad plays here — set NEXT_PUBLIC_ADSENSE_CLIENT_ID / _SLOT_ID
               </div>
             )}
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
               <div
-                className="h-full bg-indigo-500 transition-all duration-1000 ease-linear"
+                className="h-full bg-primary transition-all duration-1000 ease-linear"
                 style={{ width: `${((AD_SECONDS - secondsLeft) / AD_SECONDS) * 100}%` }}
               />
             </div>
@@ -105,11 +105,11 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
 
         {phase === "done" && (
           <>
-            <h2 className="mb-2 text-base font-semibold text-emerald-600 dark:text-emerald-400">Unlocked</h2>
-            <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">Your download is ready.</p>
+            <h2 className="mb-2 font-display text-base font-semibold text-secondary">Unlocked</h2>
+            <p className="mb-4 text-sm text-on-surface-variant">Your download is ready.</p>
             <button
               onClick={onComplete}
-              className="w-full rounded-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400"
+              className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container"
             >
               Continue
             </button>
