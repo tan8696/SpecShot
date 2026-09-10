@@ -84,33 +84,45 @@ export function LandingPage() {
   }
 
   // A hand-tweened scroll to the tool grid — slower and softer than the
-  // browser's built-in `scroll-behavior: smooth`, duration scaled to the
-  // distance and eased in/out. Bails if the visitor scrolls mid-flight so it
-  // never fights them; honours prefers-reduced-motion.
+  // browser's built-in `scroll-behavior: smooth`, with the duration scaled to
+  // the distance and an ease-in-out curve. A wheel/touch from the visitor
+  // hands control straight back; honours prefers-reduced-motion.
   function scrollToTools(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
     const el = document.getElementById("tools");
     if (!el) return;
-    const target = el.getBoundingClientRect().top + window.scrollY - 72; // clear the sticky header
     const startY = window.scrollY;
+    const target = el.getBoundingClientRect().top + startY - 72; // clear the sticky header
     const dist = target - startY;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || Math.abs(dist) < 4) {
+    if (Math.abs(dist) < 4) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.scrollTo(0, target);
       return;
     }
-    const duration = Math.min(1300, Math.max(550, Math.abs(dist) * 0.6));
+
+    const duration = Math.min(1400, Math.max(700, Math.abs(dist) * 0.9));
     const ease = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+    let cancelled = false;
+    const stop = () => {
+      cancelled = true;
+    };
+    const cleanup = () => {
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+    };
+    window.addEventListener("wheel", stop, { passive: true, once: true });
+    window.addEventListener("touchstart", stop, { passive: true, once: true });
+
     let startTime: number | null = null;
-    let expected = startY;
     const tick = (now: number) => {
+      if (cancelled) return cleanup();
       if (startTime === null) startTime = now;
-      if (Math.abs(window.scrollY - expected) > 2) return; // visitor took over
       const p = Math.min((now - startTime) / duration, 1);
-      const y = startY + dist * ease(p);
-      window.scrollTo(0, y);
-      expected = window.scrollY;
+      window.scrollTo(0, startY + dist * ease(p));
       if (p < 1) requestAnimationFrame(tick);
+      else cleanup();
     };
     requestAnimationFrame(tick);
   }
