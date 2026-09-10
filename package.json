@@ -20,6 +20,7 @@
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
     "@mediapipe/tasks-vision": "^1.0.1",
+    "heic2any": "^0.0.4",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

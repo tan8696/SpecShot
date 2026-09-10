@@ -15,7 +15,7 @@ export function formatFromMime(mime: string): CompressFormat {
   return "jpeg";
 }
 
-export function loadImageFile(file: File): Promise<HTMLImageElement> {
+export function loadImageFile(file: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);

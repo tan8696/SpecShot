@@ -18,5 +18,6 @@ export const TOOLS: ToolEntry[] = [
   { id: "rotate", label: "Rotate", description: "Rotate or flip an image.", href: "/rotate-image/" },
   { id: "convert", label: "Convert", description: "Convert between JPG, PNG, and WebP.", href: "/convert-image/" },
   { id: "watermark", label: "Watermark", description: "Stamp your own text or logo onto a photo.", href: "/watermark-image/" },
+  { id: "heic", label: "HEIC → JPG", description: "Convert an iPhone HEIC/HEIF photo to JPG or PNG.", href: "/heic-to-jpg/" },
   { id: "signature", label: "Signature", description: "Clean up a photographed signature for a form upload.", href: "/?tool=signature" },
 ];

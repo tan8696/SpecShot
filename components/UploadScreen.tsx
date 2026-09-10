@@ -14,12 +14,16 @@ export function UploadScreen({
   subheading,
   hint,
   extraAction,
+  accept = "image/*",
 }: {
   onFile: (file: File) => void;
   heading: string;
   subheading: string;
   hint: string;
   extraAction?: ReactNode;
+  // HEIC files often don't match "image/*" in a non-Apple OS file picker,
+  // so the HEIC tool passes an explicit extension list.
+  accept?: string;
 }) {
   const [dragOver, setDragOver] = useState(false);
 
@@ -62,7 +66,7 @@ export function UploadScreen({
             order entirely, which makes it unreachable by keyboard. */}
         <input
           type="file"
-          accept="image/*"
+          accept={accept}
           className="sr-only"
           onChange={(e) => {
             const f = e.target.files?.[0];
