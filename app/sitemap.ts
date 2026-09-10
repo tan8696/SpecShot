@@ -6,7 +6,9 @@ import { TOOLS } from "@/lib/tools";
 // routes as dynamic-capable by default; this opts them into static export.
 export const dynamic = "force-static";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
+// Trailing slash trimmed — routes below already start with "/", so a trailing
+// slash on the env var would emit `https://host//route`.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example").replace(/\/+$/, "");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // The nav lists the most-searched of each pair (/heic-to-jpg, /jpg-to-pdf,

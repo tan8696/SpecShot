@@ -7,7 +7,7 @@ export const dynamic = "force-static";
 // No production domain is registered yet — set NEXT_PUBLIC_SITE_URL on the
 // host before launch. Falls back to a placeholder so this never emits an
 // invalid URL in local/preview builds.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example").replace(/\/+$/, "");
 
 export default function robots(): MetadataRoute.Robots {
   return {

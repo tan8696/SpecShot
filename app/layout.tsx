@@ -13,7 +13,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 // No production domain is registered yet — set this in the host's env vars
 // before launch. Falls back to a placeholder so metadataBase/sitemap/robots
 // never build an invalid URL in local dev or a preview build.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
+// Trailing slash trimmed so `${SITE_URL}/path` concatenation (sitemap.ts,
+// robots.ts) can't produce `https://host//path` when the env var is set with
+// one — as it was on the first Vercel deploy.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example").replace(/\/+$/, "");
 const DESCRIPTION = "Turn a selfie into an ID photo that meets an exact spec. Processed entirely in your browser.";
 // Unset until an AdSense account is approved — see README "Before you go
 // live". No ad script loads at all until then, so there's nothing to review
