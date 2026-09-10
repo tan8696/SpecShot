@@ -8,6 +8,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -17,12 +18,22 @@ type Step = "upload" | "configure";
 // recomputing from the original on every click.
 const OUTPUT_QUALITY = 95;
 
+function cloneCanvas(src: HTMLCanvasElement): HTMLCanvasElement {
+  const c = document.createElement("canvas");
+  c.width = src.width;
+  c.height = src.height;
+  c.getContext("2d")!.drawImage(src, 0, 0);
+  return c;
+}
+
 export function RotateTool() {
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [format, setFormat] = useState<CompressFormat>("jpeg");
+  const [original, setOriginal] = useState<HTMLCanvasElement | null>(null);
   const [working, setWorking] = useState<HTMLCanvasElement | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
+  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
@@ -33,9 +44,11 @@ export function RotateTool() {
     setError(null);
     try {
       const img = await loadImageFile(f);
+      const base = drawResized(img);
       setFile(f);
       setFormat(formatFromMime(f.type));
-      setWorking(drawResized(img));
+      setOriginal(base);
+      setWorking(cloneCanvas(base));
       setStep("configure");
     } catch {
       setError("Could not read that image file.");
@@ -52,9 +65,12 @@ export function RotateTool() {
     let cancelled = false;
     setProcessing(true);
     setError(null);
+    const t0 = performance.now();
     compressToQuality(working, format, OUTPUT_QUALITY)
       .then((r) => {
-        if (!cancelled) setBlob(r.blob);
+        if (cancelled) return;
+        setBlob(r.blob);
+        setEncodeMs(Math.round(performance.now() - t0));
       })
       .catch(() => {
         if (!cancelled) setError("Could not process that image.");
@@ -87,8 +103,10 @@ export function RotateTool() {
   function startOver() {
     setStep("upload");
     setFile(null);
+    setOriginal(null);
     setWorking(null);
     setBlob(null);
+    setEncodeMs(null);
     setUnlocked(false);
     setError(null);
   }
@@ -107,97 +125,89 @@ export function RotateTool() {
     );
   }
 
-  const rotateBtn = (label: string, degrees: Rotation) => (
-    <button
-      key={label}
-      onClick={() => working && apply(rotateCanvas(working, degrees))}
-      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
-    >
-      {label}
-    </button>
-  );
+  const btn =
+    "flex items-center justify-center gap-1 rounded-lg bg-surface-container px-2 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface";
+  const dims = working ? `${working.width} × ${working.height}` : "…";
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different photo
-        </button>
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different photo
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Rotate
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              {rotateBtn("↺ 90°", 270)}
-              {rotateBtn("180°", 180)}
-              {rotateBtn("90° ↻", 90)}
-            </div>
-          </div>
-          <div>
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Flip
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => working && apply(flipCanvas(working, "horizontal"))}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                ⇋ Horizontal
-              </button>
-              <button
-                onClick={() => working && apply(flipCanvas(working, "vertical"))}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                ⇵ Vertical
-              </button>
-            </div>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">rotate_90_degrees_cw</span>
+          <h2 className="font-display text-base font-semibold">Rotate &amp; Flip</h2>
         </div>
-
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_260px]">
-          <div className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <canvas ref={canvasRef} role="img" aria-label="Preview of the rotated image" className="h-auto max-h-[70vh] w-full object-contain" />
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Result</h2>
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">Dimensions</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">
-                    {working ? `${working.width}×${working.height}` : "…"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">File size</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">
-                    {blob ? `${(blob.size / 1024).toFixed(1)}KB` : "…"}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
-            <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
-              disabled={!blob || processing}
-              className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {processing ? "Processing…" : unlocked ? "Download again" : "Watch ad to download — free"}
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
+          <StatPill icon="download" label="Output" value={blob ? formatKb(blob.size / 1024) : "—"} />
+          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
         </div>
       </div>
 
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="truncate">{file?.name}</span>
+              <span className="shrink-0 font-mono text-outline">{dims}</span>
+            </div>
+            <div className="flex items-center justify-center p-3">
+              <canvas ref={canvasRef} role="img" aria-label="Preview of the rotated image" className="max-h-[58vh] max-w-full object-contain" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Rotate</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button className={btn} onClick={() => working && apply(rotateCanvas(working, 270 as Rotation))}>
+                  <span className="material-symbols-outlined text-[16px]">rotate_left</span>90°
+                </button>
+                <button className={btn} onClick={() => working && apply(rotateCanvas(working, 180 as Rotation))}>
+                  180°
+                </button>
+                <button className={btn} onClick={() => working && apply(rotateCanvas(working, 90 as Rotation))}>
+                  <span className="material-symbols-outlined text-[16px]">rotate_right</span>90°
+                </button>
+              </div>
+            </div>
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Flip</span>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button className={btn} onClick={() => working && apply(flipCanvas(working, "horizontal"))}>
+                  <span className="material-symbols-outlined text-[16px]">flip</span>Horizontal
+                </button>
+                <button className={btn} onClick={() => working && apply(flipCanvas(working, "vertical"))}>
+                  <span className="material-symbols-outlined rotate-90 text-[16px]">flip</span>Vertical
+                </button>
+              </div>
+            </div>
+            <button
+              className={`${btn} w-full`}
+              onClick={() => original && apply(cloneCanvas(original))}
+            >
+              <span className="material-symbols-outlined text-[16px]">restart_alt</span>Reset to original
+            </button>
+          </div>
+
+          <button
+            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            disabled={!blob || processing}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            {processing ? "Processing…" : unlocked ? `Download again (${blob ? formatKb(blob.size / 1024) : ""})` : "Watch ad to download — free"}
+          </button>
+        </div>
+      </div>
+
+      <StudioPrivacyNote />
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );

@@ -7,16 +7,17 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
-const POSITIONS: { id: WatermarkPosition; label: string }[] = [
-  { id: "top-left", label: "↖" },
-  { id: "top-right", label: "↗" },
-  { id: "center", label: "•" },
-  { id: "bottom-left", label: "↙" },
-  { id: "bottom-right", label: "↘" },
-  { id: "tile", label: "▦" },
+const POSITIONS: { id: WatermarkPosition; label: string; icon: string }[] = [
+  { id: "top-left", label: "Top left", icon: "north_west" },
+  { id: "top-right", label: "Top right", icon: "north_east" },
+  { id: "center", label: "Center", icon: "center_focus_weak" },
+  { id: "bottom-left", label: "Bottom left", icon: "south_west" },
+  { id: "bottom-right", label: "Bottom right", icon: "south_east" },
+  { id: "tile", label: "Tiled", icon: "grid_view" },
 ];
 
 export function WatermarkTool() {
@@ -29,6 +30,7 @@ export function WatermarkTool() {
   const [opacity, setOpacity] = useState(50);
   const [position, setPosition] = useState<WatermarkPosition>("bottom-right");
   const [result, setResult] = useState<CompressResult | null>(null);
+  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
@@ -72,7 +74,9 @@ export function WatermarkTool() {
       try {
         const base = drawResized(img);
         const marked = applyWatermark(base, { text, logo: logo ?? undefined, opacity: opacity / 100, position });
+        const t0 = performance.now();
         const r = await compressToQuality(marked, format, 92);
+        setEncodeMs(Math.round(performance.now() - t0));
         setResult(r);
       } catch {
         setError("Could not watermark that image.");
@@ -130,6 +134,7 @@ export function WatermarkTool() {
     setImg(null);
     setLogo(null);
     setResult(null);
+    setEncodeMs(null);
     setUnlocked(false);
     setError(null);
   }
@@ -148,125 +153,122 @@ export function WatermarkTool() {
     );
   }
 
+  const dims = result ? `${result.width} × ${result.height}` : "…";
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different photo
-        </button>
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different photo
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <label htmlFor="wmText" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Watermark text
-            </label>
-            <input
-              id="wmText"
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="© Your Name"
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-            />
-            <p className="mt-1 text-xs text-slate-500">Ignored in tile mode unless it's set.</p>
-          </div>
-
-          <div>
-            <label htmlFor="wmLogo" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Or a logo image (optional)
-            </label>
-            <input
-              id="wmLogo"
-              type="file"
-              accept="image/*"
-              onChange={(e) => onLogoFile(e.target.files?.[0])}
-              className="w-full text-xs text-slate-600 file:mr-2 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-slate-700 dark:text-slate-400 dark:file:bg-slate-800 dark:file:text-slate-200"
-            />
-            <p className="mt-1 text-xs text-slate-500">A logo replaces the text everywhere except tile mode.</p>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Position
-            </span>
-            <div className="grid grid-cols-6 gap-1">
-              {POSITIONS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setPosition(p.id)}
-                  aria-label={p.id}
-                  aria-pressed={position === p.id}
-                  className={`rounded-md border py-2 text-sm transition-colors ${
-                    position === p.id
-                      ? "border-indigo-500 bg-indigo-500 text-white"
-                      : "border-slate-300 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label htmlFor="wmOpacity" className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                Opacity
-              </label>
-              <span className="font-mono text-xs text-slate-500">{opacity}%</span>
-            </div>
-            <input
-              id="wmOpacity"
-              type="range"
-              min={5}
-              max={100}
-              value={opacity}
-              onChange={(e) => setOpacity(Number(e.target.value))}
-              className="w-full accent-indigo-500"
-            />
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">branding_watermark</span>
+          <h2 className="font-display text-base font-semibold">Watermark</h2>
+          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{logo ? "LOGO" : "TEXT"}</span>
         </div>
-
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_260px]">
-          <div className="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <canvas ref={canvasRef} role="img" aria-label="Preview of the watermarked image" className="h-auto max-h-[70vh] w-full object-contain" />
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Result</h2>
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">Dimensions</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">{result ? `${result.width}×${result.height}` : "…"}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">File size</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">
-                    {result ? `${(result.blob.size / 1024).toFixed(1)}KB` : "…"}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
-            <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
-              disabled={!result || processing}
-              className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {processing ? "Applying…" : unlocked ? "Download again" : "Watch ad to download — free"}
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
+          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
+          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
         </div>
       </div>
 
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="truncate">{file?.name}</span>
+              <span className="shrink-0 font-mono text-outline">{dims}</span>
+            </div>
+            <div className="flex items-center justify-center p-3">
+              <canvas ref={canvasRef} role="img" aria-label="Preview of the watermarked image" className="max-h-[58vh] max-w-full object-contain" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <label htmlFor="wmText" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">
+                Watermark text
+              </label>
+              <input
+                id="wmText"
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="© Your Name"
+                className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary/60 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="wmLogo" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">
+                Or a logo image (replaces the text)
+              </label>
+              <input
+                id="wmLogo"
+                type="file"
+                accept="image/*"
+                onChange={(e) => onLogoFile(e.target.files?.[0])}
+                className="w-full text-xs text-on-surface-variant file:mr-2 file:rounded-md file:border-0 file:bg-surface-container-high file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-on-surface"
+              />
+            </div>
+
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Position</span>
+              <div className="grid grid-cols-6 gap-1">
+                {POSITIONS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setPosition(p.id)}
+                    aria-label={p.label}
+                    aria-pressed={position === p.id}
+                    className={`flex items-center justify-center rounded-lg py-2 transition-colors ${
+                      position === p.id
+                        ? "bg-primary-container text-on-primary-container"
+                        : "bg-surface-container text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[16px]">{p.icon}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label htmlFor="wmOpacity" className="text-xs font-medium text-on-surface">
+                  Opacity
+                </label>
+                <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{opacity}%</span>
+              </div>
+              <input
+                id="wmOpacity"
+                type="range"
+                min={5}
+                max={100}
+                value={opacity}
+                onChange={(e) => setOpacity(Number(e.target.value))}
+                className="w-full accent-primary"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            disabled={!result || processing}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            {processing ? "Applying…" : unlocked ? `Download again (${result ? formatKb(result.blob.size / 1024) : ""})` : "Watch ad to download — free"}
+          </button>
+        </div>
+      </div>
+
+      <StudioPrivacyNote />
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );

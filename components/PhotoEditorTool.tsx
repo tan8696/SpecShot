@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { compressToQuality, drawResized, formatFromMime, loadImageFile, type CompressFormat, type CompressResult } from "@/lib/engine/compress";
 import { rotateCanvas, flipCanvas } from "@/lib/engine/rotate";
 import { buildFilterString, FILTER_PRESETS, type FilterPreset } from "@/lib/engine/editor";
 import { wrapText, drawTextBlock } from "@/lib/engine/textlayer";
 import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
-import { takeHandoffImage } from "@/lib/handoff";
+import { stashHandoffImage, takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type TextPos = "top" | "center" | "bottom";
@@ -19,17 +21,18 @@ function Slider({ id, label, value, set, min = 50, max = 150 }: { id: string; la
   return (
     <div>
       <div className="mb-1 flex items-center justify-between">
-        <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+        <label htmlFor={id} className="text-xs font-medium text-on-surface">
           {label}
         </label>
-        <span className="font-mono text-xs text-slate-500">{value}%</span>
+        <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{value}%</span>
       </div>
-      <input id={id} type="range" min={min} max={max} value={value} onChange={(e) => set(Number(e.target.value))} className="w-full accent-indigo-500" />
+      <input id={id} type="range" min={min} max={max} value={value} onChange={(e) => set(Number(e.target.value))} className="w-full accent-primary" />
     </div>
   );
 }
 
 export function PhotoEditorTool() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("upload");
   const [file, setFile] = useState<File | null>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -50,6 +53,7 @@ export function PhotoEditorTool() {
   const [textPct, setTextPct] = useState(7);
 
   const [result, setResult] = useState<CompressResult | null>(null);
+  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
@@ -71,8 +75,8 @@ export function PhotoEditorTool() {
     }
   }
 
-  // An image handed off from the landing-page dropzone: load it straight into
-  // the editor instead of showing the upload screen. One-shot on mount.
+  // An image handed off from another tool (landing dropzone, crop, resize):
+  // load it straight in. One-shot on mount.
   useEffect(() => {
     const f = takeHandoffImage();
     if (f) void onFile(f);
@@ -121,7 +125,10 @@ export function PhotoEditorTool() {
           });
         }
 
-        setResult(await compressToQuality(out, format, 92));
+        const t0 = performance.now();
+        const r = await compressToQuality(out, format, 92);
+        setEncodeMs(Math.round(performance.now() - t0));
+        setResult(r);
       } catch {
         setError("Could not apply those edits.");
       } finally {
@@ -168,11 +175,21 @@ export function PhotoEditorTool() {
     downloadBlob(result.blob, `${base}-edited.${ext}`);
   }
 
+  async function pipeToCompressor() {
+    if (!result) return;
+    const ext = format === "jpeg" ? "jpg" : format;
+    const base = file?.name.replace(/\.[^.]+$/, "") || "image";
+    const handoff = new File([result.blob], `${base}-edited.${ext}`, { type: result.blob.type || `image/${format}` });
+    await stashHandoffImage(handoff).catch(() => {});
+    router.push("/app/?tool=compress");
+  }
+
   function startOver() {
     setStep("upload");
     setFile(null);
     setImg(null);
     setResult(null);
+    setEncodeMs(null);
     setUnlocked(false);
     setError(null);
   }
@@ -191,109 +208,149 @@ export function PhotoEditorTool() {
     );
   }
 
-  const btn = "rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-800";
+  const iconBtn =
+    "flex h-9 items-center justify-center gap-1 rounded-lg bg-surface-container text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface";
+  const dims = result ? `${result.width} × ${result.height}` : "…";
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different photo
-        </button>
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different photo
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">Filter</span>
-            <div className="flex flex-wrap gap-1">
-              {FILTER_PRESETS.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setPreset(p.id)}
-                  className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${
-                    preset === p.id ? "bg-indigo-500 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">tune</span>
+          <h2 className="font-display text-base font-semibold">Photo Editor</h2>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
+          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
+          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="truncate">{file?.name}</span>
+              <span className="shrink-0 font-mono text-outline">{dims}</span>
             </div>
-          </div>
-
-          <Slider id="ed-b" label="Brightness" value={brightness} set={setBrightness} />
-          <Slider id="ed-c" label="Contrast" value={contrast} set={setContrast} />
-          <Slider id="ed-s" label="Saturation" value={saturation} set={setSaturation} />
-
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">Rotate / flip</span>
-            <div className="grid grid-cols-4 gap-1">
-              <button className={btn} onClick={() => setRotation((r) => (r + 270) % 360)}>↺</button>
-              <button className={btn} onClick={() => setRotation((r) => (r + 90) % 360)}>↻</button>
-              <button className={`${btn} ${flipH ? "!bg-indigo-500 !text-white" : ""}`} onClick={() => setFlipH((v) => !v)}>⇋</button>
-              <button className={`${btn} ${flipV ? "!bg-indigo-500 !text-white" : ""}`} onClick={() => setFlipV((v) => !v)}>⇵</button>
+            <div className="flex items-center justify-center p-3">
+              <canvas ref={canvasRef} role="img" aria-label="Edited photo preview" className="max-h-[62vh] max-w-full object-contain" />
             </div>
-          </div>
-
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">Border</span>
-              <input type="color" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} className="h-6 w-8 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Border colour" />
-            </div>
-            <input type="range" min={0} max={12} value={borderW} onChange={(e) => setBorderW(Number(e.target.value))} className="w-full accent-indigo-500" aria-label="Border width" />
-          </div>
-
-          <div className="space-y-2 border-t border-slate-200 pt-3 dark:border-slate-800">
-            <label htmlFor="ed-text" className="block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Caption
-            </label>
-            <input
-              id="ed-text"
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Optional"
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-            />
-            {text.trim() && (
-              <>
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-1 gap-1 rounded-md bg-slate-100 p-1 dark:bg-slate-950">
-                    {(["top", "center", "bottom"] as const).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setTextPos(p)}
-                        className={`flex-1 rounded px-1 py-1 text-xs font-medium capitalize transition-colors ${
-                          textPos === p ? "bg-indigo-500 text-white" : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                  <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="h-8 w-9 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Caption colour" />
-                </div>
-                <input type="range" min={3} max={16} value={textPct} onChange={(e) => setTextPct(Number(e.target.value))} className="w-full accent-indigo-500" aria-label="Caption size" />
-              </>
-            )}
           </div>
         </div>
 
-        <button
-          onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
-          disabled={!result || processing}
-          className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {processing ? "Rendering…" : unlocked ? "Download again" : "Watch ad to download — free"}
-        </button>
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Filter</span>
+              <div className="flex flex-wrap gap-1">
+                {FILTER_PRESETS.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => setPreset(p.id)}
+                    className={`rounded-lg px-2 py-1 text-xs font-medium transition-colors ${
+                      preset === p.id ? "bg-primary-container text-on-primary-container" : "bg-surface-container text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
+            <Slider id="ed-b" label="Brightness" value={brightness} set={setBrightness} />
+            <Slider id="ed-c" label="Contrast" value={contrast} set={setContrast} />
+            <Slider id="ed-s" label="Saturation" value={saturation} set={setSaturation} />
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <canvas ref={canvasRef} role="img" aria-label="Edited photo preview" className="h-auto max-h-[75vh] w-full object-contain" />
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Rotate / flip</span>
+              <div className="grid grid-cols-4 gap-1">
+                <button className={iconBtn} onClick={() => setRotation((r) => (r + 270) % 360)}>
+                  <span className="material-symbols-outlined text-[16px]">rotate_left</span>
+                </button>
+                <button className={iconBtn} onClick={() => setRotation((r) => (r + 90) % 360)}>
+                  <span className="material-symbols-outlined text-[16px]">rotate_right</span>
+                </button>
+                <button className={`${iconBtn} ${flipH ? "!bg-primary/20 !text-primary-fixed" : ""}`} onClick={() => setFlipH((v) => !v)}>
+                  <span className="material-symbols-outlined text-[16px]">flip</span>
+                </button>
+                <button className={`${iconBtn} ${flipV ? "!bg-primary/20 !text-primary-fixed" : ""}`} onClick={() => setFlipV((v) => !v)}>
+                  <span className="material-symbols-outlined rotate-90 text-[16px]">flip</span>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-xs font-medium text-on-surface">Border</span>
+                <input type="color" value={borderColor} onChange={(e) => setBorderColor(e.target.value)} className="h-6 w-8 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Border colour" />
+              </div>
+              <input type="range" min={0} max={12} value={borderW} onChange={(e) => setBorderW(Number(e.target.value))} className="w-full accent-primary" aria-label="Border width" />
+            </div>
+
+            <div className="space-y-2 border-t border-outline-variant/30 pt-3">
+              <label htmlFor="ed-text" className="block text-[11px] font-semibold uppercase tracking-wider text-outline">
+                Caption
+              </label>
+              <input
+                id="ed-text"
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Optional"
+                className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary/60 focus:outline-none"
+              />
+              {text.trim() && (
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-1 gap-1 rounded-lg bg-surface-container-lowest p-1">
+                      {(["top", "center", "bottom"] as const).map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setTextPos(p)}
+                          className={`flex-1 rounded px-1 py-1 text-xs font-medium capitalize transition-colors ${
+                            textPos === p ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:text-on-surface"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                    <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="h-8 w-9 cursor-pointer rounded border-0 bg-transparent p-0" aria-label="Caption colour" />
+                  </div>
+                  <input type="range" min={3} max={16} value={textPct} onChange={(e) => setTextPct(Number(e.target.value))} className="w-full accent-primary" aria-label="Caption size" />
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <button
+              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+              disabled={!result || processing}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">download</span>
+              {processing ? "Rendering…" : unlocked ? `Download again (${result ? formatKb(result.blob.size / 1024) : ""})` : "Watch ad to download — free"}
+            </button>
+            <button
+              onClick={pipeToCompressor}
+              disabled={!result}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface-container-high px-4 py-2 text-xs font-medium text-secondary transition-colors hover:bg-surface-container-highest disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-[16px]">compress</span>
+              Send the edit to the compressor
+            </button>
+          </div>
+        </div>
       </div>
 
+      <StudioPrivacyNote />
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );

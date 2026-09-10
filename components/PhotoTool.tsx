@@ -14,6 +14,7 @@ import { CameraCapture } from "./CameraCapture";
 import { Notice } from "./Notice";
 import { ResultCard, type JobStatus } from "./ResultCard";
 import { UploadScreen } from "./UploadScreen";
+import { StudioPrivacyNote, STUDIO_FRAME } from "./studioUi";
 
 const PROGRESS_LABEL: Record<ProgressStage, string> = {
   "loading-image": "Reading your photo…",
@@ -92,12 +93,9 @@ export function PhotoTool({ specs, initialSlug }: { specs: Spec[]; initialSlug?:
           extraAction={
             <button
               onClick={() => setShowCamera(true)}
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              className="flex items-center gap-1.5 text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 8a2 2 0 012-2h2l1.5-2h7L17 6h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                <circle cx="12" cy="13" r="3.5" />
-              </svg>
+              <span className="material-symbols-outlined text-[18px]">photo_camera</span>
               Use camera instead
             </button>
           }
@@ -118,73 +116,65 @@ export function PhotoTool({ specs, initialSlug }: { specs: Spec[]; initialSlug?:
 
   if (step === "configure") {
     return (
-      <div className="mx-auto max-w-xl py-10">
-        <div className="mb-6 flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 dark:bg-slate-800">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-slate-400">
-              <rect x="3" y="4" width="18" height="16" rx="2" />
-              <circle cx="9" cy="10" r="1.5" />
-              <path d="M21 16l-5.5-5.5L3 20" />
-            </svg>
+      <div className={`mx-auto max-w-xl ${STUDIO_FRAME}`}>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">badge</span>
+            <h2 className="font-display text-base font-semibold">ID Photo</h2>
           </div>
-          <div className="min-w-0 flex-1 truncate text-sm font-medium text-slate-900 dark:text-slate-100">
-            {file?.name}
+          <div className="flex min-w-0 items-center gap-2 text-xs text-on-surface-variant">
+            <span className="truncate font-mono">{file?.name}</span>
+            <button onClick={() => setStep("upload")} className="shrink-0 rounded-lg bg-surface-container px-2 py-1 font-medium text-secondary transition-colors hover:bg-surface-container-high">
+              Change
+            </button>
           </div>
-          <button
-            onClick={() => setStep("upload")}
-            className="shrink-0 text-sm font-medium text-indigo-600 dark:text-indigo-400"
-          >
-            Change
-          </button>
         </div>
 
-        <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Choose your document</h2>
-        <SpecPicker specs={specs} slug={slug} onChange={setSlug} />
+        <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+          <span className="block text-[11px] font-semibold uppercase tracking-wider text-outline">Choose your document</span>
+          <SpecPicker specs={specs} slug={slug} onChange={setSlug} />
 
-        {otherSpecs.length > 0 && (
-          <div className="mt-6">
-            <h2 className="mb-1 text-sm font-semibold text-slate-700 dark:text-slate-200">Also generate</h2>
-            <p className="mb-3 text-xs text-slate-500">One photo, several documents at once.</p>
-            <div className="space-y-2">
-              {otherSpecs.map((s) => (
-                <label key={s.slug} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={extraSlugs.includes(s.slug)}
-                    onChange={() => toggleExtra(s.slug)}
-                    className="accent-indigo-500"
-                  />
-                  {s.country} — {s.document}
-                </label>
-              ))}
+          {otherSpecs.length > 0 && (
+            <div className="border-t border-outline-variant/30 pt-4">
+              <span className="block text-[11px] font-semibold uppercase tracking-wider text-outline">Also generate</span>
+              <p className="mt-1 mb-2 text-[11px] text-outline">One photo, several documents at once.</p>
+              <div className="space-y-1.5">
+                {otherSpecs.map((s) => (
+                  <label key={s.slug} className="flex items-center gap-2 text-sm text-on-surface-variant">
+                    <input
+                      type="checkbox"
+                      checked={extraSlugs.includes(s.slug)}
+                      onChange={() => toggleExtra(s.slug)}
+                      className="accent-primary"
+                    />
+                    {s.country} — {s.document}
+                  </label>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <button
           onClick={startProcessing}
           disabled={!spec}
-          className="mt-8 w-full rounded-md bg-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
         >
+          <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
           Create my photo
         </button>
+
+        <StudioPrivacyNote />
       </div>
     );
   }
 
   return (
-    <div>
-      <button
-        onClick={startOver}
-        className="mb-4 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-      >
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Start over
       </button>
-      {progressText && (
-        <div className="mb-4">
-          <Notice tone="info">{progressText}</Notice>
-        </div>
-      )}
+      {progressText && <Notice tone="info">{progressText}</Notice>}
       {jobs.length > 0 && (
         <div className={jobs.length > 1 ? "grid grid-cols-1 gap-4 xl:grid-cols-2" : "grid grid-cols-1 gap-4"}>
           {jobs.map((job) => (
@@ -192,6 +182,7 @@ export function PhotoTool({ specs, initialSlug }: { specs: Spec[]; initialSlug?:
           ))}
         </div>
       )}
+      <StudioPrivacyNote />
     </div>
   );
 }

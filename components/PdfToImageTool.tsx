@@ -8,6 +8,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "rendering" | "configure";
 type Format = "jpeg" | "png";
@@ -55,9 +56,6 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
     }
   }
 
-  // Re-encode the visible page whenever it, the format, or the quality
-  // changes. Only format/quality re-locks the download — flipping pages is
-  // still the same paid-for output.
   useEffect(() => {
     if (canvases.length === 0) return;
     let cancelled = false;
@@ -151,108 +149,115 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
 
   if (step === "rendering") {
     return (
-      <div className="py-20 text-center">
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Rendering{progress && progress.total ? ` page ${progress.page} of ${progress.total}` : ""}… (the PDF engine loads the first time)
+      <div className="rounded-2xl bg-surface-container-lowest p-10 text-center font-body text-on-surface">
+        <span className="material-symbols-outlined animate-spin text-[28px] text-primary">progress_activity</span>
+        <p className="mt-3 text-sm text-on-surface-variant">
+          Rendering{progress && progress.total ? ` page ${progress.page} of ${progress.total}` : ""}… the PDF engine loads the first time.
         </p>
       </div>
     );
   }
 
+  const btn =
+    "flex items-center justify-center gap-1 rounded-lg bg-surface-container px-2 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-40";
+  const pageDims = blob ? `${canvases[pageIdx].width} × ${canvases[pageIdx].height}` : "…";
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different file
-        </button>
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different file
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">Format</span>
-            <div className="flex gap-1 rounded-md bg-slate-100 p-1 dark:bg-slate-950">
-              {(["jpeg", "png"] as const).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFormat(f)}
-                  className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors ${
-                    format === f ? "bg-indigo-500 text-white" : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  {LABELS[f]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {format === "jpeg" && (
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label htmlFor="pdfQuality" className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                  Quality
-                </label>
-                <span className="font-mono text-xs text-slate-500">{quality}%</span>
-              </div>
-              <input id="pdfQuality" type="range" min={1} max={100} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-full accent-indigo-500" />
-            </div>
-          )}
-
-          {multi && (
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => setPageIdx((i) => Math.max(0, i - 1))}
-                disabled={pageIdx === 0}
-                className="rounded-md border border-slate-300 px-2 py-1 text-xs disabled:opacity-40 dark:border-slate-700"
-              >
-                ← Prev
-              </button>
-              <span className="font-mono text-xs text-slate-600 dark:text-slate-400">
-                Page {pageIdx + 1} / {canvases.length}
-              </span>
-              <button
-                onClick={() => setPageIdx((i) => Math.min(canvases.length - 1, i + 1))}
-                disabled={pageIdx === canvases.length - 1}
-                className="rounded-md border border-slate-300 px-2 py-1 text-xs disabled:opacity-40 dark:border-slate-700"
-              >
-                Next →
-              </button>
-            </div>
-          )}
-
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-600 dark:text-slate-400">This page</span>
-            <span className="font-mono text-slate-900 dark:text-slate-100">
-              {blob ? `${canvases[pageIdx].width}×${canvases[pageIdx].height}, ${(blob.size / 1024).toFixed(0)}KB` : "…"}
-            </span>
-          </div>
-
-          <button
-            onClick={() => (unlocked ? downloadPage(pageIdx) : setShowAdGate(true))}
-            disabled={!blob}
-            className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {unlocked ? `Download page ${pageIdx + 1}` : "Watch ad to download — free"}
-          </button>
-          {unlocked && multi && (
-            <button
-              onClick={downloadAll}
-              disabled={busy}
-              className="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-xs font-medium text-slate-800 transition-colors hover:bg-slate-200 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
-            >
-              {busy ? "Downloading…" : `Download all ${canvases.length} pages`}
-            </button>
-          )}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">auto_stories</span>
+          <h2 className="font-display text-base font-semibold">PDF → Images</h2>
+          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
+            {canvases.length} {canvases.length === 1 ? "page" : "pages"}
+          </span>
         </div>
-
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
-
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <canvas ref={canvasRef} role="img" aria-label={`Preview of page ${pageIdx + 1}`} className="h-auto max-h-[75vh] w-full object-contain" />
+        <div className="flex flex-wrap items-center gap-2">
+          <StatPill icon="crop_free" label="Page" value={pageDims} tone="primary" />
+          <StatPill icon="download" label="This page" value={blob ? formatKb(blob.size / 1024) : "—"} />
+        </div>
       </div>
 
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="truncate">{name}</span>
+              <span className="shrink-0 font-mono text-outline">page {pageIdx + 1} / {canvases.length}</span>
+            </div>
+            <div className="flex items-center justify-center p-3">
+              <canvas ref={canvasRef} role="img" aria-label={`Preview of page ${pageIdx + 1}`} className="max-h-[62vh] max-w-full object-contain" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Format</span>
+              <div className="grid grid-cols-2 gap-1 rounded-lg bg-surface-container-lowest p-1">
+                {(["jpeg", "png"] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFormat(f)}
+                    className={`rounded px-2 py-1.5 text-xs font-medium transition-colors ${
+                      format === f ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    {LABELS[f]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {format === "jpeg" && (
+              <div>
+                <div className="mb-1 flex items-center justify-between">
+                  <label htmlFor="pdfQuality" className="text-xs font-medium text-on-surface">Quality</label>
+                  <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{quality}%</span>
+                </div>
+                <input id="pdfQuality" type="range" min={1} max={100} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-full accent-primary" />
+              </div>
+            )}
+
+            {multi && (
+              <div className="flex items-center justify-between gap-2">
+                <button className={btn} onClick={() => setPageIdx((i) => Math.max(0, i - 1))} disabled={pageIdx === 0}>
+                  <span className="material-symbols-outlined text-[16px]">chevron_left</span>Prev
+                </button>
+                <span className="font-mono text-xs text-on-surface-variant">{pageIdx + 1} / {canvases.length}</span>
+                <button className={btn} onClick={() => setPageIdx((i) => Math.min(canvases.length - 1, i + 1))} disabled={pageIdx === canvases.length - 1}>
+                  Next<span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <button
+              onClick={() => (unlocked ? downloadPage(pageIdx) : setShowAdGate(true))}
+              disabled={!blob}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">download</span>
+              {unlocked ? `Download page ${pageIdx + 1}` : "Watch ad to download — free"}
+            </button>
+            {unlocked && multi && (
+              <button onClick={downloadAll} disabled={busy} className={`${btn} w-full`}>
+                <span className="material-symbols-outlined text-[16px]">download_for_offline</span>
+                {busy ? "Downloading…" : `Download all ${canvases.length} pages`}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <StudioPrivacyNote />
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );

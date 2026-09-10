@@ -8,6 +8,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -24,6 +25,7 @@ export function MemeTool() {
   const [strokePct, setStrokePct] = useState(8);
   const [allCaps, setAllCaps] = useState(true);
   const [result, setResult] = useState<CompressResult | null>(null);
+  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
@@ -75,7 +77,9 @@ export function MemeTool() {
         if (top.trim()) drawTextBlock(ctx, wrapText(measure, cap(top), maxWidth), canvas.width / 2, canvas.height, { ...shared, anchor: "top" });
         if (bottom.trim()) drawTextBlock(ctx, wrapText(measure, cap(bottom), maxWidth), canvas.width / 2, canvas.height, { ...shared, anchor: "bottom" });
 
+        const t0 = performance.now();
         const r = await compressToQuality(canvas, format, 92);
+        setEncodeMs(Math.round(performance.now() - t0));
         setResult(r);
       } catch {
         setError("Could not build that meme.");
@@ -128,6 +132,7 @@ export function MemeTool() {
     setFile(null);
     setImg(null);
     setResult(null);
+    setEncodeMs(null);
     setUnlocked(false);
     setError(null);
   }
@@ -146,81 +151,89 @@ export function MemeTool() {
     );
   }
 
+  const inputCls =
+    "w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary/60 focus:outline-none";
+  const dims = result ? `${result.width} × ${result.height}` : "…";
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different photo
-        </button>
+    <div className={STUDIO_FRAME}>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different photo
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <label htmlFor="memeTop" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Top text
-            </label>
-            <input
-              id="memeTop"
-              type="text"
-              value={top}
-              onChange={(e) => setTop(e.target.value)}
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
-          <div>
-            <label htmlFor="memeBottom" className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Bottom text
-            </label>
-            <input
-              id="memeBottom"
-              type="text"
-              value={bottom}
-              onChange={(e) => setBottom(e.target.value)}
-              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-            />
-          </div>
-
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label htmlFor="memeFont" className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                Font size
-              </label>
-              <span className="font-mono text-xs text-slate-500">{fontPct}%</span>
-            </div>
-            <input id="memeFont" type="range" min={3} max={20} value={fontPct} onChange={(e) => setFontPct(Number(e.target.value))} className="w-full accent-indigo-500" />
-          </div>
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label htmlFor="memeStroke" className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                Outline
-              </label>
-              <span className="font-mono text-xs text-slate-500">{strokePct}%</span>
-            </div>
-            <input id="memeStroke" type="range" min={0} max={20} value={strokePct} onChange={(e) => setStrokePct(Number(e.target.value))} className="w-full accent-indigo-500" />
-          </div>
-          <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-            <input type="checkbox" checked={allCaps} onChange={(e) => setAllCaps(e.target.checked)} className="accent-indigo-500" />
-            ALL CAPS
-          </label>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">sentiment_very_satisfied</span>
+          <h2 className="font-display text-base font-semibold">Meme Generator</h2>
         </div>
-
-        <button
-          onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
-          disabled={!result || processing}
-          className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {processing ? "Rendering…" : unlocked ? "Download again" : "Watch ad to download — free"}
-        </button>
-
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
-
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <canvas ref={canvasRef} role="img" aria-label="Meme preview" className="h-auto max-h-[75vh] w-full object-contain" />
+        <div className="flex flex-wrap items-center gap-2">
+          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
+          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
+          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
+        </div>
       </div>
 
+      <div className="grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="truncate">{file?.name}</span>
+              <span className="shrink-0 font-mono text-outline">{dims}</span>
+            </div>
+            <div className="flex items-center justify-center p-3">
+              <canvas ref={canvasRef} role="img" aria-label="Meme preview" className="max-h-[62vh] max-w-full object-contain" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <label htmlFor="memeTop" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">
+                Top text
+              </label>
+              <input id="memeTop" type="text" value={top} onChange={(e) => setTop(e.target.value)} className={inputCls} />
+            </div>
+            <div>
+              <label htmlFor="memeBottom" className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">
+                Bottom text
+              </label>
+              <input id="memeBottom" type="text" value={bottom} onChange={(e) => setBottom(e.target.value)} className={inputCls} />
+            </div>
+
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label htmlFor="memeFont" className="text-xs font-medium text-on-surface">Font size</label>
+                <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{fontPct}%</span>
+              </div>
+              <input id="memeFont" type="range" min={3} max={20} value={fontPct} onChange={(e) => setFontPct(Number(e.target.value))} className="w-full accent-primary" />
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label htmlFor="memeStroke" className="text-xs font-medium text-on-surface">Outline</label>
+                <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{strokePct}%</span>
+              </div>
+              <input id="memeStroke" type="range" min={0} max={20} value={strokePct} onChange={(e) => setStrokePct(Number(e.target.value))} className="w-full accent-primary" />
+            </div>
+            <label className="flex items-center gap-2 text-xs text-on-surface-variant">
+              <input type="checkbox" checked={allCaps} onChange={(e) => setAllCaps(e.target.checked)} className="accent-primary" />
+              ALL CAPS
+            </label>
+          </div>
+
+          <button
+            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            disabled={!result || processing}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px]">download</span>
+            {processing ? "Rendering…" : unlocked ? `Download again (${result ? formatKb(result.blob.size / 1024) : ""})` : "Watch ad to download — free"}
+          </button>
+        </div>
+      </div>
+
+      <StudioPrivacyNote />
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
