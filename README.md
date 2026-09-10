@@ -42,6 +42,8 @@ black box. SpecShot instead:
 | ↻ **Rotate** | 90° steps and horizontal/vertical flip. |
 | 🔄 **Convert** | Switch between JPG, PNG, and WebP. |
 | 🏷️ **Watermark** | Stamp your own text or logo onto a photo — position, opacity, tiled or single. |
+| 🎨 **Photo Editor** | Brightness/contrast/saturation, filter presets, border, caption, rotate/flip. |
+| 😂 **Meme Generator** | Classic top/bottom Impact captions, auto-wrapped, on any image. |
 | 📱 **HEIC → JPG/PNG** | Convert iPhone HEIC/HEIF photos (`heic2any`, WASM, loaded only when used). |
 | 📄 **Images ↔ PDF** | Combine images into one PDF (`pdf-lib`), or render every PDF page to JPG/PNG (`pdfjs-dist`). Both loaded only when used. |
 | 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
