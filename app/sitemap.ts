@@ -9,9 +9,20 @@ export const dynamic = "force-static";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // /heic-to-png is a standalone SEO page but isn't in TOOLS (the nav only
-  // lists the more-searched /heic-to-jpg), so it's listed here by hand.
-  const staticRoutes = ["/", "/business/", "/photo/", "/privacy/", "/terms/", "/tools/", "/heic-to-png/"].map((route) => ({
+  // The nav lists the most-searched of each pair (/heic-to-jpg, /jpg-to-pdf,
+  // /pdf-to-jpg); the siblings are standalone SEO pages not in TOOLS, so
+  // they're listed here by hand.
+  const staticRoutes = [
+    "/",
+    "/business/",
+    "/photo/",
+    "/privacy/",
+    "/terms/",
+    "/tools/",
+    "/heic-to-png/",
+    "/png-to-pdf/",
+    "/pdf-to-png/",
+  ].map((route) => ({
     url: `${SITE_URL}${route}`,
     lastModified: new Date(),
   }));

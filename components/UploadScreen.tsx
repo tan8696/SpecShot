@@ -10,13 +10,17 @@ import { useState, type ReactNode } from "react";
  */
 export function UploadScreen({
   onFile,
+  onFiles,
   heading,
   subheading,
   hint,
   extraAction,
   accept = "image/*",
+  selectLabel = "Select a photo",
 }: {
-  onFile: (file: File) => void;
+  onFile?: (file: File) => void;
+  // For the Image -> PDF tool, which takes several images at once.
+  onFiles?: (files: File[]) => void;
   heading: string;
   subheading: string;
   hint: string;
@@ -24,8 +28,17 @@ export function UploadScreen({
   // HEIC files often don't match "image/*" in a non-Apple OS file picker,
   // so the HEIC tool passes an explicit extension list.
   accept?: string;
+  selectLabel?: string;
 }) {
   const [dragOver, setDragOver] = useState(false);
+  const multiple = !!onFiles;
+
+  function handle(list: FileList | null | undefined) {
+    const files = list ? Array.from(list) : [];
+    if (files.length === 0) return;
+    if (onFiles) onFiles(files);
+    else onFile?.(files[0]);
+  }
 
   return (
     <div className="flex flex-col items-center py-16 text-center">
@@ -41,8 +54,7 @@ export function UploadScreen({
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) onFile(f);
+          handle(e.dataTransfer.files);
         }}
         className={`flex w-full max-w-xl cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-10 py-16 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-500/40 ${
           dragOver
@@ -57,9 +69,9 @@ export function UploadScreen({
         </svg>
 
         <span className="rounded-md bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm">
-          {dragOver ? "Drop it" : "Select a photo"}
+          {dragOver ? "Drop it" : selectLabel}
         </span>
-        <span className="text-sm text-slate-500">or drag and drop it here</span>
+        <span className="text-sm text-slate-500">or drag and drop {multiple ? "them" : "it"} here</span>
         <span className="text-xs text-slate-400">{hint}</span>
 
         {/* sr-only, not hidden: display:none removes an input from the tab
@@ -67,10 +79,10 @@ export function UploadScreen({
         <input
           type="file"
           accept={accept}
+          multiple={multiple}
           className="sr-only"
           onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) onFile(f);
+            handle(e.target.files);
             e.target.value = "";
           }}
         />

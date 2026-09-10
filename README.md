@@ -43,6 +43,7 @@ black box. SpecShot instead:
 | 🔄 **Convert** | Switch between JPG, PNG, and WebP. |
 | 🏷️ **Watermark** | Stamp your own text or logo onto a photo — position, opacity, tiled or single. |
 | 📱 **HEIC → JPG/PNG** | Convert iPhone HEIC/HEIF photos (`heic2any`, WASM, loaded only when used). |
+| 📄 **Images ↔ PDF** | Combine images into one PDF (`pdf-lib`), or render every PDF page to JPG/PNG (`pdfjs-dist`). Both loaded only when used. |
 | 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
 | ✍️ **Signature Cleaner** | Photograph a signature on paper; SpecShot crops to the ink, strips shadows, and outputs it at an exact pixel size for exam/visa portals. |
 | 📷 **Camera capture** | Take the photo directly in-browser with live face-framing guidance — no separate camera app needed. |
