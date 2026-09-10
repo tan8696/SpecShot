@@ -83,8 +83,40 @@ export function LandingPage() {
       .finally(() => router.push("/photo-editor/"));
   }
 
+  // A hand-tweened scroll to the tool grid — slower and softer than the
+  // browser's built-in `scroll-behavior: smooth`, duration scaled to the
+  // distance and eased in/out. Bails if the visitor scrolls mid-flight so it
+  // never fights them; honours prefers-reduced-motion.
+  function scrollToTools(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    const el = document.getElementById("tools");
+    if (!el) return;
+    const target = el.getBoundingClientRect().top + window.scrollY - 72; // clear the sticky header
+    const startY = window.scrollY;
+    const dist = target - startY;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || Math.abs(dist) < 4) {
+      window.scrollTo(0, target);
+      return;
+    }
+    const duration = Math.min(1300, Math.max(550, Math.abs(dist) * 0.6));
+    const ease = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+    let startTime: number | null = null;
+    let expected = startY;
+    const tick = (now: number) => {
+      if (startTime === null) startTime = now;
+      if (Math.abs(window.scrollY - expected) > 2) return; // visitor took over
+      const p = Math.min((now - startTime) / duration, 1);
+      const y = startY + dist * ease(p);
+      window.scrollTo(0, y);
+      expected = window.scrollY;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
   return (
-    <div className="relative min-h-screen scroll-smooth font-body text-on-surface antialiased">
+    <div className="relative min-h-screen font-body text-on-surface antialiased">
       {/* Opaque base — sits under the WebGL layer so the page never falls back
           to the light <body> background when the OS theme is light. */}
       <div className="fixed inset-0 -z-20 bg-surface-container-lowest" />
@@ -124,7 +156,7 @@ export function LandingPage() {
             <span className="font-display text-lg font-semibold tracking-tight text-on-surface">SpecShot</span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-on-surface-variant md:flex">
-            <a href="#tools" className="transition-colors hover:text-on-surface">
+            <a href="#tools" onClick={scrollToTools} className="transition-colors hover:text-on-surface">
               Tools
             </a>
             <Link href="/photo/" className="transition-colors hover:text-on-surface">
@@ -164,6 +196,7 @@ export function LandingPage() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href="#tools"
+              onClick={scrollToTools}
               className="inline-flex items-center justify-center rounded-xl bg-primary-container px-6 py-3 text-sm font-semibold text-on-primary-container shadow-xl transition-colors hover:bg-primary"
             >
               Browse the tools
