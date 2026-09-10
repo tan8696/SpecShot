@@ -28,7 +28,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Only tools with a real standalone route belong here — entries like
-  // "/?tool=compress" are query params on the homepage, not a distinct page.
+  // "/app/?tool=compress" are query params on the tool hub, not a distinct page.
+  // "/app/" itself (the id-photo entry) is a real route and is included.
   const toolRoutes = TOOLS.filter((t) => t.href.startsWith("/") && !t.href.includes("?") && t.href !== "/").map((t) => ({
     url: `${SITE_URL}${t.href}`,
     lastModified: new Date(),

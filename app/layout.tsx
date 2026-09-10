@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Geist, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+
+// Geist for display type, Inter for body — used only by the landing page via
+// the --font-display / --font-body theme tokens (app/globals.css). next/font
+// self-hosts them, so no render-blocking Google Fonts request.
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 // No production domain is registered yet — set this in the host's env vars
 // before launch. Falls back to a placeholder so metadataBase/sitemap/robots
@@ -50,7 +57,13 @@ const THEME_INIT_SCRIPT = `
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${geist.variable} ${inter.variable}`} suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+      </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased dark:bg-[#05070f] dark:text-slate-100">
         <Script id="theme-init" strategy="beforeInteractive">
           {THEME_INIT_SCRIPT}

@@ -7,6 +7,7 @@ import { buildFilterString, FILTER_PRESETS, type FilterPreset } from "@/lib/engi
 import { wrapText, drawTextBlock } from "@/lib/engine/textlayer";
 import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
+import { takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
@@ -69,6 +70,14 @@ export function PhotoEditorTool() {
       setError("Could not read that image file.");
     }
   }
+
+  // An image handed off from the landing-page dropzone: load it straight into
+  // the editor instead of showing the upload screen. One-shot on mount.
+  useEffect(() => {
+    const f = takeHandoffImage();
+    if (f) void onFile(f);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!img) return;

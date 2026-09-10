@@ -1,15 +1,13 @@
-import { Suspense } from "react";
-import { loadSpecs } from "@/lib/specs";
-import { AppShell } from "@/components/AppShell";
+import type { Metadata } from "next";
+import { LandingPage } from "@/components/LandingPage";
+
+export const metadata: Metadata = {
+  title: "SpecShot — Private image tools that run in your browser",
+  description:
+    "Thirteen image tools that run entirely in your browser — ID photos, compress, resize, crop, convert, HEIC, PDF, and more. Nothing is uploaded, no account needed.",
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
-  const specs = loadSpecs();
-  // AppShell reads the ?doc= deep link via useSearchParams, which requires a
-  // Suspense boundary here to keep this page statically generated rather
-  // than forcing a per-request server render.
-  return (
-    <Suspense>
-      <AppShell specs={specs} />
-    </Suspense>
-  );
+  return <LandingPage />;
 }

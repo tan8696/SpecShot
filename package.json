@@ -22,6 +22,7 @@
     "@mediapipe/tasks-vision": "^1.0.1",
     "heic2any": "^0.0.4",
     "next": "^15.0.0",
+    "ogl": "^1.0.11",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289",
     "react": "^19.0.0",

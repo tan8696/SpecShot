@@ -19,3 +19,6 @@ next-env.d.ts
 # misc
 .DS_Store
 *.log
+
+# /graphify knowledge-graph output + tooling cache
+/graphify-out/
