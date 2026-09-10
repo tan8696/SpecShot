@@ -15,6 +15,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
+import { StatPill, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type SizeMode = "quality" | "target";
 type Step = "upload" | "configure";
@@ -226,7 +227,7 @@ export function CompressTool() {
   }
 
   return (
-    <div className="space-y-4 rounded-2xl bg-surface-container-lowest p-4 font-body text-on-surface shadow-2xl sm:p-6">
+    <div className={STUDIO_FRAME}>
       <button
         onClick={startOver}
         className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface"
@@ -244,9 +245,9 @@ export function CompressTool() {
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Stat icon="savings" label="Saved" value={result ? (bigger ? `+${-reduction}%` : `−${reduction}%`) : "—"} tone={bigger ? "warn" : "secondary"} />
-          <Stat icon="download" label="Output" value={result ? formatKb(resultKb) : "—"} tone="primary" />
-          <Stat icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
+          <StatPill icon="savings" label="Saved" value={result ? (bigger ? `+${-reduction}%` : `−${reduction}%`) : "—"} tone={bigger ? "warn" : "secondary"} />
+          <StatPill icon="download" label="Output" value={result ? formatKb(resultKb) : "—"} tone="primary" />
+          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
           <div className="flex rounded-lg bg-surface-container p-0.5">
             {(["split", "dual"] as const).map((m) => (
               <button
@@ -532,18 +533,3 @@ export function CompressTool() {
   );
 }
 
-function Stat({ icon, label, value, tone = "neutral" }: { icon: string; label: string; value: string; tone?: "primary" | "secondary" | "warn" | "neutral" }) {
-  const color =
-    tone === "primary" ? "text-primary" : tone === "secondary" ? "text-secondary" : tone === "warn" ? "text-amber-400" : "text-on-surface";
-  return (
-    <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-lowest px-2.5 py-1">
-      <span className={`material-symbols-outlined text-[15px] ${color}`}>{icon}</span>
-      <span className="text-[10px] uppercase tracking-wider text-outline">{label}</span>
-      <span className={`font-mono text-xs font-medium ${color}`}>{value}</span>
-    </div>
-  );
-}
-
-function formatKb(kb: number) {
-  return kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${kb.toFixed(0)} KB`;
-}
