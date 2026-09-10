@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   loadImageFile,
   drawResized,
@@ -18,6 +18,7 @@ import { AdGate } from "./AdGate";
 
 type SizeMode = "quality" | "target";
 type Step = "upload" | "configure";
+type ViewMode = "split" | "dual";
 
 const FORMATS: CompressFormat[] = ["jpeg", "png", "webp"];
 
@@ -31,13 +32,23 @@ export function CompressTool() {
   const [targetKb, setTargetKb] = useState(200);
   const [resizeEnabled, setResizeEnabled] = useState(false);
   const [maxDim, setMaxDim] = useState(1920);
+
   const [result, setResult] = useState<CompressResult | null>(null);
+  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [showAdGate, setShowAdGate] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [view, setView] = useState<ViewMode>("split");
+  const [split, setSplit] = useState(50);
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
+  const [compressedUrl, setCompressedUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
 
   // PNG has no quality knob, so a size target is meaningless for it.
   useEffect(() => {
@@ -58,6 +69,17 @@ export function CompressTool() {
     }
   }
 
+  // Original preview URL — the file exactly as picked, for the "before" side.
+  useEffect(() => {
+    if (!file) {
+      setOriginalUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setOriginalUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+
   // Recompresses whenever any control changes. Debounced so dragging the
   // quality slider doesn't re-encode on every intermediate value. Any
   // settings change re-locks the download — a previously-watched ad only
@@ -71,10 +93,12 @@ export function CompressTool() {
       setError(null);
       try {
         const canvas = drawResized(img, resizeEnabled ? maxDim : undefined);
+        const t0 = performance.now();
         const r =
           sizeMode === "quality"
             ? await compressToQuality(canvas, format, quality)
             : await compressToTargetKb(canvas, format, targetKb);
+        setEncodeMs(Math.round(performance.now() - t0));
         setResult(r);
       } catch {
         setError("Could not compress that image.");
@@ -87,33 +111,42 @@ export function CompressTool() {
     };
   }, [img, format, sizeMode, quality, targetKb, resizeEnabled, maxDim]);
 
-  // Draws the live result — watermarked until this exact output has been
-  // unlocked with an ad, otherwise the canvas could just be right-click-saved
-  // and the ad gate would be pointless.
-  useLayoutEffect(() => {
-    if (!result || !canvasRef.current) return;
+  // The "after" side. Watermarked until this exact output has been unlocked
+  // with an ad — otherwise the preview could just be right-click-saved and the
+  // ad gate would be pointless.
+  useEffect(() => {
+    if (!result) {
+      setCompressedUrl(null);
+      return;
+    }
     let cancelled = false;
-    const url = URL.createObjectURL(result.blob);
-    const preview = new Image();
-    preview.onload = () => {
-      if (cancelled) {
-        URL.revokeObjectURL(url);
-        return;
-      }
-      const clean = document.createElement("canvas");
-      clean.width = result.width;
-      clean.height = result.height;
-      clean.getContext("2d")!.drawImage(preview, 0, 0);
+    let objectUrl: string | null = null;
 
-      const c = canvasRef.current!;
-      c.width = result.width;
-      c.height = result.height;
-      c.getContext("2d")!.drawImage(unlocked ? clean : withWatermark(clean), 0, 0);
-      URL.revokeObjectURL(url);
-    };
-    preview.src = url;
+    if (unlocked) {
+      objectUrl = URL.createObjectURL(result.blob);
+      setCompressedUrl(objectUrl);
+    } else {
+      const srcUrl = URL.createObjectURL(result.blob);
+      const im = new Image();
+      im.onload = () => {
+        URL.revokeObjectURL(srcUrl);
+        if (cancelled) return;
+        const clean = document.createElement("canvas");
+        clean.width = result.width;
+        clean.height = result.height;
+        clean.getContext("2d")!.drawImage(im, 0, 0);
+        withWatermark(clean).toBlob((b) => {
+          if (cancelled || !b) return;
+          objectUrl = URL.createObjectURL(b);
+          setCompressedUrl(objectUrl);
+        }, "image/png");
+      };
+      im.src = srcUrl;
+    }
+
     return () => {
       cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, [result, unlocked]);
 
@@ -126,18 +159,57 @@ export function CompressTool() {
     downloadBlob(result.blob, `${base}-compressed.${ext}`);
   }
 
+  async function copyDataUri() {
+    if (!result || !unlocked) return;
+    try {
+      const dataUri = await new Promise<string>((res, rej) => {
+        const fr = new FileReader();
+        fr.onload = () => res(fr.result as string);
+        fr.onerror = () => rej(fr.error ?? new Error("read failed"));
+        fr.readAsDataURL(result.blob);
+      });
+      await navigator.clipboard.writeText(dataUri);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setError("The browser blocked clipboard access.");
+    }
+  }
+
+  function resetParams() {
+    setFormat(file ? formatFromMime(file.type) : "jpeg");
+    setSizeMode("quality");
+    setQuality(80);
+    setTargetKb(200);
+    setResizeEnabled(false);
+    setMaxDim(1920);
+    setSplit(50);
+    setView("split");
+  }
+
   function startOver() {
     setStep("upload");
     setFile(null);
     setImg(null);
     setResult(null);
+    setEncodeMs(null);
     setUnlocked(false);
     setError(null);
+  }
+
+  function moveSplit(clientX: number) {
+    const el = stageRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setSplit(Math.max(2, Math.min(98, pct)));
   }
 
   const originalKb = file ? file.size / 1024 : 0;
   const resultKb = result ? result.blob.size / 1024 : 0;
   const reduction = file && result ? Math.round((1 - result.blob.size / file.size) * 100) : 0;
+  const outputFrac = file && result ? Math.min(100, (result.blob.size / file.size) * 100) : 0;
+  const bigger = reduction < 0;
 
   if (step === "upload") {
     return (
@@ -154,192 +226,320 @@ export function CompressTool() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-      <aside className="space-y-4">
-        <button
-          onClick={startOver}
-          className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-        >
-          ← Choose a different photo
-        </button>
+    <div className="space-y-4 rounded-2xl bg-surface-container-lowest p-4 font-body text-on-surface shadow-2xl sm:p-6">
+      <button
+        onClick={startOver}
+        className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface"
+      >
+        ← Choose a different photo
+      </button>
 
-        <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Format
-            </span>
-            <div className="flex gap-1 rounded-md bg-slate-100 p-1 dark:bg-slate-950">
-              {FORMATS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFormat(f)}
-                  className={`flex-1 rounded px-2 py-1 text-xs font-medium uppercase transition-colors ${
-                    format === f
-                      ? "bg-indigo-500 text-white"
-                      : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              Compress by
-            </span>
-            <div className="flex gap-1 rounded-md bg-slate-100 p-1 dark:bg-slate-950">
-              <button
-                onClick={() => setSizeMode("quality")}
-                className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors ${
-                  sizeMode === "quality"
-                    ? "bg-indigo-500 text-white"
-                    : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
-                }`}
-              >
-                Quality
-              </button>
-              <button
-                onClick={() => setSizeMode("target")}
-                disabled={format === "png"}
-                className={`flex-1 rounded px-2 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                  sizeMode === "target"
-                    ? "bg-indigo-500 text-white"
-                    : "text-slate-600 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
-                }`}
-              >
-                Target size
-              </button>
-            </div>
-          </div>
-
-          {sizeMode === "quality" ? (
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label
-                  htmlFor="quality"
-                  className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400"
-                >
-                  Quality
-                </label>
-                <span className="font-mono text-xs text-slate-500">{quality}%</span>
-              </div>
-              <input
-                id="quality"
-                type="range"
-                min={1}
-                max={100}
-                value={quality}
-                onChange={(e) => setQuality(Number(e.target.value))}
-                disabled={format === "png"}
-                className="w-full accent-indigo-500 disabled:opacity-50"
-              />
-              {format === "png" && <p className="mt-1 text-xs text-slate-500">PNG is lossless — no quality knob.</p>}
-            </div>
-          ) : (
-            <div>
-              <label
-                htmlFor="targetKb"
-                className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400"
-              >
-                Target size (KB)
-              </label>
-              <input
-                id="targetKb"
-                type="number"
-                min={5}
-                value={targetKb}
-                onChange={(e) => setTargetKb(Math.max(5, Number(e.target.value) || 5))}
-                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-              <input
-                type="checkbox"
-                checked={resizeEnabled}
-                onChange={(e) => setResizeEnabled(e.target.checked)}
-                className="accent-indigo-500"
-              />
-              Resize
-            </label>
-            {resizeEnabled && (
-              <div className="mt-2 flex items-center gap-2">
-                <input
-                  type="number"
-                  min={16}
-                  value={maxDim}
-                  onChange={(e) => setMaxDim(Math.max(16, Number(e.target.value) || 16))}
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
-                />
-                <span className="shrink-0 text-xs text-slate-500">px, longest side</span>
-              </div>
-            )}
-          </div>
+      {/* Telemetry / control bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary">compress</span>
+          <h2 className="font-display text-base font-semibold">Compressor</h2>
+          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
+            {format === "jpeg" ? "JPG" : format.toUpperCase()}
+          </span>
         </div>
-
-        {error && <Notice tone="error">{error}</Notice>}
-      </aside>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_260px]">
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <canvas
-              ref={canvasRef}
-              role="img"
-              aria-label="Preview of the compressed image"
-              className="h-auto w-full"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-200">Result</h2>
-              <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">Original</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">{formatKb(originalKb)}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">Compressed</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">
-                    {result ? formatKb(resultKb) : "…"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-slate-600 dark:text-slate-400">Dimensions</dt>
-                  <dd className="font-mono text-slate-900 dark:text-slate-100">
-                    {result ? `${result.width}×${result.height}` : "…"}
-                  </dd>
-                </div>
-                <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-800">
-                  <dt className="font-medium text-slate-700 dark:text-slate-300">Reduction</dt>
-                  <dd
-                    className={`font-mono font-bold ${
-                      reduction >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
-                    }`}
-                  >
-                    {result ? (reduction >= 0 ? `-${reduction}%` : `+${-reduction}%`) : "…"}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
-            <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
-              disabled={!result || processing}
-              className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {processing ? "Compressing…" : unlocked ? "Download again" : "Watch ad to download — free"}
-            </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Stat icon="savings" label="Saved" value={result ? (bigger ? `+${-reduction}%` : `−${reduction}%`) : "—"} tone={bigger ? "warn" : "secondary"} />
+          <Stat icon="download" label="Output" value={result ? formatKb(resultKb) : "—"} tone="primary" />
+          <Stat icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
+          <div className="flex rounded-lg bg-surface-container p-0.5">
+            {(["split", "dual"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setView(m)}
+                className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                  view === m ? "bg-primary/20 text-primary-fixed" : "text-on-surface-variant hover:text-on-surface"
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">{m === "split" ? "compare" : "view_column"}</span>
+                {m === "split" ? "Split" : "Dual"}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
+      <div className="grid gap-4 lg:grid-cols-12">
+        {/* Viewport stage */}
+        <div className="lg:col-span-8">
+          <div className="overflow-hidden rounded-xl bg-black">
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+              <span className="flex items-center gap-2 truncate">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-secondary" />
+                <span className="truncate">{file?.name}</span>
+              </span>
+              <span className="shrink-0 font-mono text-outline">
+                {result ? `${result.width} × ${result.height}` : "…"}
+              </span>
+            </div>
+
+            {view === "split" ? (
+              <div
+                ref={stageRef}
+                onPointerDown={(e) => {
+                  draggingRef.current = true;
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  moveSplit(e.clientX);
+                }}
+                onPointerMove={(e) => draggingRef.current && moveSplit(e.clientX)}
+                onPointerUp={() => (draggingRef.current = false)}
+                onPointerCancel={() => (draggingRef.current = false)}
+                className="relative h-[360px] cursor-ew-resize touch-none select-none sm:h-[460px]"
+              >
+                {compressedUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={compressedUrl} alt="Compressed" draggable={false} className="pointer-events-none absolute inset-0 h-full w-full object-contain" />
+                )}
+                {originalUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={originalUrl}
+                    alt="Original"
+                    draggable={false}
+                    style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
+                    className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+                  />
+                )}
+                <span className="absolute bottom-3 left-3 rounded-lg bg-surface-container-lowest/90 px-2 py-1 text-[11px] font-medium text-on-surface-variant backdrop-blur">
+                  Original · <span className="font-mono text-on-surface">{formatKb(originalKb)}</span>
+                </span>
+                <span className="absolute bottom-3 right-3 rounded-lg bg-surface-container-lowest/90 px-2 py-1 text-[11px] font-medium text-secondary backdrop-blur">
+                  {format === "jpeg" ? "JPG" : format.toUpperCase()} · <span className="font-mono">{result ? formatKb(resultKb) : "…"}</span>
+                </span>
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Comparison position"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(split)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowLeft") setSplit((s) => Math.max(2, s - 2));
+                    if (e.key === "ArrowRight") setSplit((s) => Math.min(98, s + 2));
+                  }}
+                  style={{ left: `${split}%` }}
+                  className="absolute top-0 bottom-0 -ml-px w-0.5 bg-secondary shadow-[0_0_12px_rgba(123,208,255,0.8)] outline-none"
+                >
+                  <span className="absolute top-1/2 left-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-surface-container-lowest text-secondary shadow-xl">
+                    <span className="material-symbols-outlined text-[18px]">drag_indicator</span>
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="grid h-[360px] grid-cols-2 gap-1 bg-black p-1 sm:h-[460px]">
+                <figure className="relative overflow-hidden rounded-lg bg-surface-container">
+                  {originalUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={originalUrl} alt="Original" className="h-full w-full object-contain" />
+                  )}
+                  <figcaption className="absolute bottom-2 left-2 rounded bg-surface-container-lowest/90 px-2 py-0.5 text-[11px] text-on-surface-variant backdrop-blur">
+                    Original · <span className="font-mono text-on-surface">{formatKb(originalKb)}</span>
+                  </figcaption>
+                </figure>
+                <figure className="relative overflow-hidden rounded-lg bg-surface-container">
+                  {compressedUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={compressedUrl} alt="Compressed" className="h-full w-full object-contain" />
+                  )}
+                  <figcaption className="absolute bottom-2 left-2 rounded bg-surface-container-lowest/90 px-2 py-0.5 text-[11px] text-secondary backdrop-blur">
+                    {format === "jpeg" ? "JPG" : format.toUpperCase()} · <span className="font-mono">{result ? formatKb(resultKb) : "…"}</span>
+                  </figcaption>
+                </figure>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between bg-surface-container-low px-3 py-1.5 text-[11px] text-outline">
+              <span>Metadata (EXIF, GPS) is dropped on re-encode</span>
+              <span className="font-mono">
+                {sizeMode === "quality" ? `q${quality}` : `target ${targetKb} KB`}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Config panel */}
+        <div className="space-y-4 lg:col-span-4">
+          <div className="space-y-4 rounded-xl bg-surface-container-low p-4">
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Format</span>
+              <div className="grid grid-cols-3 gap-1 rounded-lg bg-surface-container-lowest p-1">
+                {FORMATS.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFormat(f)}
+                    className={`rounded px-2 py-1.5 text-xs font-medium uppercase transition-colors ${
+                      format === f ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    {f === "jpeg" ? "JPG" : f}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-outline">Compress by</span>
+              <div className="grid grid-cols-2 gap-1 rounded-lg bg-surface-container-lowest p-1">
+                <button
+                  onClick={() => setSizeMode("quality")}
+                  className={`rounded px-2 py-1.5 text-xs font-medium transition-colors ${
+                    sizeMode === "quality" ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  Visual quality
+                </button>
+                <button
+                  onClick={() => setSizeMode("target")}
+                  disabled={format === "png"}
+                  className={`rounded px-2 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                    sizeMode === "target" ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  Exact KB
+                </button>
+              </div>
+            </div>
+
+            {sizeMode === "quality" ? (
+              <div>
+                <div className="mb-1 flex items-center justify-between">
+                  <label htmlFor="quality" className="text-xs font-medium text-on-surface">
+                    Quality index
+                  </label>
+                  <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{quality}%</span>
+                </div>
+                <input
+                  id="quality"
+                  type="range"
+                  min={10}
+                  max={100}
+                  value={quality}
+                  onChange={(e) => setQuality(Number(e.target.value))}
+                  disabled={format === "png"}
+                  className="w-full accent-primary disabled:opacity-40"
+                />
+                <div className="mt-1 flex justify-between font-mono text-[10px] text-outline">
+                  <span>10 · smallest</span>
+                  <span>100 · lossless</span>
+                </div>
+                {format === "png" && <p className="mt-1 text-[11px] text-outline">PNG is lossless — no quality knob.</p>}
+              </div>
+            ) : (
+              <div>
+                <label htmlFor="targetKb" className="mb-1 block text-xs font-medium text-on-surface">
+                  Target file size
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="targetKb"
+                    type="number"
+                    min={5}
+                    value={targetKb}
+                    onChange={(e) => setTargetKb(Math.max(5, Number(e.target.value) || 5))}
+                    className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary/60 focus:outline-none"
+                  />
+                  <span className="shrink-0 text-xs text-outline">KB</span>
+                </div>
+                <p className="mt-1 text-[11px] text-outline">Found by a multi-pass quality bisection.</p>
+              </div>
+            )}
+
+            <div className="border-t border-outline-variant/30 pt-3">
+              <label className="flex items-center gap-2 text-xs font-medium text-on-surface">
+                <input
+                  type="checkbox"
+                  checked={resizeEnabled}
+                  onChange={(e) => setResizeEnabled(e.target.checked)}
+                  className="accent-primary"
+                />
+                Also resize
+              </label>
+              {resizeEnabled && (
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={16}
+                    value={maxDim}
+                    onChange={(e) => setMaxDim(Math.max(16, Number(e.target.value) || 16))}
+                    className="w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface focus:border-primary/60 focus:outline-none"
+                  />
+                  <span className="shrink-0 text-[11px] text-outline">px, longest side</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Reduction ratio */}
+          <div className="space-y-2 rounded-xl bg-surface-container-low p-4">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-outline">Output vs original</span>
+              <span className={`font-mono font-semibold ${bigger ? "text-amber-400" : "text-secondary"}`}>
+                {result ? (bigger ? `+${-reduction}% larger` : `${reduction}% saved`) : "…"}
+              </span>
+            </div>
+            <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-container-lowest">
+              <div
+                className={`h-full transition-all duration-300 ${bigger ? "bg-amber-400" : "bg-secondary"}`}
+                style={{ width: `${Math.max(2, outputFrac)}%` }}
+              />
+            </div>
+            <div className="flex justify-between font-mono text-[10px] text-outline">
+              <span>origin {formatKb(originalKb)}</span>
+              <span>{result ? formatKb(resultKb) : "…"}</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            <button
+              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+              disabled={!result || processing}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">download</span>
+              {processing ? "Compressing…" : unlocked ? `Download again (${formatKb(resultKb)})` : "Watch ad to download — free"}
+            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={copyDataUri}
+                disabled={!unlocked}
+                title={unlocked ? "Copy the compressed image as a data: URI" : "Unlocks after download"}
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container-high disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <span className="material-symbols-outlined text-[16px]">{copied ? "check" : "content_copy"}</span>
+                {copied ? "Copied" : "Copy data URI"}
+              </button>
+              <button
+                onClick={resetParams}
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-surface-container px-3 py-2 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {error && <Notice tone="error">{error}</Notice>}
       {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
+    </div>
+  );
+}
+
+function Stat({ icon, label, value, tone = "neutral" }: { icon: string; label: string; value: string; tone?: "primary" | "secondary" | "warn" | "neutral" }) {
+  const color =
+    tone === "primary" ? "text-primary" : tone === "secondary" ? "text-secondary" : tone === "warn" ? "text-amber-400" : "text-on-surface";
+  return (
+    <div className="flex items-center gap-1.5 rounded-lg bg-surface-container-lowest px-2.5 py-1">
+      <span className={`material-symbols-outlined text-[15px] ${color}`}>{icon}</span>
+      <span className="text-[10px] uppercase tracking-wider text-outline">{label}</span>
+      <span className={`font-mono text-xs font-medium ${color}`}>{value}</span>
     </div>
   );
 }
