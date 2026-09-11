@@ -1,0 +1,43 @@
+{
+  "slug": "schengen-visa-photo",
+  "country": "Schengen Area",
+  "document": "Visa",
+  "aliases": [
+    "Schengen visa photo",
+    "EU visa photo",
+    "EU Schengen visa photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 413,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 32,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Color photo, taken within the last 6 months",
+    "Neutral expression, mouth closed, eyes open, facing the camera directly",
+    "Plain white or light-coloured background",
+    "No tinted lenses; no glare on glasses",
+    "UNVERIFIED, NOT A SINGLE-SOURCE DOCUMENT: there is no single 'Schengen government' page to confirm against. SpecShot read the EU Visa Code (Regulation (EC) No 810/2009) directly on eur-lex.europa.eu on 2026-09-11: Article 10(3)(c) delegates the photo standard to Regulation (EC) No 1683/95, whose own text (also read directly) covers the visa sticker's security design, not the applicant's submitted photo. The millimetre figures actually used across Schengen states trace to ICAO Document 9303, a technical standard not freely published in full text, and are corroborated here only by convergent national-consulate guidance (France, Germany, and others), not read directly from one authoritative source. Do not ship until confirmed against ICAO 9303 itself or a specific consulate's official published numbers.",
+    "Eye-line position from the bottom of the photo is not stated in any source checked; the range below is a wide, non-rejecting placeholder, not a sourced target."
+  ],
+  "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX%3A32009R0810",
+  "verified": false,
+  "verified_on": null
+}

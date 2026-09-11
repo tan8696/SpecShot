@@ -121,6 +121,8 @@ tests/               Vitest suites for lib/engine
 | 🇬🇧 United Kingdom | Passport | ✅ Verified |
 | 🇺🇸 United States | Passport | ⏳ Pending verification |
 | 🇨🇦 Canada | Passport | ⏳ Pending verification |
+| 🇦🇺 Australia | Passport | ⏳ Pending verification |
+| 🇪🇺 Schengen Area | Visa | ⏳ Pending verification |
 
 ---
 

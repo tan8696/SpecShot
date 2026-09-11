@@ -1,0 +1,42 @@
+{
+  "slug": "australia-passport-photo",
+  "country": "Australia",
+  "document": "Passport",
+  "aliases": [
+    "Australian passport photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 413,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 32,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Photo must be less than 6 months old",
+    "Neutral expression, eyes open, face centred and looking straight at the camera",
+    "Plain white or light grey background",
+    "No glasses unless required for medical reasons",
+    "No head tilt, no shadows, no retouching",
+    "PRINT SIZE IS A RANGE, NOT FIXED: passports.gov.au accepts prints 35-40mm wide by 45-50mm high (confirmed directly against the source on 2026-09-11). SpecShot targets 35x45mm, the smallest size within that accepted range, so its output is always valid.",
+    "NOT PUBLISHED BY THE AUSTRALIAN PASSPORT OFFICE: confirmed directly against the source on 2026-09-11 — the same page that gives head height (32-36mm chin to crown) does not give an eye-line position from the bottom of the photo. The range below is a deliberately wide placeholder that cannot itself cause a false rejection; it is not a sourced target and this is not expected to change with more research."
+  ],
+  "source_url": "https://www.passports.gov.au/help/passport-photos",
+  "verified": false,
+  "verified_on": null
+}

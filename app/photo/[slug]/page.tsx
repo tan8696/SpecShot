@@ -46,8 +46,9 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
         {spec.country} {spec.document} Photo Size
       </h1>
       <p className="mt-2 text-slate-600 dark:text-slate-400">
-        Exact official dimensions, verified against the government source below — not copied from another photo
-        site.
+        {spec.verified
+          ? "Exact official dimensions, verified against the government source below — not copied from another photo site."
+          : "Draft dimensions, not yet verified against the government source below — this page only exists in local preview and is excluded from production until someone confirms it."}
       </p>
 
       <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
