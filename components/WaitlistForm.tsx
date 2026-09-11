@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 /**
  * No backend exists in this app (that's deliberate — see the ad-model
@@ -18,7 +19,7 @@ export function WaitlistForm() {
     e.preventDefault();
     const subject = encodeURIComponent("SpecShot API waitlist");
     const body = encodeURIComponent(`Email: ${email}\nCompany: ${company}`);
-    window.location.href = `mailto:hello@specshot.example?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     setSent(true);
   }
 

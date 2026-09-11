@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useModalTrap } from "./useModalTrap";
+import { getStoredConsent } from "@/lib/consent";
 
 const AD_SECONDS = 15;
 
@@ -22,6 +23,10 @@ type Phase = "prompt" | "playing" | "done";
 export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCancel: () => void }) {
   const [phase, setPhase] = useState<Phase>("prompt");
   const [secondsLeft, setSecondsLeft] = useState(AD_SECONDS);
+  // Re-read on mount rather than trusting a module-level constant: consent
+  // can change between one ad-gate open and the next without a page reload.
+  const [adsConsented, setAdsConsented] = useState(false);
+  useEffect(() => setAdsConsented(getStoredConsent() === "accepted"), []);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Escape only cancels during "prompt" — once the ad has started, backing
   // out via Escape would defeat the whole point of the gate, same as there
@@ -87,11 +92,13 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
               <span>Advertisement</span>
               <span aria-live="polite">{secondsLeft}s</span>
             </div>
-            {ADSENSE_CLIENT && ADSENSE_SLOT ? (
+            {ADSENSE_CLIENT && ADSENSE_SLOT && adsConsented ? (
               <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />
             ) : (
-              <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-sm text-outline">
-                Ad plays here — set NEXT_PUBLIC_ADSENSE_CLIENT_ID / _SLOT_ID
+              <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-center text-sm text-outline">
+                {ADSENSE_CLIENT
+                  ? "No ad to show — you've declined ad cookies. Your download still works the same."
+                  : "Ad plays here — set NEXT_PUBLIC_ADSENSE_CLIENT_ID / _SLOT_ID"}
               </div>
             )}
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">

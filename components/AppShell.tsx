@@ -91,6 +91,10 @@ export function AppShell({ specs }: { specs: Spec[] }) {
           Privacy
         </Link>
         <span>·</span>
+        <Link href="/cookies" className="transition-colors hover:text-on-surface">
+          Cookies
+        </Link>
+        <span>·</span>
         <Link href="/terms" className="transition-colors hover:text-on-surface">
           Terms
         </Link>

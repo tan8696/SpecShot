@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
-import Script from "next/script";
+import { ConsentGate } from "@/components/ConsentGate";
 import "./globals.css";
 
 // Geist for display type, Inter for body — used only by the landing page via
@@ -57,15 +57,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="min-h-screen bg-surface font-body text-on-surface antialiased">
-        {ADSENSE_CLIENT && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
         {children}
+        {/* Below the page content so the banner's fixed footer paints on top
+            of it, not behind — and so the AdSense loader (once consented)
+            isn't the very first script Next hydrates. */}
+        <ConsentGate clientId={ADSENSE_CLIENT} />
       </body>
     </html>
   );

@@ -20,6 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/photo/",
     "/privacy/",
     "/terms/",
+    "/cookies/",
+    "/data/",
     "/tools/",
     "/heic-to-png/",
     "/png-to-pdf/",

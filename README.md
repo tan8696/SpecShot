@@ -59,6 +59,7 @@ black box. SpecShot instead:
 | 🔍 **SEO spec pages** | Every verified document gets its own page with exact dimensions, cited to the government source. |
 | 🔒 **Private by construction** | Face detection and background removal run as WASM in your browser, and re-encoding strips EXIF/GPS metadata on the way out. There is no server that could see your photo, because there is no server. |
 | 📺 **Free, ad-supported** | One short ad unlocks a download. No account, no payment, no watermark on the final file. |
+| 📜 **Full legal set + consent banner** | Privacy Policy, Cookie Policy, Terms of Service, and a plain-language [Your Data](app/data/page.tsx) page — plus a real cookie-consent banner that gates the AdSense script itself, not just the ad unit. Declining never breaks a tool. |
 
 ## Tech stack
 
@@ -136,9 +137,17 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 ## Before you go live
 
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain on your host.
-- [ ] Replace the placeholder waitlist address in `components/WaitlistForm.tsx`
-      (`hello@specshot.example`) with a real, monitored inbox — and update
-      the same placeholder in `app/privacy/page.tsx` / `app/terms/page.tsx`.
+- [ ] Replace the placeholder contact address in `lib/site.ts`
+      (`hello@specshot.example`) with a real, monitored inbox — it's the
+      single source `WaitlistForm.tsx` and all four legal pages read from.
+- [ ] Fill in the governing-law jurisdiction in `app/terms/page.tsx` (search
+      for `[operator's jurisdiction`) — left as an explicit placeholder
+      rather than a guessed country, since only you know where you're
+      operating from.
+- [ ] Read through `/privacy`, `/terms`, `/cookies`, and `/data` yourself (or
+      have a lawyer do it) before launch — they're accurate to what the code
+      actually does today, but they're a template, not a substitute for
+      legal advice for your situation.
 - [ ] Verify the US and Canada passport photo specs
       (`specs/us-passport-photo.json`, `specs/canada-passport-photo.json`)
       against their primary government sources and flip `"verified": true`
@@ -148,8 +157,11 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 
 Google reviews the actual live site, so this has to happen after deploying,
 not before. SpecShot ships with the policy prerequisites already in place —
-a Privacy Policy (`/privacy`), Terms of Service (`/terms`), real functioning
-tools, and clear navigation — but three things still need a human:
+a Privacy Policy, Cookie Policy, Terms of Service, a plain-language data page,
+real functioning tools, clear navigation, and a consent banner
+(`components/ConsentGate.tsx`) that blocks the AdSense script itself — not
+just the ad slot — until a visitor clicks Accept, satisfying Google's EU User
+Consent Policy without a third-party CMP. Two things still need a human:
 
 - [ ] Apply at [adsense.google.com](https://www.google.com/adsense/) with the
       live production URL — this can't be done on your behalf, it requires
@@ -160,11 +172,6 @@ tools, and clear navigation — but three things still need a human:
       you (`google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0`) —
       not included here since a wrong/placeholder ID in that file is worse
       than a missing one.
-- [ ] If you expect any EU/UK visitors, add a consent banner before ads
-      start showing to them (Google's EU User Consent Policy requires this
-      for personalized ads) — not built yet, flagging so it doesn't get
-      missed. [Funding Choices](https://fundingchoicesmessages.google.com/)
-      is Google's own free option.
 
 ## License
 

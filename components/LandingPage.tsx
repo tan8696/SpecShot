@@ -483,6 +483,8 @@ export function LandingPage() {
               title="Legal"
               links={[
                 ["Privacy", "/privacy/"],
+                ["Cookies", "/cookies/"],
+                ["Your data", "/data/"],
                 ["Terms", "/terms/"],
               ]}
             />
