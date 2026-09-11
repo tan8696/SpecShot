@@ -89,13 +89,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Governing law</h2>
-          <p>
-            These terms are governed by the laws of{" "}
-            <span className="rounded bg-amber-400/10 px-1.5 py-0.5 font-mono text-xs text-amber-300">
-              [operator&rsquo;s jurisdiction — not yet set]
-            </span>
-            , without regard to its conflict-of-law rules.
-          </p>
+          <p>These terms are governed by the laws of India, without regard to its conflict-of-law rules.</p>
         </section>
 
         <section>

@@ -137,10 +137,6 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 ## Before you go live
 
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain on your host.
-- [ ] Fill in the governing-law jurisdiction in `app/terms/page.tsx` (search
-      for `[operator's jurisdiction`) — left as an explicit placeholder
-      rather than a guessed country, since only you know where you're
-      operating from.
 - [ ] Read through `/privacy`, `/terms`, `/cookies`, and `/data` yourself (or
       have a lawyer do it) before launch — they're accurate to what the code
       actually does today, but they're a template, not a substitute for
