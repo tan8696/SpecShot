@@ -2,10 +2,7 @@
 // depends on, so the tool keeps working offline after the first successful
 // run. Runtime caching, not a build-time precache list, because Next's
 // chunk filenames are content-hashed and change every build.
-// Bump this version string on every deploy that changes any cached static
-// asset or the app shell itself — the fetch handler below is cache-first, so
-// returning visitors keep the old cache indefinitely otherwise.
-const CACHE = "specshot-v1";
+const CACHE = "specshot-v2";
 const CACHEABLE_HOSTS = new Set(["cdn.jsdelivr.net", "storage.googleapis.com"]);
 
 self.addEventListener("install", () => {
@@ -25,6 +22,28 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   const cacheable = url.origin === self.location.origin || CACHEABLE_HOSTS.has(url.hostname);
   if (!cacheable) return;
+
+  // Page loads must go network-first: they carry the current build's chunk-hash
+  // manifest, so serving a stale cached page sends the browser looking for JS
+  // chunks an old deploy already replaced — a 404 that trips the error boundary.
+  // Hashed static assets (_next/static/*) stay cache-first below since their
+  // filename IS the content fingerprint; they never go stale in place.
+  const isDocument = event.request.mode === "navigate" || event.request.headers.get("accept")?.includes("text/html");
+
+  if (isDocument) {
+    event.respondWith(
+      caches.open(CACHE).then(async (cache) => {
+        try {
+          const response = await fetch(event.request);
+          if (response.ok) cache.put(event.request, response.clone());
+          return response;
+        } catch {
+          return (await cache.match(event.request)) ?? Response.error();
+        }
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.open(CACHE).then(async (cache) => {
