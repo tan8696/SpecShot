@@ -33,7 +33,7 @@
     "Neutral expression or natural smile, both eyes open",
     "Plain white or off-white background",
     "No glasses",
-    "NOT YET VERIFIED: travel.state.gov does not publish an eye-line position from the bottom of the photo, so the range below is the full plausible span, not a confirmed target. Do not ship until confirmed against a primary source."
+    "UNCONFIRMED LEAD, NOT YET VERIFIED: a secondary-source search surfaced a candidate eye-line figure of 1 1/8 to 1 3/8 inches (28.6-34.9mm, roughly 56-69% from the bottom of a 2in photo) from travel.state.gov, but this session could not load travel.state.gov directly (it sits behind Cloudflare bot-protection that blocked every access path tried: direct navigation, WebFetch, and an archived copy) to confirm that wording appears on the primary source itself rather than being blended in from a third-party photo site. Treat this figure as a lead to check, not a confirmed number. The range below remains the full plausible span until someone reads the primary page directly."
   ],
   "source_url": "https://travel.state.gov/content/travel/en/passports/how-apply/photos.html",
   "verified": false,
