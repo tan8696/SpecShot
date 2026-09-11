@@ -137,9 +137,6 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 ## Before you go live
 
 - [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain on your host.
-- [ ] Replace the placeholder contact address in `lib/site.ts`
-      (`hello@specshot.example`) with a real, monitored inbox — it's the
-      single source `WaitlistForm.tsx` and all four legal pages read from.
 - [ ] Fill in the governing-law jurisdiction in `app/terms/page.tsx` (search
       for `[operator's jurisdiction`) — left as an explicit placeholder
       rather than a guessed country, since only you know where you're
