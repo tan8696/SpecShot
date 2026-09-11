@@ -44,6 +44,9 @@ export function ComplianceChecklist({
           </li>
         ))}
       </ul>
+      <p className="mt-3 border-t border-slate-200 pt-2.5 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        This is a measurement, not a guarantee — the issuing authority always makes the final call.
+      </p>
     </div>
   );
 }

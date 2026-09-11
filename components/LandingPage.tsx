@@ -195,14 +195,15 @@ export function LandingPage() {
             No uploads &nbsp;·&nbsp; Works offline &nbsp;·&nbsp; No account
           </div>
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-on-surface sm:text-6xl">
-            Image tools that never leave your{" "}
+            A photo that meets the exact spec —{" "}
             <span className="bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
-              browser
+              verified, not guessed
             </span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-on-surface-variant sm:text-lg">
-            Thirteen focused tools for photos, scans and PDFs — passport crops, compression, format
-            conversion and more. Every byte stays on your device.
+            SpecShot measures your photo against a government&rsquo;s published requirements — head
+            height, eye line, background — and shows you a pass/fail checklist before you download.
+            Plus 12 more free tools for photos, scans and PDFs. Every byte stays on your device.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
