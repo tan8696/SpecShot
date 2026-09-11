@@ -14,7 +14,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -145,7 +145,7 @@ export function SignatureTool() {
               <span className="shrink-0 font-mono text-outline">{dims}</span>
             </div>
             <div
-              className="flex items-center justify-center p-6"
+              className="relative flex min-h-[200px] items-center justify-center p-6"
               style={{
                 backgroundColor: background === "white" ? "#ffffff" : "#0e0e10",
                 backgroundImage:
@@ -156,7 +156,13 @@ export function SignatureTool() {
                 backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
               }}
             >
-              <canvas ref={canvasRef} role="img" aria-label="Preview of the cleaned signature" className="max-h-[52vh] max-w-full" />
+              <CanvasLoading show={!result} />
+              <canvas
+                ref={canvasRef}
+                role="img"
+                aria-label="Preview of the cleaned signature"
+                className={`max-h-[52vh] max-w-full ${!result ? "invisible" : ""}`}
+              />
             </div>
           </div>
         </div>

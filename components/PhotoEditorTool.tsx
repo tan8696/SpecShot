@@ -12,7 +12,7 @@ import { stashHandoffImage, takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type TextPos = "top" | "center" | "bottom";
@@ -237,8 +237,14 @@ export function PhotoEditorTool() {
               <span className="truncate">{file?.name}</span>
               <span className="shrink-0 font-mono text-outline">{dims}</span>
             </div>
-            <div className="flex items-center justify-center p-3">
-              <canvas ref={canvasRef} role="img" aria-label="Edited photo preview" className="max-h-[62vh] max-w-full object-contain" />
+            <div className="relative flex items-center justify-center p-3 min-h-[200px]">
+              <CanvasLoading show={!result} />
+              <canvas
+                ref={canvasRef}
+                role="img"
+                aria-label="Edited photo preview"
+                className={`max-h-[62vh] max-w-full object-contain ${!result ? "invisible" : ""}`}
+              />
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
 import { AdGate } from "./AdGate";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -154,8 +154,14 @@ export function RotateTool() {
               <span className="truncate">{file?.name}</span>
               <span className="shrink-0 font-mono text-outline">{dims}</span>
             </div>
-            <div className="flex items-center justify-center p-3">
-              <canvas ref={canvasRef} role="img" aria-label="Preview of the rotated image" className="max-h-[58vh] max-w-full object-contain" />
+            <div className="relative flex items-center justify-center p-3 min-h-[200px]">
+              <CanvasLoading show={!working} />
+              <canvas
+                ref={canvasRef}
+                role="img"
+                aria-label="Preview of the rotated image"
+                className={`max-h-[58vh] max-w-full object-contain ${!working ? "invisible" : ""}`}
+              />
             </div>
           </div>
         </div>
