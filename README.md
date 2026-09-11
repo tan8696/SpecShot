@@ -1,124 +1,120 @@
-# SpecShot
+<div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
-![Client-side only](https://img.shields.io/badge/backend-none-brightgreen)
-![License](https://img.shields.io/badge/license-private-lightgrey)
+# 📸 SpecShot
 
-**Turn a selfie into an ID photo that actually meets the spec — then keep
-going.** SpecShot began as an ID-photo compliance checker and grew into a
-full browser image studio: compress, resize, crop, convert, watermark, HEIC,
-image ↔ PDF, a photo editor, and more. Every tool shares one dark workspace
-and one rule — nothing you open is ever uploaded.
+### Privacy-first, in-browser image studio — with government-spec ID photo compliance
 
-For an ID photo specifically, SpecShot measures your head height, eye line,
-and background against a government's exact published requirements — the same
-way an examiner would — and shows you a pass/fail checklist before you
-download, not after you've already paid for prints that get rejected.
+**Turn a selfie into an ID photo that actually passes — then compress, crop, convert, watermark and more. Nothing is ever uploaded.**
 
-Every pixel of processing happens **in your browser**. No backend, no API
-route, no account. Free to use, supported by a single short ad on download.
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-offline_ready-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-## Why this exists
+[Features](#-features) · [How it works](#-how-the-id-photo-pipeline-works) · [Tech stack](#-tech-stack) · [Getting started](#-getting-started) · [Architecture](#-architecture) · [Contact](#-author)
 
-Most "passport photo" sites either eyeball the crop or make you trust a
-black box. SpecShot instead:
+</div>
 
-1. Detects your face and levels the photo (MediaPipe FaceLandmarker)
-2. Removes the background to find your **true hairline** — not an
-   estimated landmark, which sits 15–40mm too low for a real crown
-   measurement (`@imgly/background-removal`, running as WASM)
-3. Crops to the government's exact head-height and eye-line targets
-4. **Re-measures the finished file** and shows you the same checklist an
-   examiner would use — head height, eye line, background, resolution,
-   file size — so you see a failure *before* you print, not after
+---
+
+## 📌 Overview
+
+Most "passport photo" websites eyeball the crop or hide the result behind a paywall — and you only find out it was wrong when the application is rejected.
+
+**SpecShot measures the photo the way an examiner would.** It detects the face, finds the true top of the head, crops to the exact head-height and eye-line targets published by the government, and then **re-measures the finished file** against a pass/fail checklist *before* you download.
+
+What started as an ID-photo checker grew into a complete **browser-based image studio** of 13+ tools that share one workspace and one rule: **every pixel is processed on your device**. There is no backend, no API route and no account.
+
+> 🔒 **Private by construction** — face detection and background removal run as WebAssembly in the browser, and re-encoding strips EXIF/GPS metadata on the way out. There is no server that could see your photo, because there is no server.
+
+---
 
 ## ✨ Features
 
-| | |
+### 🪪 ID photo engine
+- **Spec-accurate auto-crop** to verified government document requirements, with a crown / eye / chin guide overlay
+- **Live compliance checklist** — head height, eye line, background, resolution and file size
+- **Multiple documents from one photo** in a single pass
+- **Print sheets** — tile 4–30 copies onto a 4×6 in or A4 sheet with cut guides
+- **In-browser camera capture** with live face-framing guidance
+
+### 🧰 Image studio
+
+| Category | Tools |
 |---|---|
-| 🪪 **ID Photo** | Auto crop to any supported document spec, with a visible crown/eye/chin guide overlay and a live compliance checklist. Generate several documents from one photo in a single pass. |
-| 🖨️ **Print sheets** | Tile 4–30 copies of your finished photo onto a 4×6in or A4 sheet with cut guides — the thing photo labs charge extra for. |
-| 📐 **Resize** | Exact pixels or by percent, with an aspect-ratio lock, on any image. |
-| ✂️ **Crop** | Drag a real selection rectangle over any photo, with aspect-ratio presets or exact numbers. |
-| ↻ **Rotate** | 90° steps and horizontal/vertical flip. |
-| 🔄 **Convert** | Switch between JPG, PNG, and WebP. |
-| 🏷️ **Watermark** | Stamp your own text or logo onto a photo — position, opacity, tiled or single. |
-| 🎨 **Photo Editor** | Brightness/contrast/saturation, filter presets, border, caption, rotate/flip. |
-| 😂 **Meme Generator** | Classic top/bottom Impact captions, auto-wrapped, on any image. |
-| 📱 **HEIC → JPG/PNG** | Convert iPhone HEIC/HEIF photos (`heic2any`, WASM, loaded only when used). |
-| 📄 **Images ↔ PDF** | Combine images into one PDF (`pdf-lib`), or render every PDF page to JPG/PNG (`pdfjs-dist`). Both loaded only when used. |
-| 🗜️ **Compress Photo** | Hit an exact file-size target (KB) or a quality level for any image, not just ID photos. |
-| ✍️ **Signature Cleaner** | Photograph a signature on paper; SpecShot crops to the ink, strips shadows, and outputs it at an exact pixel size for exam/visa portals. |
-| 📷 **Camera capture** | Take the photo directly in-browser with live face-framing guidance — no separate camera app needed. |
-| 🌘 **One dark studio** | Every tool shares the same layout: a stage, a controls panel, and a live readout of output size, dimensions and encode time. No theme toggle — one focused dark surface. |
-| 🔗 **Tools chain together** | Send a crop, resize or edit straight into the compressor — the handoff stays in the browser, no round-trip to disk. |
-| 📱 **Installable PWA** | Works offline after first load; add-to-home-screen on mobile. |
-| 🔍 **SEO spec pages** | Every verified document gets its own page with exact dimensions, cited to the government source. |
-| 🔒 **Private by construction** | Face detection and background removal run as WASM in your browser, and re-encoding strips EXIF/GPS metadata on the way out. There is no server that could see your photo, because there is no server. |
-| 📺 **Free, ad-supported** | One short ad unlocks a download. No account, no payment, no watermark on the final file. |
-| 📜 **Full legal set + consent banner** | Privacy Policy, Cookie Policy, Terms of Service, and a plain-language [Your Data](app/data/page.tsx) page — plus a real cookie-consent banner that gates the AdSense script itself, not just the ad unit. Declining never breaks a tool. |
+| **Optimize** | Compress to an exact KB target or quality level · Convert JPG / PNG / WebP |
+| **Transform** | Resize (pixels or %, aspect lock) · Crop (drag selection + presets) · Rotate & flip |
+| **Create** | Photo editor (light, colour, filters, border, caption) · Watermark (text or logo, tiled or single) · Meme generator |
+| **Documents** | HEIC → JPG/PNG · Images → PDF · PDF → JPG/PNG · Signature cleaner for exam/visa portals |
 
-## Tech stack
+### 🧩 Platform
+- **Tools chain together** — hand a crop or edit straight into the compressor without touching disk
+- **Installable PWA** — works offline after first load
+- **SEO spec pages** — every verified document gets its own page, cited to its government source
+- **Full legal set + real consent banner** — the ad script itself is gated behind consent, and declining never breaks a tool
+- **Static export** — ships as plain HTML/CSS/JS; deploys to any static host
 
-- **[Next.js 15](https://nextjs.org)** (App Router, static export — ships as plain HTML/JS/CSS, no Node server needed)
-- **React 19** + **TypeScript** (strict mode)
-- **Tailwind CSS v4** — Material-3-style dark palette, dark-only, one shared studio frame (`components/studioUi.tsx`)
-- **Geist + Inter** via `next/font`, **Material Symbols** for icons
-- **[MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe)** — face landmark detection
-- **[@imgly/background-removal](https://github.com/imgly/background-removal-js)** — in-browser background segmentation
-- **`heic2any`** (HEIC decode), **`pdf-lib`** / **`pdfjs-dist`** (PDF write/read), **`ogl`** (landing-page WebGL background) — all loaded only when used
-- **Vitest** — unit tests for the measurement/crop/compression/rotate math
+---
 
-## Getting started
+## 🔬 How the ID photo pipeline works
 
-```bash
-npm install
-npm run dev
+```mermaid
+flowchart LR
+    A[📷 Photo or camera] --> B[Face landmarks<br/>MediaPipe]
+    B --> C[Level & straighten]
+    C --> D[Background removal<br/>WASM segmentation]
+    D --> E[Crown detection<br/>alpha-channel scan]
+    E --> F[Crop to spec<br/>head height + eye line]
+    F --> G[Encode & bisect quality<br/>to hit size cap]
+    G --> H[Re-measure output<br/>✅ compliance checklist]
 ```
 
-### Build
+**The hard problem:** passport specs measure head height from the **crown** (top of the skull, including hair), but face-mesh landmarks stop at the forehead — typically 15–40 mm too low. SpecShot solves this by removing the background and scanning the alpha mask for the first row with a sustained run of opaque pixels inside a band centred on the face, which separates real hair from mask noise.
 
-Production build is a **static export** — a folder of plain files,
-deployable to Vercel, Netlify, GitHub Pages, S3, or any static host.
+**File size caps** are met with a binary search over encoder quality, so the output lands as close to the limit as possible without exceeding it.
 
-```bash
-npm run build   # runs spec validation first, then next build
+---
+
+## 🛠 Tech stack
+
+| Layer | Technology |
+|---|---|
+| **Framework** | Next.js 15 (App Router, static export), React 19 |
+| **Language** | TypeScript (strict mode) |
+| **Styling** | Tailwind CSS v4, Geist + Inter via `next/font`, Material Symbols |
+| **Computer vision** | MediaPipe Tasks Vision (face landmarks), `@imgly/background-removal` (WASM) |
+| **Documents** | `pdf-lib` (write), `pdfjs-dist` (render), `heic2any` (HEIC decode) |
+| **Graphics** | Canvas 2D pipeline, `ogl` (WebGL landing background) |
+| **Testing** | Vitest (14 suites covering the image engine) |
+| **Delivery** | Service worker (PWA), code-split heavy WASM/PDF libraries loaded only on use |
+
+---
+
+## 🏗 Architecture
+
 ```
-
-Output goes to `out/`.
-
-### Test
-
-```bash
-npm run test        # run once
-npm run test:watch  # watch mode
-npm run typecheck   # tsc --noEmit
-```
-
-## Project structure
-
-```
-app/                 Routes: landing page (/), tool hub (/app), one route per
-                      tool, per-document SEO pages, /business, /privacy, /terms
-components/          One dark "studio" per tool (studioUi.tsx = the shared frame);
-                      plus LandingPage, Scanner, PhotoTool, ResultCard, AdGate…
-lib/engine/          The actual math: crown detection, crop geometry, encoding,
-                      print sheets, watermarking, rotate/straighten — all pure,
-                      all unit-tested
-lib/handoff.ts       Passes an image from one tool to another, in the browser
+app/                 Routes — landing page, tool hub, one route per tool,
+                     per-document SEO pages, legal pages, sitemap & robots
+components/          One "studio" UI per tool, sharing a common frame (studioUi.tsx)
+lib/engine/          Pure, unit-tested image math: crown detection, crop geometry,
+                     encoding, compression, print sheets, watermark, rotate, PDF, HEIC
+lib/handoff.ts       In-browser image hand-off between tools
+lib/tools.ts         Single source of truth for every tool's route and nav entry
 specs/               One JSON file per document, cited to a government source
-scripts/             Spec data validator (runs before every build)
-tests/               Vitest suite for lib/engine
+scripts/             Spec validator (runs before every build), icon + PDF worker setup
+tests/               Vitest suites for lib/engine
 ```
 
-## Supported documents
+### Engineering highlights
+- **Pure-function engine** — image math operates on plain `{ width, height, data }` buffers, so it's fully unit-testable without a browser.
+- **Data integrity gate** — every document spec must be `verified: true` against a primary government source, or the strict validator excludes it from production builds. SpecShot would rather ship fewer documents than one wrong number.
+- **Zero-server privacy model** — no API routes exist; privacy is an architectural guarantee, not a policy promise.
+- **Performance budget** — WASM models and PDF/HEIC libraries are lazy-loaded only when a tool needs them.
+- **Consent-correct ads** — the consent banner blocks the third-party script itself, not just the ad slot.
 
-Each spec is either `verified: true` (a human confirmed every number against
-the cited government source) or excluded from production builds entirely —
-SpecShot would rather show fewer documents than ship an unconfirmed number.
+### Supported documents
 
 | Country | Document | Status |
 |---|---|---|
@@ -126,46 +122,72 @@ SpecShot would rather show fewer documents than ship an unconfirmed number.
 | 🇺🇸 United States | Passport | ⏳ Pending verification |
 | 🇨🇦 Canada | Passport | ⏳ Pending verification |
 
-## Environment variables
+---
+
+## 🚀 Getting started
+
+**Prerequisites:** Node.js 18.18+ (20+ recommended)
+
+```bash
+git clone https://github.com/tan8696/SpecShot.git
+cd SpecShot
+npm install
+npm run dev          # http://localhost:3000
+```
+
+### Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Validate specs (strict), then produce a static export in `out/` |
+| `npm start` | Serve the static `out/` folder locally |
+| `npm test` | Run the Vitest suite once |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run typecheck` | Type-check with `tsc --noEmit` |
+| `npm run validate` | Validate document spec data |
+
+### Environment variables
 
 | Variable | Required | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Yes, for production | Absolute base URL (e.g. `https://specshot.com`) used in `metadataBase`, `sitemap.xml`, and `robots.txt`. Falls back to a placeholder domain if unset — fine for local dev, wrong for a real deploy. |
-| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | No — only once AdSense-approved | Your AdSense publisher ID (`ca-pub-XXXXXXXXXXXXXXXX`). Unset, no AdSense script loads at all and the ad-gate shows its placeholder box. |
-| `NEXT_PUBLIC_ADSENSE_SLOT_ID` | No — only once AdSense-approved | The ad unit's slot ID, from the same AdSense dashboard. |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Production | Absolute base URL used for metadata, `sitemap.xml` and `robots.txt` |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | Optional | AdSense publisher ID — no ad script loads when unset |
+| `NEXT_PUBLIC_ADSENSE_SLOT_ID` | Optional | AdSense ad unit slot ID |
 
-## Before you go live
+<details>
+<summary><b>📋 Pre-launch checklist</b></summary>
 
-- [ ] Set `NEXT_PUBLIC_SITE_URL` to the real production domain on your host.
-- [ ] Read through `/privacy`, `/terms`, `/cookies`, and `/data` yourself (or
-      have a lawyer do it) before launch — they're accurate to what the code
-      actually does today, but they're a template, not a substitute for
-      legal advice for your situation.
-- [ ] Verify the US and Canada passport photo specs
-      (`specs/us-passport-photo.json`, `specs/canada-passport-photo.json`)
-      against their primary government sources and flip `"verified": true`
-      once confirmed — they're excluded from production builds until then.
+- [ ] Set `NEXT_PUBLIC_SITE_URL` to the production domain
+- [ ] Review `/privacy`, `/terms`, `/cookies` and `/data` for your jurisdiction
+- [ ] Verify the US and Canada specs against primary sources and set `"verified": true`
+- [ ] Apply for AdSense with the live URL; once approved, set the AdSense env vars and add `public/ads.txt`
 
-### Getting AdSense approved
+</details>
 
-Google reviews the actual live site, so this has to happen after deploying,
-not before. SpecShot ships with the policy prerequisites already in place —
-a Privacy Policy, Cookie Policy, Terms of Service, a plain-language data page,
-real functioning tools, clear navigation, and a consent banner
-(`components/ConsentGate.tsx`) that blocks the AdSense script itself — not
-just the ad slot — until a visitor clicks Accept, satisfying Google's EU User
-Consent Policy without a third-party CMP. Two things still need a human:
+---
 
-- [ ] Apply at [adsense.google.com](https://www.google.com/adsense/) with the
-      live production URL — this can't be done on your behalf, it requires
-      your own Google account and Google's manual review.
-- [ ] Once approved, set `NEXT_PUBLIC_ADSENSE_CLIENT_ID` and
-      `NEXT_PUBLIC_ADSENSE_SLOT_ID` (above) and add
-      `public/ads.txt` containing the exact line AdSense's dashboard gives
-      you (`google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0`) —
-      not included here since a wrong/placeholder ID in that file is worse
-      than a missing one.
+## 🗺 Roadmap
 
-## License
+- [ ] Verify and enable US and Canada passport specs
+- [ ] Add more countries and visa / exam photo specs
+- [ ] Batch processing across multiple images
+- [ ] Additional export presets for popular application portals
 
-Private — all rights reserved.
+---
+
+## 👤 Author
+
+**Tanish Lather** — Full-stack developer
+
+[![GitHub](https://img.shields.io/badge/GitHub-tan8696-181717?style=flat-square&logo=github)](https://github.com/tan8696)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Tanish_Lather-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/tanish-lather-27456b40a)
+[![Email](https://img.shields.io/badge/Email-Contact-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:tanishla1100@gmail.com)
+
+💼 *Open to freelance and full-time opportunities — feel free to reach out.*
+
+---
+
+## 📄 License
+
+Private — all rights reserved. The source is shared for portfolio and evaluation purposes.
