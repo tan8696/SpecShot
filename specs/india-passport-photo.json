@@ -1,0 +1,43 @@
+{
+  "slug": "india-passport-photo",
+  "country": "India",
+  "document": "Passport",
+  "aliases": [
+    "Indian passport photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 457
+  },
+  "digital": {
+    "width_px": 630,
+    "height_px": 810,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 36,
+    "height_mm_max": 38
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Face should take up 80-85% of the photograph (confirmed directly from mportal.passportindia.gov.in on 2026-09-13). SpecShot's 36-38mm head-height range above is derived from that percentage assuming a 45mm-tall frame — it is not an independently published mm figure, unlike UK/Canada/Australia where a chin-to-crown mm range is stated directly.",
+    "PRINT SIZE NOT DIRECTLY STATED: the source gives digital pixel dimensions (630x810px) and the 80-85% face rule, but no explicit mm print size. 35x45mm is the conventional size matching that exact pixel aspect ratio (630:810 = 35:45), not a number read from the source itself.",
+    "Background must be plain white",
+    "Full head, top of hair to bottom of chin, centred, not tilted; no head coverings except for religious reasons",
+    "Neutral expression, mouth closed, eyes open and clearly visible, no red-eye or shadows",
+    "No glasses (remove to avoid reflections)",
+    "NOT PUBLISHED IN THE SOURCE READ: no eye-line position from the bottom of the photo is stated. The range below is a wide, non-rejecting placeholder, not a sourced target.",
+    "File size limit not found in the document checked this session — leave unconfirmed rather than import an unverified figure from a third-party site."
+  ],
+  "source_url": "https://mportal.passportindia.gov.in/pdf/Guidelines_for_ICAO_Compliant_Photographs_for_Passport_Applications.pdf",
+  "verified": false,
+  "verified_on": null
+}

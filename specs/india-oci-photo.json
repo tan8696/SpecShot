@@ -1,0 +1,45 @@
+{
+  "slug": "india-oci-photo",
+  "country": "India",
+  "document": "OCI Card",
+  "aliases": [
+    "OCI photo",
+    "Overseas Citizen of India photo",
+    "OCI card photo"
+  ],
+  "print": {
+    "width_mm": 51,
+    "height_mm": 51,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 602,
+    "height_px": 602,
+    "max_kb": 200,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 25,
+    "height_mm_max": 35
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#E8E6E0",
+    "tolerance": 40
+  },
+  "rules": [
+    "Photo must be 2x2 inch (51x51mm), square, colour",
+    "Head height, top of hair to bottom of chin, must measure 25-35mm (confirmed directly from the official photo-spec PDF on 2026-09-13)",
+    "TWO OFFICIAL FIGURES THAT DON'T CLEANLY RECONCILE: the FAQ page on the same site separately states 'not less than 51x51mm (with 80% coverage of face)' — 80% of a 51mm frame is roughly 41mm, which doesn't match the PDF's 25-35mm chin-to-crown range above. Both are quoted directly from ociservices.gov.in rather than silently picked between; the 25-35mm figure is used in the schema since it's already a directly-stated mm range.",
+    "BACKGROUND IS NOT WHITE, UNLIKE EVERY OTHER DOCUMENT IN THIS LIBRARY: confirmed direct quote from the ociservices.gov.in FAQ — 'plain light color background (not white)'. No specific hex is given (any plain light colour is accepted); SpecShot targets a representative light grey with a wide tolerance, since the real rule is 'not white, not dark', not proximity to one exact colour. If in doubt, use a plain light grey, beige, or pastel backdrop, never white.",
+    "Digital upload: JPEG/JPG, 200x200px to 900x900px, max 200KB (confirmed directly from the ociservices.gov.in FAQ). SpecShot targets 602x602px, which sits inside that accepted range.",
+    "Head coverings not permitted except for religious reasons; full face, front view, eyes open, centred; no tinted or dark glasses",
+    "UNCONFIRMED, PARTIALLY ILLEGIBLE IN SOURCE: the photo-spec PDF gives an eye-height figure ('eye height is between 1-1/8 inches to 1-3...') whose upper bound was cut off in every extraction attempted this session. The lower bound (1-1/8in, about 56% from the bottom of a 51mm frame) is legible; the upper bound is not. Do not ship a specific eye-line range until someone reads that exact line directly — page 2 of the source PDF, 'Do's and Dont's for a Proper photo' diagram."
+  ],
+  "source_url": "https://ociservices.gov.in/Photo-Spec-FINAL.pdf",
+  "verified": false,
+  "verified_on": null
+}

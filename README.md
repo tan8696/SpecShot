@@ -123,6 +123,8 @@ tests/               Vitest suites for lib/engine
 | 🇨🇦 Canada | Passport | ⏳ Pending verification |
 | 🇦🇺 Australia | Passport | ⏳ Pending verification |
 | 🇪🇺 Schengen Area | Visa | ⏳ Pending verification |
+| 🇮🇳 India | Passport | ⏳ Pending verification |
+| 🇮🇳 India | OCI Card | ⏳ Pending verification |
 
 ---
 
