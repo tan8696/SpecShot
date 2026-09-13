@@ -1,0 +1,44 @@
+{
+  "slug": "uae-visa-photo",
+  "country": "United Arab Emirates",
+  "document": "Visa",
+  "aliases": [
+    "UAE visa photo",
+    "Emirates visa photo",
+    "Dubai visa photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 413,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 32,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Width must be 35-40mm and face must take up 70-80% of the photograph — both confirmed directly from ICP's (Federal Authority for Identity, Citizenship, Customs & Port Security) own 'Personal Photo Specifications' PDF on 2026-09-13. SpecShot targets 35mm, the smallest size within that accepted width range.",
+    "HEIGHT NOT STATED: the source gives width (35-40mm) and a face-coverage percentage but no explicit height in mm. 45mm above is a conventional ICAO portrait-ratio assumption, not read from the source. Head height (32-36mm) is likewise derived from the confirmed 70-80% rule applied to that assumed height, not an independently published mm figure.",
+    "Background must be a 'plain light-coloured background' (exact wording from the source) — not specifically 'white'. White is a light colour and is the common real-world choice, but isn't textually mandated the way it is for UK/Canada/Australia/China. A different figure (43x55mm) is commonly cited elsewhere specifically for 'UAE visa photos', but this session could not confirm it against any UAE government page — ICP's own confirmed 35-40mm width is used instead.",
+    "This ICP document is titled generically 'Personal Photo Specifications', not visa-specific, and may be the same standard ICP applies across its services (Emirates ID, visas, residency) rather than a visa-only rule.",
+    "Neutral expression, mouth closed, eyes open; head not tilted, both edges of face visible; no other people or objects in frame; recent, taken within 6 months",
+    "Head coverings permitted only for religious reasons, full face from chin to forehead still visible; glasses must show eyes clearly with no tinted lenses or flash glare",
+    "EYE-LINE AND DIGITAL FILE SPECS NOT FOUND IN THE SOURCE READ THIS SESSION: some secondary sources cite 600 DPI / 1-15MB digital upload figures, not confirmed here — left unset rather than imported unverified."
+  ],
+  "source_url": "https://icp.gov.ae/wp-content/uploads/2021/11/icao_english.pdf",
+  "verified": false,
+  "verified_on": null
+}

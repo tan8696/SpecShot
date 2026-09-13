@@ -1,0 +1,43 @@
+{
+  "slug": "germany-id-photo",
+  "country": "Germany",
+  "document": "ID Card",
+  "aliases": [
+    "Personalausweis photo",
+    "German ID photo",
+    "Germany passport photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 413,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 32,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "BLOCKED FROM DIRECT PRIMARY-SOURCE CONFIRMATION THIS SESSION, on 2026-09-13: the German government's own FAQ page (personalausweisportal.de) exists and loaded, but only points to a PDF ('Fotomustertafel') for the actual numbers. That PDF, and a related BMI photo-template PDF, both refused this session's attempts to read them (a direct fetch returned an error on both, and viewing them in a browser triggered a forced file download rather than a page render, which was not accepted). Every number in this file is therefore an unconfirmed, well-corroborated figure from secondary sources, not something read directly from bmi.bund.de by SpecShot.",
+    "Commonly cited: 35x45mm, head height 32-36mm (70-80% of frame height) — consistent with the general EU/Schengen ICAO convention documented elsewhere in this library.",
+    "CONFLICTING CLAIM, UNCONFIRMED: several sources specifically claim Germany requires a light grey background and does NOT accept pure white, unlike most of its neighbours. This could not be confirmed or ruled out this session. #FFFFFF is used here as a placeholder pending confirmation, not because it's been verified as correct for Germany specifically.",
+    "UNCONFIRMED CLAIM: several sources state glasses have been completely banned in German biometric photos since November 2017 (all eyewear, not just tinted lenses) — notably stricter than every other document in this library, which all allow glasses if lenses aren't tinted. Not confirmed against a primary source.",
+    "UNCONFIRMED PROCEDURAL CLAIM: several sources state that since 1 May 2025, German ID/passport photos must be captured in person at the registration office or a certified photo service and transmitted digitally — self-submitted photo files are no longer accepted at all. If true, this would affect how (or whether) a browser tool like SpecShot's ID Photo feature is even usable for this document, not just what numbers it targets. Needs confirming before this spec goes anywhere near production.",
+    "Do not verify this spec from secondary sources alone — the numbers above need someone to actually open bmi.bund.de's Fotomustertafel PDF directly."
+  ],
+  "source_url": "https://www.personalausweisportal.de/SharedDocs/faqs/Webs/PA/DE/Haeufige-Fragen/2_biometrie_faq/C2_3_Passbild_beachten.html",
+  "verified": false,
+  "verified_on": null
+}

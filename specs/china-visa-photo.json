@@ -1,0 +1,45 @@
+{
+  "slug": "china-visa-photo",
+  "country": "China",
+  "document": "Visa",
+  "aliases": [
+    "Chinese visa photo"
+  ],
+  "print": {
+    "width_mm": 33,
+    "height_mm": 48,
+    "dpi": 295
+  },
+  "digital": {
+    "width_px": 383,
+    "height_px": 557,
+    "min_kb": 40,
+    "max_kb": 120,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 28,
+    "height_mm_max": 33
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 54,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "Print photo: 33mm wide x 48mm high, head width 15-22mm, head height (chin to crown) 28-33mm, space from crown to top edge 3-5mm, space from chin to bottom edge >=7mm — all confirmed directly from an official MFA-published PDF (visaforchina.cn) on 2026-09-13, which also resolved a real ambiguity: some secondary sites quote this as '48x33mm' (implying landscape), but the source's own diagram shows 33mm as width and 48mm as height (portrait) — used correctly here.",
+    "EYE-LINE: PARTIALLY CONFIRMED, A GENUINE FIRST for this library. The source states the vertical distance from the bottom edge to the eye line must be >=256 pixels on a 472px-tall reference photo — that's a confirmed MINIMUM of 54% from the bottom. No maximum is stated, so 85% above is an unconfirmed, non-rejecting ceiling, not a sourced number.",
+    "Digital upload: JPEG, 40-120KB file size (confirmed exactly), dimensions between 354x472px and 420x560px. SpecShot targets 383x557px, inside that confirmed range.",
+    "Background should be white or close to white, no border",
+    "Neutral expression, eyes open, mouth closed, ears visible; head tilt <=20 degrees left/right, <=25 degrees up/down",
+    "No head coverings except for religious reasons; glasses allowed only if lenses aren't tinted and don't glare/obscure the eyes",
+    "Photo must be recent, taken within 6 months",
+    "Source document is dated 2016 by its own copyright line but remains the current document linked from the live official visa portal as of this check."
+  ],
+  "source_url": "https://bio.visaforchina.cn/KUL3_EN/upload/20231123/4b89d0c364d44f778f85d6fd76d93475.pdf",
+  "verified": false,
+  "verified_on": null
+}

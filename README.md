@@ -125,6 +125,10 @@ tests/               Vitest suites for lib/engine
 | 🇪🇺 Schengen Area | Visa | ⏳ Pending verification |
 | 🇮🇳 India | Passport | ⏳ Pending verification |
 | 🇮🇳 India | OCI Card | ⏳ Pending verification |
+| 🇨🇳 China | Visa | ⏳ Pending verification |
+| 🇯🇵 Japan | Visa | ⏳ Pending verification |
+| 🇦🇪 United Arab Emirates | Visa | ⏳ Pending verification |
+| 🇩🇪 Germany | ID Card | ⏳ Pending verification |
 
 ---
 

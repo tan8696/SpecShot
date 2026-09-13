@@ -1,0 +1,40 @@
+{
+  "slug": "japan-visa-photo",
+  "country": "Japan",
+  "document": "Visa",
+  "aliases": [
+    "Japanese visa photo"
+  ],
+  "print": {
+    "width_mm": 45,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 531,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 32,
+    "height_mm_max": 36
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 40,
+    "from_bottom_pct_max": 85
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
+  "rules": [
+    "NOT A SINGLE NATIONAL STANDARD: Japan's own Ministry of Foreign Affairs says visa photo requirements are set by whichever specific embassy or consulate processes the application, not by one MOFA-wide page (confirmed via MOFA's own English site on 2026-09-13, which redirects photo questions to 'the website of the specific Diplomatic Mission of Japan'). This spec reflects the Embassy of Japan in Mumbai, India's own published standard specifically, read directly on 2026-09-13. Other embassies commonly cite a different size (35x45mm rectangular is common elsewhere) — verify with the exact embassy or consulate the application will go through.",
+    "45mm x 45mm, square, no border, white background only ('Photos with dark, busy, or patterned backgrounds will not be accepted') — confirmed directly from the Mumbai embassy's page.",
+    "Photographed in person, within 6 months of application, front view, no hat, no background scene",
+    "HEAD HEIGHT NOT STATED BY THIS SOURCE: 32-36mm above is derived from the common 70-80%-of-frame-height convention applied to the confirmed 45mm frame, not an independently published mm figure.",
+    "EYE-LINE NOT STATED BY THIS SOURCE: the range below is a wide, non-rejecting placeholder, not a sourced target."
+  ],
+  "source_url": "https://www.mumbai.in.emb-japan.go.jp/en/visa/photo.html",
+  "verified": false,
+  "verified_on": null
+}
