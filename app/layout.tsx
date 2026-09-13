@@ -40,6 +40,12 @@ export const metadata: Metadata = {
     title: "SpecShot",
     description: DESCRIPTION,
   },
+  // AdSense ownership verification. The loader script itself is consent-gated
+  // (ConsentGate), so Google's verification crawler — which never clicks
+  // "Accept" — would otherwise never see it and the site would fail review.
+  // This meta tag is static, sets no cookie and identifies no visitor, so it
+  // can ship ungated without touching the privacy promise.
+  ...(ADSENSE_CLIENT ? { other: { "google-adsense-account": ADSENSE_CLIENT } } : {}),
 };
 
 export const viewport: Viewport = {
