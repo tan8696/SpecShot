@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Exactly what SpecShot does and doesn't collect: your photos, browser storage, cookies, and advertising data.",
 };
 
-const LAST_UPDATED = "September 11, 2026";
+const LAST_UPDATED = "September 13, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -68,8 +68,19 @@ export default function PrivacyPage() {
         <section>
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Analytics and tracking</h2>
           <p>
-            SpecShot runs no analytics, no tracking pixel, and no session-recording script of its own. Nothing about
-            how you use the site is collected by SpecShot.
+            SpecShot uses Vercel Web Analytics to see how many people visit the site and which pages they land on —
+            aggregate traffic numbers, not individual behavior. It runs no other analytics, no tracking pixel, and no
+            session-recording script.
+          </p>
+          <p className="mt-3">
+            Vercel Web Analytics sets no cookie and stores no IP address. Each page view is counted using a hash
+            generated from the request, which Vercel discards after 24 hours — it can&rsquo;t be used to identify
+            you, build a profile of you, or follow you across other sites. What it does record, per page view, is
+            all aggregate and anonymous: the page visited, referring site, rough geolocation (country/city, not a
+            precise location), and general device/browser type. None of it can be linked to your photos, files, or
+            anything you do inside a tool — those never leave your device regardless. Because it can&rsquo;t identify
+            anyone, this runs for every visitor and isn&rsquo;t part of the ad-cookie consent banner described below,
+            which only covers Google AdSense.
           </p>
         </section>
 

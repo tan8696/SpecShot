@@ -3,15 +3,15 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "Your Data — What SpecShot Collects (Nothing) — SpecShot",
+  title: "Your Data — What SpecShot Collects (Nothing Personal) — SpecShot",
   description: "A plain-language breakdown of exactly what SpecShot does and doesn't do with your photos and data.",
 };
 
 const ROWS: { icon: string; q: string; a: string; tone?: "good" }[] = [
   { icon: "photo_camera", q: "Your photos, signatures, PDFs", a: "Never leave your device. There is no upload button that sends them anywhere, because there is no server for them to go to.", tone: "good" },
   { icon: "account_circle", q: "Account information", a: "None exists — there's no sign-up, no login, no password, no email required to use any tool." },
-  { icon: "monitoring", q: "Analytics or tracking scripts", a: "None. No pixel, no session recorder, no “how did you use this page” script of any kind." },
-  { icon: "fingerprint", q: "A profile of you across visits", a: "Not built. SpecShot has no accounts and no analytics, so there's nothing to link one visit to the next." },
+  { icon: "monitoring", q: "Analytics or tracking scripts", a: "One: an anonymous visit counter (Vercel Web Analytics) that sets no cookie and can't identify you — just aggregate traffic numbers. No pixel, no session recorder, no “how did you use this page” script." },
+  { icon: "fingerprint", q: "A profile of you across visits", a: "Not built. No accounts exist, and the visit counter above forgets you within 24 hours by design — there's nothing that links one visit to the next." },
   { icon: "cookie", q: "Cookies", a: "None from SpecShot itself. Google AdSense may set one — only if you accept the banner on your first visit." },
   { icon: "save", q: "Browser storage SpecShot does use", a: "Two small, functional things: a same-tab handoff when you move an image between tools (deleted the instant it's read), and your ad-cookie choice. Neither is ever sent anywhere — see the table below." },
 ];

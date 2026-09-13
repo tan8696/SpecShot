@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "What SpecShot stores in your browser, what Google AdSense sets if you accept ads, and how to change your choice.",
 };
 
-const LAST_UPDATED = "September 11, 2026";
+const LAST_UPDATED = "September 13, 2026";
 
 export default function CookiesPage() {
   return (
@@ -25,8 +25,9 @@ export default function CookiesPage() {
           <p>
             SpecShot itself sets no cookies at all. The only thing it puts in your browser — session storage for
             passing an image between tools, and one flag remembering your ad-cookie choice — isn&rsquo;t a cookie
-            and isn&rsquo;t sent to anyone. The only real cookies come from Google AdSense, and only if you accept
-            them below.
+            and isn&rsquo;t sent to anyone. Separately, an anonymous, cookie-free visit counter (Vercel Web
+            Analytics) runs for every visitor — it can&rsquo;t identify you, so there&rsquo;s nothing to consent to.
+            The only real cookies come from Google AdSense, and only if you accept them below.
           </p>
         </section>
 
@@ -57,6 +58,21 @@ export default function CookiesPage() {
             </tbody>
           </table>
           <p className="mt-2">Neither of these is ever transmitted anywhere — they exist only inside your browser.</p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Anonymous visit counting — not a cookie either</h2>
+          <p>
+            SpecShot uses Vercel Web Analytics to count visits and page views in aggregate. It sets no cookie and
+            stores nothing in your browser at all — it works by hashing the incoming request, and Vercel discards
+            that hash after 24 hours. It can&rsquo;t identify you, follow you across other sites, or be linked to
+            anything you do inside a tool. Because it can&rsquo;t identify anyone, it runs for every visitor and
+            isn&rsquo;t part of the consent choice below, which only covers Google AdSense. Full detail is in the{" "}
+            <Link href="/privacy/" className="text-primary underline hover:text-primary-fixed">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </section>
 
         <section>

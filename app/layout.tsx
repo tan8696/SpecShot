@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ConsentGate } from "@/components/ConsentGate";
 import "./globals.css";
 
@@ -62,6 +63,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             of it, not behind — and so the AdSense loader (once consented)
             isn't the very first script Next hydrates. */}
         <ConsentGate clientId={ADSENSE_CLIENT} />
+        {/* Vercel Web Analytics — cookieless, no IP storage, counts page
+            views in aggregate only. See app/privacy/page.tsx for the
+            disclosure. Unlike AdGate, this needs no consent gate: it sets
+            no cookie and can't identify a visitor, so there's nothing to
+            opt into or out of. */}
+        <Analytics />
       </body>
     </html>
   );

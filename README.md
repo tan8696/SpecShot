@@ -89,6 +89,7 @@ flowchart LR
 | **Graphics** | Canvas 2D pipeline, `ogl` (WebGL landing background) |
 | **Testing** | Vitest (14 suites covering the image engine) |
 | **Delivery** | Service worker (PWA), code-split heavy WASM/PDF libraries loaded only on use |
+| **Analytics** | Vercel Web Analytics — cookieless, no IP storage, aggregate-only. See `/privacy` |
 
 ---
 
