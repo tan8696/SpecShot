@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { TOOLS } from "@/lib/tools";
+import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS } from "@/lib/tools";
 
 export const metadata: Metadata = {
   title: "All Tools — SpecShot",
@@ -24,9 +24,15 @@ export default function ToolsIndexPage() {
           <li key={t.id}>
             <Link
               href={t.href}
-              className="block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-indigo-400 dark:border-slate-800 dark:bg-slate-900"
+              className={`block rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900 ${CATEGORY_ACCENT[t.category].border}`}
             >
-              <span className="font-medium text-slate-900 dark:text-slate-100">{t.label}</span>
+              <span className="flex items-center gap-2">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${CATEGORY_ACCENT[t.category].dot}`} aria-hidden />
+                <span className="font-medium text-slate-900 dark:text-slate-100">{t.label}</span>
+                <span className={`text-[11px] font-medium uppercase tracking-wide ${CATEGORY_ACCENT[t.category].text}`}>
+                  {CATEGORY_LABELS[t.category]}
+                </span>
+              </span>
               <span className="mt-0.5 block text-sm text-slate-600 dark:text-slate-400">{t.description}</span>
             </Link>
           </li>

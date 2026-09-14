@@ -16,6 +16,19 @@ export type ToolEntry = {
   primary?: boolean; // shown directly in the nav row, not under "More tools"
 };
 
+/** One hue per category — the only colour in an otherwise monochrome UI, so
+ * it always means "these tools do the same kind of job". Full class strings
+ * rather than a hue name because Tailwind scans source for literal classes. */
+export const CATEGORY_ACCENT: Record<
+  ToolCategory,
+  { text: string; hoverText: string; bg: string; border: string; dot: string }
+> = {
+  optimize: { text: "text-accent-teal", hoverText: "group-hover:text-accent-teal", bg: "bg-accent-teal/12", border: "hover:border-accent-teal/50", dot: "bg-accent-teal" },
+  transform: { text: "text-accent-amber", hoverText: "group-hover:text-accent-amber", bg: "bg-accent-amber/12", border: "hover:border-accent-amber/50", dot: "bg-accent-amber" },
+  create: { text: "text-accent-coral", hoverText: "group-hover:text-accent-coral", bg: "bg-accent-coral/12", border: "hover:border-accent-coral/50", dot: "bg-accent-coral" },
+  document: { text: "text-accent-sky", hoverText: "group-hover:text-accent-sky", bg: "bg-accent-sky/12", border: "hover:border-accent-sky/50", dot: "bg-accent-sky" },
+};
+
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   optimize: "Optimize",
   transform: "Transform",

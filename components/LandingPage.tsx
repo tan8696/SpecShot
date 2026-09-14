@@ -4,13 +4,12 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Scanner from "./Scanner";
-import { CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
+import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
 import { stashHandoffImage } from "@/lib/handoff";
 
 type Filter = "all" | ToolCategory;
 
 const FILTERS: Filter[] = ["all", "optimize", "transform", "create", "document"];
-const ICON_ACCENT = ["text-primary", "text-secondary", "text-tertiary"];
 
 const FAQ: { q: string; a: string }[] = [
   {
@@ -138,8 +137,8 @@ export function LandingPage() {
       {/* WebGL scan-field background + legibility scrim */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <Scanner
-          color1="#3a3a3a"
-          color2="#9a9a9a"
+          color1="#0f3b44"
+          color2="#4f8fc7"
           color3="#ffffff"
           colorSpread={0}
           speed={0.3}
@@ -291,12 +290,15 @@ export function LandingPage() {
                   key={f}
                   type="button"
                   onClick={() => setFilter(f)}
-                  className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors ${
                     filter === f
                       ? "bg-primary-container text-on-primary-container"
                       : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
                   }`}
                 >
+                  {f !== "all" && (
+                    <span className={`h-1.5 w-1.5 rounded-full ${CATEGORY_ACCENT[f].dot}`} aria-hidden />
+                  )}
                   {f === "all" ? "All tools" : CATEGORY_LABELS[f]}
                 </button>
               ))}
@@ -327,12 +329,12 @@ export function LandingPage() {
                 <Link
                   key={t.id}
                   href={t.href}
-                  className="group flex flex-col justify-between rounded-2xl border border-outline-variant/25 bg-surface-container-low/70 p-5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-surface-container/80"
+                  className={`group flex flex-col justify-between rounded-2xl border border-outline-variant/25 bg-surface-container-low/70 p-5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-surface-container/80 ${CATEGORY_ACCENT[t.category].border}`}
                 >
                   <div>
                     <div className="flex items-start justify-between">
                       <span
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl bg-surface-container-high ${ICON_ACCENT[i % 3]}`}
+                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${CATEGORY_ACCENT[t.category].bg} ${CATEGORY_ACCENT[t.category].text}`}
                       >
                         <span className="material-symbols-outlined text-[22px]">{t.icon}</span>
                       </span>
@@ -340,12 +342,12 @@ export function LandingPage() {
                         {String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
-                    <h3 className="mt-4 font-display text-base font-semibold text-on-surface group-hover:text-primary">
+                    <h3 className={`mt-4 font-display text-base font-semibold text-on-surface transition-colors ${CATEGORY_ACCENT[t.category].hoverText}`}>
                       {t.label}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-on-surface-variant">{t.description}</p>
                   </div>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-outline transition-colors group-hover:text-primary">
+                  <span className={`mt-4 inline-flex items-center gap-1 text-sm font-medium text-outline transition-colors ${CATEGORY_ACCENT[t.category].hoverText}`}>
                     Open
                     <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5">
                       arrow_forward

@@ -10,17 +10,18 @@ export function ComplianceChecklist({
   checks: ComplianceCheck[];
   allPassed: boolean;
 }) {
-  const accent = allPassed
-    ? "border-emerald-500/60 text-emerald-600 dark:text-emerald-400"
-    : "border-red-500/60 text-red-600 dark:text-red-400";
+  // Monochrome on purpose: every state already says which it is in words
+  // ("Meets spec" / "Needs a retake"), in the n/n PASS count, and per row in
+  // the leading glyph — so hue was the fourth copy of the same signal.
+  const accent = allPassed ? "text-on-surface" : "text-outline";
   const badge = allPassed
-    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-    : "bg-red-500/10 text-red-700 dark:text-red-400";
+    ? "bg-primary text-on-primary"
+    : "bg-surface-container-high text-on-surface-variant";
 
   return (
     <div
       className={`rounded-lg border-2 bg-white p-4 shadow-lg dark:bg-slate-900 ${
-        allPassed ? "border-emerald-500/60" : "border-red-500/60"
+        allPassed ? "border-primary/70" : "border-outline-variant/60"
       }`}
     >
       <div className="mb-3 flex items-center justify-between">
@@ -33,7 +34,7 @@ export function ComplianceChecklist({
         {checks.map((c) => (
           <li key={c.id} className="flex items-start gap-2 text-sm">
             <span
-              className={`mt-0.5 font-bold ${c.pass ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}
+              className={`mt-0.5 font-bold ${c.pass ? "text-on-surface" : "text-outline"}`}
             >
               {c.pass ? "✓" : "✗"}
             </span>

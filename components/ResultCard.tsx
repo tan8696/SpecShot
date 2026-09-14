@@ -182,14 +182,16 @@ function drawGuides(
   const eyeBandTop = height * (1 - spec.eye_line.from_bottom_pct_max / 100);
   const eyeBandBottom = height * (1 - spec.eye_line.from_bottom_pct_min / 100);
 
+  // Monochrome: the two bands overlap, so they separate by fill weight
+  // rather than hue, and each line names itself in its own label chip.
   ctx.save();
-  drawBand(ctx, crownBandTop, crownBandBottom, width, "#22d3ee");
-  drawBand(ctx, eyeBandTop, eyeBandBottom, width, "#facc15");
+  drawBand(ctx, crownBandTop, crownBandBottom, width, "#ffffff", 0.1);
+  drawBand(ctx, eyeBandTop, eyeBandBottom, width, "#ffffff", 0.2);
 
   const lines: [number, string, string][] = [
-    [m.crownY, "Crown", "#22d3ee"],
-    [m.eyeY, "Eye line", "#facc15"],
-    [m.chinY, "Chin", "#f472b6"],
+    [m.crownY, "Crown", "#ffffff"],
+    [m.eyeY, "Eye line", "#ffffff"],
+    [m.chinY, "Chin", "#ffffff"],
   ];
   ctx.font = "bold 12px sans-serif";
   ctx.textBaseline = "middle";
@@ -205,16 +207,23 @@ function drawGuides(
     const textWidth = ctx.measureText(label).width;
     ctx.fillStyle = color;
     ctx.fillRect(4, y - 9, textWidth + 8, 18);
-    ctx.fillStyle = "#0b1120";
+    ctx.fillStyle = "#101010";
     ctx.fillText(label, 8, y);
   }
   ctx.restore();
 }
 
-function drawBand(ctx: CanvasRenderingContext2D, top: number, bottom: number, width: number, color: string) {
+function drawBand(
+  ctx: CanvasRenderingContext2D,
+  top: number,
+  bottom: number,
+  width: number,
+  color: string,
+  alpha = 0.12
+) {
   ctx.setLineDash([]);
   ctx.fillStyle = color;
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = alpha;
   ctx.fillRect(0, top, width, bottom - top);
   ctx.globalAlpha = 1;
 }

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @source "./**/*.{ts,tsx}";
 @source "../components/**/*.{ts,tsx}";
+@source "../lib/**/*.{ts,tsx}";
 
 /* The app is dark-only now (see app/layout.tsx — `dark` is always on <html>).
    `dark:` utilities therefore always resolve; kept because much of the app
@@ -35,6 +36,15 @@
   --color-tertiary: #d2d2d2;
   --color-tertiary-container: #9a9a9a;
 
+  /* --- Category accents --------------------------------------------------
+     The chrome stays monochrome; colour is reserved for one job — telling
+     the four tool categories apart (see CATEGORY_ACCENT in lib/tools.ts).
+     Four hues, balanced warm/cool, all legible on the #131313 surface. */
+  --color-accent-teal: #3ddbd9;   /* optimize  */
+  --color-accent-amber: #f5c451;  /* transform */
+  --color-accent-coral: #ff8a76;  /* create    */
+  --color-accent-sky: #6fb0ff;    /* document  */
+
   /* --- Legacy palette remap ---------------------------------------------
      Pre-studio components are written `bg-white dark:bg-slate-900`,
      `text-slate-900 dark:text-white`, `bg-indigo-500 text-slate-950`, etc.
@@ -63,17 +73,21 @@
   --color-indigo-600: #e0e0e0;
   --color-indigo-700: #e3e3e3;
 
-  --color-emerald-300: #86efac;
-  --color-emerald-400: #4ade80;
-  --color-emerald-500: #22c55e;
-  --color-emerald-600: #4ade80;
-  --color-emerald-700: #4ade80;
+  --color-emerald-300: #e6e6e6;
+  --color-emerald-400: #d2d2d2;
+  --color-emerald-500: #9a9a9a;
+  --color-emerald-600: #d2d2d2;
+  --color-emerald-700: #e6e6e6;
 
   --color-red-200: #ffd9d5;
-  --color-red-400: #ff9a91;
-  --color-red-500: #ff6b61;
-  --color-red-600: #ff9a91;
+  --color-red-400: #ff8a7f;
+  --color-red-500: #f4594c;
+  --color-red-600: #ff8a7f;
   --color-red-700: #ffb0a8;
+
+  --color-amber-300: #f7d68a;
+  --color-amber-400: #f5c451;
+  --color-amber-500: #e0a92e;
 }
 
 body {
