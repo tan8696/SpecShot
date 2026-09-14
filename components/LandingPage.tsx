@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Topography from "./Topography";
+import { PageBackground } from "./PageBackground";
 import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
 import { stashHandoffImage } from "@/lib/handoff";
 
@@ -130,33 +130,7 @@ export function LandingPage() {
 
   return (
     <div className="relative min-h-screen font-body text-on-surface antialiased">
-      {/* Opaque base — sits under the WebGL layer so the page never falls back
-          to the light <body> background when the OS theme is light. */}
-      <div className="fixed inset-0 -z-20 bg-surface-container-lowest" />
-
-      {/* WebGL contour-field background + legibility scrim */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <Topography
-          lowColor="#6f6f6f"
-          midColor="#bdbdbd"
-          highColor="#ffffff"
-          speed={0.3}
-          morphAmount={3}
-          morphSpeed={0.05}
-          bands={2}
-          thickness={0.02}
-          scale={1.2}
-          glow={0.35}
-          colorMode="elevation"
-          contrast={1.2}
-          brightness={1}
-          opacity={1}
-          grain
-          grainIntensity={0.03}
-          mouseInteraction={false}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/40 via-surface-container-lowest/70 to-surface-container-lowest/92" />
-      </div>
+      <PageBackground />
 
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-outline-variant/25 bg-surface-container-lowest/70 backdrop-blur-xl">
