@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { loadSpecs } from "@/lib/specs";
 import { AppShell } from "@/components/AppShell";
-import { PageBackground } from "@/components/PageBackground";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -24,8 +23,6 @@ export default function AppPage() {
   // actually land on.
   return (
     <>
-      <PageBackground />
-
       <Suspense>
         <AppShell specs={specs} />
       </Suspense>

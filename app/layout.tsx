@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { PageBackground } from "@/components/PageBackground";
 import { ConsentGate } from "@/components/ConsentGate";
 import "./globals.css";
 
@@ -64,6 +65,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="min-h-screen bg-surface font-body text-on-surface antialiased">
+        {/* The topographic contour field every page sits on. Fixed and
+            pointer-transparent, so it never affects page layout. */}
+        <PageBackground />
         {children}
         {/* Below the page content so the banner's fixed footer paints on top
             of it, not behind — and so the AdSense loader (once consented)

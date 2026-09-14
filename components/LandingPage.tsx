@@ -3,7 +3,6 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PageBackground } from "./PageBackground";
 import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
 import { stashHandoffImage } from "@/lib/handoff";
 
@@ -130,8 +129,6 @@ export function LandingPage() {
 
   return (
     <div className="relative min-h-screen font-body text-on-surface antialiased">
-      <PageBackground />
-
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-outline-variant/25 bg-surface-container-lowest/70 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
