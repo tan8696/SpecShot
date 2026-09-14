@@ -13,6 +13,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { crownFit } from "./crown-fit.mjs";
 
 const STRICT = process.argv.includes("--strict");
 const DIR = path.join(process.cwd(), "specs");
@@ -85,19 +86,12 @@ for (const file of files) {
   if (e.from_bottom_pct_min < 25 || e.from_bottom_pct_max > 85) err("eye_line percentages outside 25-85 are almost certainly wrong");
 
   // Does the head physically fit above the eye line?
-  //
-  // Warning, not error: 0.48 is the adult average share of head height above
-  // the eye line, so a legitimate spec can sit near the boundary. A validator
-  // that fails builds on approximations is one people learn to ignore. When
-  // this fires, check the source — usually the eye_line band was transcribed
-  // from a different document's requirements.
-  const headMid = (h.height_mm_min + h.height_mm_max) / 2;
-  const eyeMid = (e.from_bottom_pct_min + e.from_bottom_pct_max) / 2;
-  const eyeFromTopMm = p.height_mm * (1 - eyeMid / 100);
-  const needed = headMid * 0.48;
-  if (needed > eyeFromTopMm) {
+  const fit = crownFit(p.height_mm, h.height_mm_min, e.from_bottom_pct_min);
+  if (!fit.fits) {
     warn(
-      `crown may fall outside the frame: a ${headMid}mm head with eyes at ${eyeMid}% needs ~${needed.toFixed(1)}mm above the eye line, frame allows ${eyeFromTopMm.toFixed(1)}mm`
+      `crown falls outside the frame: even the smallest allowed head (${h.height_mm_min}mm) ` +
+      `at the lowest allowed eye line (${e.from_bottom_pct_min}%) needs ~${fit.needed.toFixed(1)}mm ` +
+      `above the eyes, frame allows ${fit.available.toFixed(1)}mm`
     );
   }
 
