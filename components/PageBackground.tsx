@@ -13,20 +13,20 @@ export function PageBackground() {
 
       <div className="pointer-events-none fixed inset-0 -z-10">
         <Topography
-          lowColor="#6f6f6f"
-          midColor="#bdbdbd"
+          lowColor="#5a5a5a"
+          midColor="#9c9c9c"
           highColor="#ffffff"
-          speed={0.3}
+          speed={0.15}
           morphAmount={3}
           morphSpeed={0.05}
           bands={2}
-          thickness={0.02}
+          thickness={0.013}
           scale={1.2}
-          glow={0.35}
+          glow={0.22}
           colorMode="elevation"
-          contrast={1.2}
+          contrast={1.7}
           brightness={1}
-          opacity={1}
+          opacity={0.8}
           grain
           grainIntensity={0.03}
           mouseInteraction={false}
