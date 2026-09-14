@@ -155,7 +155,7 @@ export function LandingPage() {
           grainIntensity={0.03}
           mouseInteraction={false}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/25 via-surface-container-lowest/55 to-surface-container-lowest/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/40 via-surface-container-lowest/70 to-surface-container-lowest/92" />
       </div>
 
       {/* Header */}
