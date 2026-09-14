@@ -13,7 +13,6 @@ const FEATURES = [
   "The same measurement engine as the consumer tool — crown detection, re-verified compliance, not a rough crop",
   "Bulk processing: send many photos against one or many document specs in a single request",
   "Every spec verified against its government source, not copied from another photo site — the library grows as more documents are checked",
-  "No per-seat pricing — pay for renders, not headcount",
 ];
 
 export default function BusinessPage() {
@@ -38,24 +37,11 @@ export default function BusinessPage() {
         ))}
       </ul>
 
-      <div className="mt-8 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-        <div className="grid grid-cols-2 divide-x divide-slate-200 dark:divide-slate-800">
-          <div className="p-4 text-center">
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">$0.30</p>
-            <p className="text-xs text-slate-500">per render</p>
-          </div>
-          <div className="p-4 text-center">
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">$199–499</p>
-            <p className="text-xs text-slate-500">per month, volume plans</p>
-          </div>
-        </div>
-      </div>
-
       <div className="mt-10 rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <h2 className="mb-1 text-lg font-semibold text-slate-900 dark:text-slate-100">Get early access</h2>
         <p className="mb-4 text-sm text-slate-600 dark:text-slate-400">
-          The API isn&rsquo;t public yet, and the pricing above is indicative rather than final. Leave your details
-          and you&rsquo;ll hear first when it opens up.
+          The API isn&rsquo;t public yet, and pricing hasn&rsquo;t been set. Leave your details and you&rsquo;ll
+          hear first when it opens up.
         </p>
         <WaitlistForm />
       </div>
