@@ -62,7 +62,7 @@ export function WaitlistForm() {
       </div>
       <button
         type="submit"
-        className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400"
+        className="w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-indigo-400"
       >
         Request API access
       </button>

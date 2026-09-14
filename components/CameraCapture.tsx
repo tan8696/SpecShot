@@ -140,7 +140,7 @@ export function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) 
             <button
               onClick={capture}
               disabled={!guidance.faceDetected}
-              className="mt-3 w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-3 w-full rounded-md bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Capture photo
             </button>

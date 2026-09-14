@@ -82,7 +82,7 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
         </p>
         <Link
           href={`/app/?doc=${spec.slug}`}
-          className="inline-block rounded-md bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400"
+          className="inline-block rounded-md bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-indigo-400"
         >
           Create my {spec.document.toLowerCase()} photo — free
         </Link>

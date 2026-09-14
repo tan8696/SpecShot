@@ -138,9 +138,10 @@ export function LandingPage() {
       {/* WebGL scan-field background + legibility scrim */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <Scanner
-          color1="#5227FF"
-          color2="#7bd0ff"
-          color3="#e1e0ff"
+          color1="#3a3a3a"
+          color2="#9a9a9a"
+          color3="#ffffff"
+          colorSpread={0}
           speed={0.3}
           sweepSpeed={0.16}
           sweepWidth={1.7}

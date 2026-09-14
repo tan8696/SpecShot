@@ -12,54 +12,56 @@
   --font-display: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  /* Material-3-style dark studio palette — the whole product's identity. */
-  --color-surface: #131315;
-  --color-surface-container-lowest: #0e0e10;
-  --color-surface-container-low: #1c1b1d;
-  --color-surface-container: #201f21;
-  --color-surface-container-high: #2a2a2c;
-  --color-surface-container-highest: #353437;
-  --color-on-surface: #e5e1e4;
-  --color-on-surface-variant: #c7c4d7;
-  --color-outline: #908fa0;
-  --color-outline-variant: #464554;
+  /* Monochrome dark studio palette — neutral greys, white accent. */
+  --color-surface: #131313;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-low: #1b1b1b;
+  --color-surface-container: #202020;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353535;
+  --color-on-surface: #e6e6e6;
+  --color-on-surface-variant: #b5b5b5;
+  --color-outline: #8d8d8d;
+  --color-outline-variant: #454545;
 
-  --color-primary: #c0c1ff;
-  --color-on-primary: #1000a9;
-  --color-primary-container: #8083ff;
-  --color-on-primary-container: #0d0096;
-  --color-primary-fixed: #e1e0ff;
-  --color-secondary: #7bd0ff;
-  --color-on-secondary: #00354a;
-  --color-secondary-fixed: #c4e7ff;
-  --color-tertiary: #ddb7ff;
-  --color-tertiary-container: #b76dff;
+  --color-primary: #ffffff;
+  --color-on-primary: #101010;
+  --color-primary-container: #e8e8e8;
+  --color-on-primary-container: #101010;
+  --color-primary-fixed: #ffffff;
+  --color-secondary: #c6c6c6;
+  --color-on-secondary: #101010;
+  --color-secondary-fixed: #e0e0e0;
+  --color-tertiary: #d2d2d2;
+  --color-tertiary-container: #9a9a9a;
 
   /* --- Legacy palette remap ---------------------------------------------
      Pre-studio components are written `bg-white dark:bg-slate-900`,
-     `text-slate-900 dark:text-white`, `bg-indigo-500 text-white`, etc. The
-     app is dark-only so the `dark:` half is what renders; these overrides
-     point that half (and the indigo accents) at the studio surfaces so the
-     older components match without touching every file. */
+     `text-slate-900 dark:text-white`, `bg-indigo-500 text-slate-950`, etc.
+     The app is dark-only so the `dark:` half is what renders; these
+     overrides point that half (and the accents) at the studio surfaces so
+     the older components match without touching every file. */
   --color-white: #ffffff;
-  --color-slate-50: #201f26;
-  --color-slate-100: #e9e5eb;
-  --color-slate-200: #e3dfe7;
-  --color-slate-300: #cdcad9;
-  --color-slate-400: #c2bfd0;
-  --color-slate-500: #9d9bad;
-  --color-slate-600: #b3b1c2;
-  --color-slate-700: #3a3945;
-  --color-slate-800: #26252b;
-  --color-slate-900: #16151a;
-  --color-slate-950: #0e0e10;
+  --color-slate-50: #202020;
+  --color-slate-100: #e9e9e9;
+  --color-slate-200: #e3e3e3;
+  --color-slate-300: #cdcdcd;
+  --color-slate-400: #c2c2c2;
+  --color-slate-500: #9d9d9d;
+  --color-slate-600: #b3b3b3;
+  --color-slate-700: #3a3a3a;
+  --color-slate-800: #262626;
+  --color-slate-900: #161616;
+  --color-slate-950: #0e0e0e;
 
-  --color-indigo-200: #d6d7ff;
-  --color-indigo-300: #c0c1ff;
-  --color-indigo-400: #8983ff;
-  --color-indigo-500: #6d5efc;
-  --color-indigo-600: #c0c1ff;
-  --color-indigo-700: #d6d7ff;
+  --color-indigo-50: #202020;
+  --color-indigo-100: #2a2a2a;
+  --color-indigo-200: #e3e3e3;
+  --color-indigo-300: #d2d2d2;
+  --color-indigo-400: #e0e0e0;
+  --color-indigo-500: #ffffff;
+  --color-indigo-600: #e0e0e0;
+  --color-indigo-700: #e3e3e3;
 
   --color-emerald-300: #86efac;
   --color-emerald-400: #4ade80;

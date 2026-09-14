@@ -14,7 +14,7 @@ export default function Error({ reset }: { error: Error & { digest?: string }; r
       <div className="mt-6 flex gap-3">
         <button
           onClick={reset}
-          className="rounded-md bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-400"
+          className="rounded-md bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-indigo-400"
         >
           Try again
         </button>
