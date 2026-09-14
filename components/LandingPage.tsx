@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Scanner from "./Scanner";
+import Topography from "./Topography";
 import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
 import { stashHandoffImage } from "@/lib/handoff";
 
@@ -134,27 +134,25 @@ export function LandingPage() {
           to the light <body> background when the OS theme is light. */}
       <div className="fixed inset-0 -z-20 bg-surface-container-lowest" />
 
-      {/* WebGL scan-field background + legibility scrim */}
+      {/* WebGL contour-field background + legibility scrim */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <Scanner
-          color1="#0f3b44"
-          color2="#4f8fc7"
-          color3="#ffffff"
-          colorSpread={0}
+        <Topography
+          lowColor="#6f6f6f"
+          midColor="#bdbdbd"
+          highColor="#ffffff"
           speed={0.3}
-          sweepSpeed={0.16}
-          sweepWidth={1.7}
-          scale={1.9}
-          bandDensity={10}
-          glow={0.2}
+          morphAmount={3}
+          morphSpeed={0.05}
+          bands={2}
+          thickness={0.02}
+          scale={1.2}
+          glow={0.35}
+          colorMode="elevation"
+          contrast={1.2}
           brightness={1}
-          contrast={1.15}
-          vignette={0.55}
-          softness={1.5}
-          scanline={false}
+          opacity={1}
           grain
           grainIntensity={0.03}
-          opacity={0.9}
           mouseInteraction={false}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-surface-container-lowest/25 via-surface-container-lowest/55 to-surface-container-lowest/85" />
