@@ -96,9 +96,13 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
               <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />
             ) : (
               <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-center text-sm text-outline">
+                {/* Both branches are visitor-facing copy. The second used to
+                    print the env var names, which read as an unfinished site
+                    to anyone who reached the download flow before ads were
+                    configured. */}
                 {ADSENSE_CLIENT
                   ? "No ad to show — you've declined ad cookies. Your download still works the same."
-                  : "Ad plays here — set NEXT_PUBLIC_ADSENSE_CLIENT_ID / _SLOT_ID"}
+                  : "No ad to show right now. Your download still works the same."}
               </div>
             )}
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">

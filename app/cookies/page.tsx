@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { CookiePreferences } from "@/components/CookiePreferences";
 import { CONTACT_EMAIL } from "@/lib/site";
 
@@ -131,11 +132,7 @@ export default function CookiesPage() {
         </section>
       </div>
 
-      <p className="mt-10 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <Link href="/privacy/" className="text-primary hover:underline">Privacy Policy</Link>
-        <Link href="/terms/" className="text-primary hover:underline">Terms of Service</Link>
-        <Link href="/data/" className="text-primary hover:underline">Your Data</Link>
-      </p>
+      <SiteFooter />
     </div>
   );
 }

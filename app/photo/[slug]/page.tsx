@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { findSpec, loadSpecSlugs } from "@/lib/specs";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 /** One template, one page per verified spec — the actual distribution
  * channel: transactional queries like "Schengen visa photo size" that an AI
@@ -94,6 +95,75 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
         </a>
         {spec.verified_on && ` — verified ${spec.verified_on}`}
       </p>
+
+      <div className="mt-16 space-y-10 border-t border-outline-variant/30 pt-12 text-sm leading-relaxed text-on-surface-variant">
+        <section>
+          <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">
+            Taking the photo
+          </h2>
+          <p>
+            Most failures are created at the moment of capture, not in the crop. Face a window during the day so
+            the light falls evenly on your face, and stand at least an arm&rsquo;s length in front of a plain wall
+            &mdash; close to the wall and your own shadow lands on the background, which counts as a patterned
+            backdrop. Have someone else take the picture from a few steps back rather than shooting at
+            arm&rsquo;s length: a close-up lens exaggerates the nose and narrows the ears, and that distortion
+            cannot be corrected afterwards.
+          </p>
+          <p className="mt-3">
+            Look straight into the lens with a neutral expression and your mouth closed, keep your shoulders square
+            to the camera, and push your hair back from the outline of your face. If you wear glasses, check
+            whether this document permits them at all &mdash; several authorities now require them removed, and
+            where they are allowed the frames must not cross your eyes and the lenses must not reflect the light.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">
+            Head height is the rule people miss
+          </h2>
+          <p>
+            This specification requires {spec.head.height_mm_min}&ndash;{spec.head.height_mm_max}&nbsp;mm from the
+            crown to the chin, and it is worth being precise about what that means. The crown is the top of your
+            skull including your hair &mdash; not your hairline, and not the top of your forehead. Judged by eye
+            the difference is easy to get wrong by a centimetre or more, which is enough to fail on its own. It is
+            the single most common reason an otherwise good photograph is returned.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">
+            Printing and submitting
+          </h2>
+          <p>
+            For a printed photo, the paper size must come out at exactly{" "}
+            {spec.print.width_mm}&nbsp;&times;&nbsp;{spec.print.height_mm}&nbsp;mm. Print at{" "}
+            {spec.print.dpi}&nbsp;DPI on photo paper, and make sure any &ldquo;fit to page&rdquo; or
+            &ldquo;shrink to fit&rdquo; option is switched off in the print dialog &mdash; that setting silently
+            rescales the image and is a common way a correctly sized file becomes an incorrectly sized print.
+          </p>
+          <p className="mt-3">
+            For a digital submission, the file needs to be {spec.digital.width_px}&nbsp;&times;&nbsp;
+            {spec.digital.height_px}&nbsp;px as {spec.digital.format.toUpperCase()}, with a file size of{" "}
+            {fileSize}. If your file is over the limit, compress it rather than reducing the pixel dimensions
+            &mdash; the dimensions are themselves part of the requirement.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">
+            Before you rely on this page
+          </h2>
+          <p>
+            These numbers were taken from the official source linked above and checked against it. Requirements do
+            change, so treat that source as the final authority, and tell us if anything here has drifted out of
+            date. SpecShot is not affiliated with any government, embassy or visa service, and cannot guarantee
+            acceptance &mdash; the issuing authority always makes the final decision on whether a photograph meets
+            its standard.
+          </p>
+        </section>
+      </div>
+
+      <SiteFooter />
     </div>
   );
 }

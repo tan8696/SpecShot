@@ -50,7 +50,9 @@ const PROMISES: { icon: string; title: string; body: string }[] = [
   {
     icon: "person_off",
     title: "No account, ever",
-    body: "No sign-up, no email, no tracking cookies. Open a tool and use it.",
+    // Was "no tracking cookies" — that stops being true the moment a visitor
+    // accepts the ad banner, so it now says what is actually guaranteed.
+    body: "No sign-up, no email, no password. Open a tool and use it — ads only set a cookie if you accept them.",
   },
 ];
 
@@ -478,6 +480,8 @@ export function LandingPage() {
               links={[
                 ["Document specs", "/photo/"],
                 ["For businesses", "/business/"],
+                ["About", "/about/"],
+                ["Contact", "/contact/"],
               ]}
             />
             <FooterCol

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Your Data — What SpecShot Collects (Nothing Personal) — SpecShot",
@@ -91,11 +92,7 @@ export default function DataPage() {
         </table>
       </section>
 
-      <p className="mt-10 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <Link href="/privacy/" className="text-primary hover:underline">Privacy Policy</Link>
-        <Link href="/cookies/" className="text-primary hover:underline">Cookie Policy</Link>
-        <Link href="/terms/" className="text-primary hover:underline">Terms of Service</Link>
-      </p>
+      <SiteFooter />
     </div>
   );
 }

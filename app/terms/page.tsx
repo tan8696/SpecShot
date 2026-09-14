@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -109,11 +110,7 @@ export default function TermsPage() {
         </section>
       </div>
 
-      <p className="mt-10 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <Link href="/privacy/" className="text-primary hover:underline">Privacy Policy</Link>
-        <Link href="/cookies/" className="text-primary hover:underline">Cookie Policy</Link>
-        <Link href="/data/" className="text-primary hover:underline">Your Data</Link>
-      </p>
+      <SiteFooter />
     </div>
   );
 }

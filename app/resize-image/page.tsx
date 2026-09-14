@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ToolPageSections } from "@/components/ToolPageSections";
+import { TOOL_CONTENT } from "@/lib/toolContent";
 import { ResizeTool } from "@/components/ResizeTool";
 
 export const metadata: Metadata = {
@@ -8,16 +11,19 @@ export const metadata: Metadata = {
 };
 
 export default function ResizeImagePage() {
+  const content = TOOL_CONTENT["resize-image"];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <SiteHeader />
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Resize Image</h1>
-      <p className="mt-2 text-slate-600 dark:text-slate-400">
-        Set an exact width and height, or scale by percent. Nothing you upload leaves your browser.
-      </p>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-on-surface sm:text-3xl">Resize Image</h1>
+      <p className="mt-2 max-w-3xl text-on-surface-variant">{content.lede}</p>
       <div className="mt-8">
         <ResizeTool />
       </div>
+
+      <ToolPageSections content={content} howTo="resize an image" />
+      <SiteFooter />
     </div>
   );
 }

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ToolPageSections } from "@/components/ToolPageSections";
+import { TOOL_CONTENT } from "@/lib/toolContent";
 import { HeicTool } from "@/components/HeicTool";
 
 export const metadata: Metadata = {
@@ -8,16 +11,19 @@ export const metadata: Metadata = {
 };
 
 export default function HeicToPngPage() {
+  const content = TOOL_CONTENT["heic-to-png"];
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <SiteHeader />
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">HEIC to PNG</h1>
-      <p className="mt-2 text-slate-600 dark:text-slate-400">
-        Convert an iPhone HEIC/HEIF photo to a lossless PNG. Nothing you upload leaves your browser.
-      </p>
+      <h1 className="font-display text-2xl font-semibold tracking-tight text-on-surface sm:text-3xl">HEIC to PNG</h1>
+      <p className="mt-2 max-w-3xl text-on-surface-variant">{content.lede}</p>
       <div className="mt-8">
         <HeicTool defaultTarget="png" />
       </div>
+
+      <ToolPageSections content={content} howTo="convert HEIC to PNG" />
+      <SiteFooter />
     </div>
   );
 }
