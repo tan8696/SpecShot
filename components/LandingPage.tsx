@@ -21,7 +21,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Which browsers are supported?",
-    a: "Any current version of Chrome, Safari, Firefox, Edge or Brave. A few tools lean on WebAssembly — HEIC decoding, background removal — which all of them support.",
+    a: "Any current version of Chrome, Safari, Firefox, Edge or Brave. A few tools lean on WebAssembly — HEIC decoding, PDF rendering — which all of them support.",
   },
   {
     q: "How is it free?",
@@ -33,7 +33,7 @@ const PROMISES: { icon: string; title: string; body: string }[] = [
   {
     icon: "vpn_lock",
     title: "Nothing is uploaded",
-    body: "There is no server to upload to. Face detection, background removal and every conversion run as code inside your own browser tab.",
+    body: "There is no server to upload to. Every resize, conversion and compression runs as code inside your own browser tab.",
   },
   {
     icon: "all_inclusive",
@@ -166,15 +166,15 @@ export function LandingPage() {
             No uploads &nbsp;·&nbsp; Works offline &nbsp;·&nbsp; No account
           </div>
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-on-surface sm:text-6xl">
-            A photo that meets the exact spec —{" "}
+            Every image tool you need —{" "}
             <span className="bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
-              verified, not guessed
+              without the upload
             </span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-on-surface-variant sm:text-lg">
-            SpecShot measures your photo against a government&rsquo;s published requirements — head
-            height, eye line, background — and shows you a pass/fail checklist before you download.
-            Plus 12 more free tools for photos, scans and PDFs. Every byte stays on your device.
+            Compress to an exact file size, resize, upscale, crop, convert, watermark, and move
+            between HEIC, JPG and PDF. Thirteen free tools that run inside this tab — every byte stays
+            on your device.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -189,7 +189,7 @@ export function LandingPage() {
               href="/app/"
               className="inline-flex items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container/60 px-6 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-high"
             >
-              Make a passport photo
+              Compress a photo
             </Link>
           </div>
 
@@ -420,7 +420,7 @@ export function LandingPage() {
                   href="/app/"
                   className="inline-flex items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container-high px-6 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
                 >
-                  Make a passport photo
+                  Compress a photo
                 </Link>
               </div>
             </div>
@@ -441,8 +441,8 @@ export function LandingPage() {
             <FooterCol
               title="Tools"
               links={[
-                ["ID photo", "/app/"],
-                ["Compress", "/app/?tool=compress"],
+                ["Upscale", "/upscale-image/"],
+                ["Compress", "/app/"],
                 ["Resize", "/resize-image/"],
                 ["All tools", "/tools/"],
               ]}

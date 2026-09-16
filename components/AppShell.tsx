@@ -3,27 +3,22 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { Spec } from "@/lib/specs";
 import { ToolNav } from "./ToolNav";
-import { PhotoTool } from "./PhotoTool";
 import { CompressTool } from "./CompressTool";
 import { SignatureTool } from "./SignatureTool";
 
-type Mode = "id-photo" | "compress" | "signature";
+type Mode = "compress" | "signature";
 
 const TABS: { id: Mode; label: string; shortLabel: string }[] = [
-  { id: "id-photo", label: "ID Photo", shortLabel: "ID Photo" },
   { id: "compress", label: "Compress Photo", shortLabel: "Compress" },
   { id: "signature", label: "Signature Cleaner", shortLabel: "Signature" },
 ];
 
-export function AppShell({ specs }: { specs: Spec[] }) {
+export function AppShell() {
   const searchParams = useSearchParams();
-  // Deep link from an SEO page's "create my photo" CTA: /?doc=uk-passport-photo
-  const initialSlug = searchParams.get("doc") ?? undefined;
   // Deep link from ToolNav's "Compress"/"Signature" entries: /?tool=compress
   const initialTool = searchParams.get("tool");
-  const [mode, setMode] = useState<Mode>(initialTool === "compress" || initialTool === "signature" ? initialTool : "id-photo");
+  const [mode, setMode] = useState<Mode>(initialTool === "signature" ? "signature" : "compress");
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -74,7 +69,6 @@ export function AppShell({ specs }: { specs: Spec[] }) {
         ))}
       </div>
 
-      {mode === "id-photo" && <PhotoTool specs={specs} initialSlug={initialSlug} />}
       {mode === "compress" && <CompressTool />}
       {mode === "signature" && <SignatureTool />}
 

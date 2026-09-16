@@ -10,6 +10,7 @@ import {
   type CompressResult,
 } from "@/lib/engine/compress";
 import { lockedDimension, dimensionsFromPercent, drawToSize } from "@/lib/engine/resize";
+import { upscaleCanvas } from "@/lib/engine/upscale";
 import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage } from "@/lib/handoff";
@@ -35,6 +36,7 @@ export function ResizeTool() {
   const [height, setHeight] = useState(0);
   const [percent, setPercent] = useState(50);
   const [lockAspect, setLockAspect] = useState(true);
+  const [sharpen, setSharpen] = useState(60);
 
   const [result, setResult] = useState<CompressResult | null>(null);
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
@@ -103,7 +105,11 @@ export function ResizeTool() {
       setProcessing(true);
       setError(null);
       try {
-        const canvas = drawToSize(img, targetW, targetH);
+        // Going bigger goes through the stepped upscaler — one bilinear jump
+        // to 2x+ is the case the browser's scaler handles worst.
+        const canvas = upscaling
+          ? upscaleCanvas(img, targetW, targetH, sharpen / 100)
+          : drawToSize(img, targetW, targetH);
         const t0 = performance.now();
         const r = await compressToQuality(canvas, format, 92);
         setEncodeMs(Math.round(performance.now() - t0));
@@ -117,7 +123,7 @@ export function ResizeTool() {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [img, targetW, targetH, format]);
+  }, [img, targetW, targetH, format, upscaling, sharpen]);
 
   // Preview — watermarked until this exact output has been unlocked with an ad.
   useEffect(() => {
@@ -273,7 +279,7 @@ export function ResizeTool() {
             </div>
 
             <div className="flex items-center justify-between bg-surface-container-low px-3 py-1.5 text-[11px] text-outline">
-              <span>{upscaling ? "Upscaling — the image is enlarged past its native size" : "Re-sampled with the browser's bilinear scaler"}</span>
+              <span>{upscaling ? "Upscaling — stepped 2× resample, then sharpened" : "Re-sampled with the browser's bilinear scaler"}</span>
               <span className="font-mono">{format === "jpeg" ? "JPG" : format.toUpperCase()} · q92</span>
             </div>
           </div>
@@ -359,6 +365,27 @@ export function ResizeTool() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {upscaling && (
+              <div className="border-t border-outline-variant/30 pt-3">
+                <div className="mb-1 flex items-center justify-between">
+                  <label htmlFor="sharpen" className="text-xs font-medium text-on-surface">Sharpen</label>
+                  <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{sharpen}%</span>
+                </div>
+                <input
+                  id="sharpen"
+                  type="range"
+                  min={0}
+                  max={150}
+                  value={sharpen}
+                  onChange={(e) => setSharpen(Number(e.target.value))}
+                  className="w-full accent-primary"
+                />
+                <p className="mt-1 text-[11px] leading-snug text-outline">
+                  Enlarging softens edges. This restores local contrast — it does not add detail the original never had.
+                </p>
               </div>
             )}
 
