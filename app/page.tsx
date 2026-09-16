@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LandingPage } from "@/components/LandingPage";
 
 const DESCRIPTION =
-  "Thirteen image tools that run entirely in your browser — ID photos, compress, resize, crop, convert, HEIC, PDF, and more. Nothing is uploaded, no account needed.";
+  "Thirteen image tools that run entirely in your browser — compress, resize, upscale, crop, convert, HEIC, PDF, and more. Nothing is uploaded, no account needed.";
 
 export const metadata: Metadata = {
   title: "SpecShot — Private image tools that run in your browser",

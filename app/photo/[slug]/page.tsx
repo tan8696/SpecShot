@@ -76,15 +76,15 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
 
       <div className="mt-10 rounded-lg border border-indigo-200 bg-indigo-50 p-6 text-center dark:border-indigo-500/30 dark:bg-indigo-500/10">
         <p className="mb-4 text-sm text-slate-700 dark:text-slate-300">
-          SpecShot measures your actual photo against these numbers — head height from your real hairline (not an
-          estimate), eye position, background — and shows you the result before you download. Nothing is uploaded
-          anywhere; it all runs in your browser.
+          These are reference figures, cited to the government page below. SpecShot&rsquo;s tools can crop, resize
+          and compress a photo to hit them — they do not measure head height for you, so check the numbers against
+          your own image. Nothing is uploaded anywhere; it all runs in your browser.
         </p>
         <Link
-          href={`/app/?doc=${spec.slug}`}
+          href="/crop-image/"
           className="inline-block rounded-md bg-indigo-500 px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-indigo-400"
         >
-          Create my {spec.document.toLowerCase()} photo — free
+          Crop a photo to these dimensions — free
         </Link>
       </div>
 

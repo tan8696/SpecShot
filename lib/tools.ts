@@ -37,11 +37,11 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
 };
 
 export const TOOLS: ToolEntry[] = [
-  { id: "id-photo", label: "ID Photo", description: "Crop a selfie to an exact government spec, with a live compliance check.", href: "/app/", icon: "badge", category: "document", primary: true },
   { id: "resize", label: "Resize", description: "Change an image's dimensions by pixels or percent.", href: "/resize-image/", icon: "aspect_ratio", category: "transform", primary: true },
+  { id: "upscale", label: "Upscale", description: "Enlarge a photo 2–4× and sharpen it back up.", href: "/upscale-image/", icon: "hd", category: "transform", primary: true },
   { id: "crop", label: "Crop", description: "Drag a selection rectangle to crop any photo.", href: "/crop-image/", icon: "crop", category: "transform", primary: true },
   { id: "editor", label: "Photo Editor", description: "Light, colour, filters, border, caption, rotate.", href: "/photo-editor/", icon: "tune", category: "create", primary: true },
-  { id: "compress", label: "Compress", description: "Shrink a photo's file size, by quality or an exact KB target.", href: "/app/?tool=compress", icon: "compress", category: "optimize" },
+  { id: "compress", label: "Compress", description: "Shrink a photo's file size, by quality or an exact KB target.", href: "/app/", icon: "compress", category: "optimize", primary: true },
   { id: "rotate", label: "Rotate", description: "Rotate in 90° steps or flip horizontally / vertically.", href: "/rotate-image/", icon: "rotate_90_degrees_cw", category: "transform" },
   { id: "convert", label: "Convert", description: "Convert between JPG, PNG, and WebP.", href: "/convert-image/", icon: "sync_alt", category: "optimize" },
   { id: "watermark", label: "Watermark", description: "Stamp your own text or logo onto a photo.", href: "/watermark-image/", icon: "branding_watermark", category: "create" },

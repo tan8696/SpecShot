@@ -40,7 +40,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     faqs: [
       {
         q: "Will resizing make my image blurry?",
-        a: "Making an image smaller is safe — detail is discarded but what remains stays sharp. Making it larger is not: the extra pixels have to be invented by interpolation, so an upscaled photo always looks softer than one taken at that size. As a rule, never enlarge a photo you intend to print.",
+        a: "Making an image smaller is safe — detail is discarded but what remains stays sharp. Making it larger is not: the extra pixels have to be filled in by interpolation, so an enlarged photo always looks softer than one taken at that size. Setting a size above the original here switches to the stepped upscaler and offers a sharpen slider, which gets you the cleanest enlargement possible — but it cannot restore detail the camera never captured, so treat enlargement for print with caution.",
       },
       {
         q: "What is the difference between resizing by pixels and by percent?",
@@ -60,6 +60,43 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
       },
     ],
     note: "Resizing re-encodes the image, so saving a JPEG repeatedly through several rounds of editing will slowly degrade it. Work from the original file where you can, rather than from a file you already resized.",
+  },
+
+  "upscale-image": {
+    lede: "Enlarge a photo to two, three or four times its size without the mushy result a plain resize gives you. The image is stepped up a doubling at a time rather than stretched in one jump, and an unsharp mask afterwards restores the edge contrast that any enlargement flattens.",
+    steps: [
+      "Open the photo you want to enlarge, or drop it onto the page.",
+      "Pick a scale factor — 2×, 3× or 4× the original dimensions.",
+      "Adjust the sharpen slider until edges look crisp without a visible halo around them.",
+      "Hold the compare button to check the result against the original before you download it.",
+    ],
+    faqs: [
+      {
+        q: "Does this add detail that was not in the original?",
+        a: "No, and be wary of any tool that claims otherwise without telling you it is generating pixels. A detail not captured by the camera is not recoverable — what this does is enlarge cleanly and restore the local contrast that interpolation loses, so the result looks like a good enlargement rather than a blurry one.",
+      },
+      {
+        q: "Why is this better than just typing a bigger number into the resizer?",
+        a: "One big jump asks the browser's scaler to invent most of the pixels in a single pass, which is exactly what it is worst at. Doubling repeatedly keeps every pass inside the range the scaler handles well. The resizer here now uses the same stepped path whenever you enlarge, so you get this either way — this page just makes the common 2× and 4× cases one click.",
+      },
+      {
+        q: "How much sharpening should I use?",
+        a: "Around 60% suits most photographs. Text and line art take more; skin and sky take less. If you can see a pale outline tracing high-contrast edges, you have gone too far — that halo is the giveaway of an over-sharpened image and it will not print well.",
+      },
+      {
+        q: "Why is 4× disabled for my photo?",
+        a: "Browsers cap how large a canvas can be, and the ceiling is roughly 16 megapixels on the strictest of them. A 12MP phone photo at 4× would be 190MP, far past it, so the larger factors are switched off rather than handing you a blank file.",
+      },
+      {
+        q: "Can I upscale a photo for printing?",
+        a: "You can, and a stepped enlargement prints better than a stretched one, but it is no substitute for the resolution the shot needed. As a rule of thumb print wants around 300 pixels per inch, so a 1000px-wide image is genuinely good for about 3 inches — enlarging it to fill A4 will show.",
+      },
+      {
+        q: "Is my photo uploaded anywhere?",
+        a: ON_DEVICE,
+      },
+    ],
+    note: "Upscaling multiplies the pixel count, so a 4× enlargement is sixteen times the data and the file size grows to match. If the result has to fit an upload limit, send it straight to the compressor afterwards rather than re-saving it by hand.",
   },
 
   "crop-image": {
