@@ -53,7 +53,7 @@ What started as an ID-photo checker grew into a complete **browser-based image s
 - **Tools chain together** — hand a crop or edit straight into the compressor without touching disk
 - **Installable PWA** — works offline after first load
 - **SEO spec pages** — every verified document gets its own page, cited to its government source
-- **Full legal set + real consent banner** — the ad script itself is gated behind consent, and declining never breaks a tool
+- **Full legal set** — privacy, terms, cookies and data pages; EEA/UK/CH ad consent runs through Google's certified consent message, and declining never breaks a tool
 - **Static export** — ships as plain HTML/CSS/JS; deploys to any static host
 
 ---
@@ -113,7 +113,6 @@ tests/               Vitest suites for lib/engine
 - **Data integrity gate** — every document spec must be `verified: true` against a primary government source, or the strict validator excludes it from production builds. SpecShot would rather ship fewer documents than one wrong number.
 - **Zero-server privacy model** — no API routes exist; privacy is an architectural guarantee, not a policy promise.
 - **Performance budget** — WASM models and PDF/HEIC libraries are lazy-loaded only when a tool needs them.
-- **Consent-correct ads** — the consent banner blocks the third-party script itself, not just the ad slot.
 
 ### Supported documents
 
@@ -171,6 +170,7 @@ npm run dev          # http://localhost:3000
 - [ ] Review `/privacy`, `/terms`, `/cookies` and `/data` for your jurisdiction
 - [ ] Verify the US and Canada specs against primary sources and set `"verified": true`
 - [ ] Apply for AdSense with the live URL; once approved, set the AdSense env vars and add `public/ads.txt`
+- [ ] Turn on AdSense → Privacy & messaging → European regulations message — the site has no consent banner of its own, so this is what asks EEA/UK/CH visitors
 
 </details>
 

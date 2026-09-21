@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { PageBackground } from "@/components/PageBackground";
-import { ConsentGate } from "@/components/ConsentGate";
 import "./globals.css";
 
 // Geist for display type, Inter for body — used only by the landing page via
@@ -41,11 +40,7 @@ export const metadata: Metadata = {
     title: "SpecShot",
     description: DESCRIPTION,
   },
-  // AdSense ownership verification. The loader script itself is consent-gated
-  // (ConsentGate), so Google's verification crawler — which never clicks
-  // "Accept" — would otherwise never see it and the site would fail review.
-  // This meta tag is static, sets no cookie and identifies no visitor, so it
-  // can ship ungated without touching the privacy promise.
+  // AdSense ownership verification — the method the site was connected with.
   ...(ADSENSE_CLIENT ? { other: { "google-adsense-account": ADSENSE_CLIENT } } : {}),
 };
 
@@ -63,21 +58,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
+        {/* AdSense's snippet as-is, on every page. A plain <script>, not
+            next/script, so it sits in the static HTML exactly as AdSense
+            gives it (next/script would inject it after hydration). Consent
+            where the law requires it (EEA/UK/CH) is Google's own message,
+            set up under AdSense → Privacy & messaging and delivered by this
+            same script. */}
+        {ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className="min-h-screen bg-surface font-body text-on-surface antialiased">
         {/* The topographic contour field every page sits on. Fixed and
             pointer-transparent, so it never affects page layout. */}
         <PageBackground />
         {children}
-        {/* Below the page content so the banner's fixed footer paints on top
-            of it, not behind — and so the AdSense loader (once consented)
-            isn't the very first script Next hydrates. */}
-        <ConsentGate clientId={ADSENSE_CLIENT} />
         {/* Vercel Web Analytics — cookieless, no IP storage, counts page
             views in aggregate only. See app/privacy/page.tsx for the
-            disclosure. Unlike AdGate, this needs no consent gate: it sets
-            no cookie and can't identify a visitor, so there's nothing to
-            opt into or out of. */}
+            disclosure. It needs no consent: it sets no cookie and can't
+            identify a visitor, so there's nothing to opt into or out of. */}
         <Analytics />
       </body>
     </html>

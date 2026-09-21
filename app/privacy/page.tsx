@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Exactly what SpecShot does and doesn't collect: your photos, browser storage, cookies, and advertising data.",
 };
 
-const LAST_UPDATED = "September 13, 2026";
+const LAST_UPDATED = "September 22, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Browser storage SpecShot uses</h2>
-          <p>SpecShot stores exactly two things in your browser, both purely functional:</p>
+          <p>SpecShot stores exactly one thing in your browser, and it&rsquo;s purely functional:</p>
           <ul className="mt-2 list-disc space-y-2 pl-5">
             <li>
               <strong className="text-on-surface">A one-shot handoff (session storage).</strong> If you drop an image
@@ -52,11 +52,6 @@ export default function PrivacyPage() {
               compressor&rdquo;), the image is held briefly in your browser&rsquo;s session storage so the next page
               can pick it up. It&rsquo;s read once and deleted immediately, and clears entirely when you close the
               tab. It never leaves your device.
-            </li>
-            <li>
-              <strong className="text-on-surface">Your ad-cookie choice (local storage), if SpecShot shows ads.</strong>{" "}
-              Whether you accepted or declined ad cookies in the banner — see{" "}
-              <Link href="/cookies/" className="text-primary underline hover:text-primary-fixed">Cookie Policy</Link>.
             </li>
           </ul>
           <p className="mt-2">
@@ -80,19 +75,20 @@ export default function PrivacyPage() {
             all aggregate and anonymous: the page visited, referring site, rough geolocation (country/city, not a
             precise location), and general device/browser type. None of it can be linked to your photos, files, or
             anything you do inside a tool — those never leave your device regardless. Because it can&rsquo;t identify
-            anyone, this runs for every visitor and isn&rsquo;t part of the ad-cookie consent banner described below,
-            which only covers Google AdSense.
+            anyone, this runs for every visitor and needs no consent.
           </p>
         </section>
 
         <section>
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Advertising</h2>
           <p>
-            SpecShot is free to use and supported by advertising, served through Google AdSense — but only once you
-            accept the cookie banner shown on your first visit. Declining means no AdSense script loads and no ad
-            cookie is set; SpecShot&rsquo;s tools and downloads work exactly the same either way. If you accept,
-            Google and its advertising partners may use cookies and similar technologies to serve ads based on your
-            prior visits to this and other websites. You can opt out of personalized advertising at any time by
+            SpecShot is free to use and supported by advertising, served through Google AdSense, which loads on
+            every page — so Google receives standard request data such as your IP address and the page you&rsquo;re
+            on, even when no ad is shown. Google and its advertising partners may use cookies and similar
+            technologies to serve ads based on your prior visits to this and other websites. Where the law requires
+            your consent first — including in the EEA, the UK and Switzerland — Google asks for it with its own
+            consent message, and you can change that choice at any time. SpecShot&rsquo;s tools and downloads work
+            exactly the same whatever you choose. You can opt out of personalized advertising at any time by
             visiting{" "}
             <a
               href="https://adssettings.google.com"
@@ -148,9 +144,8 @@ export default function PrivacyPage() {
           <p>
             Because SpecShot never receives, stores, or processes your photos or any personal data on a server,
             there is nothing held about you to access, correct, export, or delete — the browser storage described
-            above is entirely under your own control (clear it any time via your browser&rsquo;s settings, or use
-            the reset link on the <Link href="/cookies/" className="text-primary underline hover:text-primary-fixed">Cookie Policy</Link> page).
-            Where advertising cookies do apply, the opt-outs above cover those. If you believe this is inaccurate or
+            above is entirely under your own control (clear it any time via your browser&rsquo;s settings).
+            Where advertising cookies do apply, Google&rsquo;s consent choice and the opt-outs above cover those. If you believe this is inaccurate or
             have any other privacy question, contact us — see below.
           </p>
         </section>

@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { CookiePreferences } from "@/components/CookiePreferences";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Cookie Policy — SpecShot",
-  description: "What SpecShot stores in your browser, what Google AdSense sets if you accept ads, and how to change your choice.",
+  description: "What SpecShot stores in your browser, which cookies Google AdSense may set, and how to control them.",
 };
 
-const LAST_UPDATED = "September 13, 2026";
+const LAST_UPDATED = "September 22, 2026";
 
 export default function CookiesPage() {
   return (
@@ -25,10 +24,10 @@ export default function CookiesPage() {
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">The short version</h2>
           <p>
             SpecShot itself sets no cookies at all. The only thing it puts in your browser — session storage for
-            passing an image between tools, and one flag remembering your ad-cookie choice — isn&rsquo;t a cookie
-            and isn&rsquo;t sent to anyone. Separately, an anonymous, cookie-free visit counter (Vercel Web
-            Analytics) runs for every visitor — it can&rsquo;t identify you, so there&rsquo;s nothing to consent to.
-            The only real cookies come from Google AdSense, and only if you accept them below.
+            passing an image between tools — isn&rsquo;t a cookie and isn&rsquo;t sent to anyone. Separately, an
+            anonymous, cookie-free visit counter (Vercel Web Analytics) runs for every visitor — it can&rsquo;t
+            identify you, so there&rsquo;s nothing to consent to. The only real cookies come from Google AdSense,
+            which serves the ads — see below for when it asks first and how to opt out.
           </p>
         </section>
 
@@ -50,15 +49,9 @@ export default function CookiesPage() {
                 <td className="p-2">Carries one image from a dropzone or &ldquo;send to&rdquo; action to the next tool</td>
                 <td className="p-2">Deleted the instant it&rsquo;s read; gone when the tab closes</td>
               </tr>
-              <tr>
-                <td className="p-2 font-mono">specshot:ad-consent</td>
-                <td className="p-2">Local storage</td>
-                <td className="p-2">Remembers whether you accepted or declined ad cookies, so we don&rsquo;t ask every visit</td>
-                <td className="p-2">Until you clear it (see below) or clear your browser data</td>
-              </tr>
             </tbody>
           </table>
-          <p className="mt-2">Neither of these is ever transmitted anywhere — they exist only inside your browser.</p>
+          <p className="mt-2">It&rsquo;s never transmitted anywhere — it exists only inside your browser.</p>
         </section>
 
         <section>
@@ -68,7 +61,7 @@ export default function CookiesPage() {
             stores nothing in your browser at all — it works by hashing the incoming request, and Vercel discards
             that hash after 24 hours. It can&rsquo;t identify you, follow you across other sites, or be linked to
             anything you do inside a tool. Because it can&rsquo;t identify anyone, it runs for every visitor and
-            isn&rsquo;t part of the consent choice below, which only covers Google AdSense. Full detail is in the{" "}
+            needs no consent. Full detail is in the{" "}
             <Link href="/privacy/" className="text-primary underline hover:text-primary-fixed">
               Privacy Policy
             </Link>
@@ -77,12 +70,13 @@ export default function CookiesPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Advertising cookies — only if you accept</h2>
+          <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Advertising cookies</h2>
           <p>
-            SpecShot is free, ad-supported. Ads are served through Google AdSense, but the AdSense script does not
-            load — and no ad cookie is set — until you click &ldquo;Accept&rdquo; on the banner shown on your first
-            visit. If you accept, Google and its advertising partners may set cookies to measure ads and personalize
-            them based on your visits to this and other sites. Full detail is in Google&rsquo;s own{" "}
+            SpecShot is free, ad-supported. Ads are served through Google AdSense, which loads on every page. Google
+            and its advertising partners may set cookies to measure ads and personalize them based on your visits to
+            this and other sites. Where the law requires your consent first — including in the EEA, the UK and
+            Switzerland — Google asks for it with its own consent message before using cookies for ads, and you can
+            change that choice at any time. Full detail is in Google&rsquo;s own{" "}
             <a
               href="https://policies.google.com/technologies/partner-sites"
               className="text-primary underline hover:text-primary-fixed"
@@ -91,28 +85,17 @@ export default function CookiesPage() {
             >
               policy for partner sites
             </a>
-            . You can withdraw consent at any time from either place:
+            . Wherever you are, you can opt out of personalized ads at any time through Google&rsquo;s own controls —{" "}
+            <a href="https://adssettings.google.com" className="text-primary underline hover:text-primary-fixed" target="_blank" rel="noopener noreferrer">
+              Ads Settings
+            </a>{" "}
+            or{" "}
+            <a href="https://www.aboutads.info/choices" className="text-primary underline hover:text-primary-fixed" target="_blank" rel="noopener noreferrer">
+              aboutads.info
+            </a>
+            .
           </p>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>The reset control on this page, below.</li>
-            <li>
-              Google&rsquo;s own controls —{" "}
-              <a href="https://adssettings.google.com" className="text-primary underline hover:text-primary-fixed" target="_blank" rel="noopener noreferrer">
-                Ads Settings
-              </a>{" "}
-              or{" "}
-              <a href="https://www.aboutads.info/choices" className="text-primary underline hover:text-primary-fixed" target="_blank" rel="noopener noreferrer">
-                aboutads.info
-              </a>
-              .
-            </li>
-          </ul>
-          <p className="mt-2">Declining, or withdrawing later, never affects any tool — downloads work exactly the same either way.</p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Your choice</h2>
-          <CookiePreferences />
+          <p className="mt-2">Declining, or opting out later, never affects any tool — downloads work exactly the same either way.</p>
         </section>
 
         <section>
