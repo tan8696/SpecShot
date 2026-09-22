@@ -3,7 +3,6 @@ import { removeBackground } from "@imgly/background-removal";
 import { midpoint, rollAngle, rotatePoint, computeCrop, cropOverflows, type Point, type CropRect } from "./geometry";
 import { findCrownY } from "./crown";
 import { encodeToSpec } from "./encode";
-import { withWatermark } from "./watermark";
 import type { Spec } from "../specs";
 
 const TASKS_VISION_VERSION = "0.10.17";
@@ -218,7 +217,6 @@ export type Measurements = { crownY: number; chinY: number; eyeY: number } | nul
 
 export type PipelineResult = {
   finalCanvas: HTMLCanvasElement;
-  previewCanvas: HTMLCanvasElement;
   blob: Blob;
   kb: number;
   checks: ComplianceCheck[];
@@ -356,7 +354,6 @@ export async function processPhoto(
 
   return {
     finalCanvas,
-    previewCanvas: withWatermark(finalCanvas),
     blob,
     kb,
     checks,

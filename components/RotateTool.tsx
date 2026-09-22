@@ -3,11 +3,9 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { loadImageFile, drawResized, compressToQuality, formatFromMime, type CompressFormat } from "@/lib/engine/compress";
 import { rotateCanvas, flipCanvas, type Rotation } from "@/lib/engine/rotate";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
@@ -36,8 +34,6 @@ export function RotateTool() {
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   async function onFile(f: File) {
@@ -57,7 +53,6 @@ export function RotateTool() {
 
   function apply(next: HTMLCanvasElement) {
     setWorking(next);
-    setUnlocked(false);
   }
 
   useLayoutEffect(() => {
@@ -88,13 +83,11 @@ export function RotateTool() {
     const c = canvasRef.current;
     c.width = working.width;
     c.height = working.height;
-    c.getContext("2d")!.drawImage(unlocked ? working : withWatermark(working), 0, 0);
-  }, [working, unlocked]);
+    c.getContext("2d")!.drawImage(working, 0, 0);
+  }, [working]);
 
-  function onAdComplete() {
+  function download() {
     if (!blob || !file) return;
-    setShowAdGate(false);
-    setUnlocked(true);
     const ext = format === "jpeg" ? "jpg" : format;
     const base = file.name.replace(/\.[^.]+$/, "") || "photo";
     downloadBlob(blob, `${base}-rotated.${ext}`);
@@ -107,7 +100,6 @@ export function RotateTool() {
     setWorking(null);
     setBlob(null);
     setEncodeMs(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -202,19 +194,18 @@ export function RotateTool() {
           </div>
 
           <button
-            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            onClick={download}
             disabled={!blob || processing}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
-            {processing ? "Processing…" : unlocked ? `Download again (${blob ? formatKb(blob.size / 1024) : ""})` : "Watch ad to download — free"}
+            {processing ? "Processing…" : `Download (${blob ? formatKb(blob.size / 1024) : ""})`}
           </button>
         </div>
       </div>
 
       <StudioPrivacyNote />
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

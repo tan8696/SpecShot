@@ -12,7 +12,6 @@ import {
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "queue";
@@ -59,10 +58,7 @@ export function ConvertTool() {
   const [globalTarget, setGlobalTarget] = useState<CompressFormat>("webp");
   const [quality, setQuality] = useState(90);
   const [matte, setMatte] = useState<Matte>("white");
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const pendingAction = useRef<{ type: "all" } | { type: "one"; id: string } | null>(null);
   const qualityDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
   const busyRef = useRef(false);
 
@@ -96,7 +92,6 @@ export function ConvertTool() {
       return;
     }
     setItems((s) => [...s, ...loaded]);
-    setUnlocked(false);
     setStep("queue");
   }
 
@@ -130,18 +125,15 @@ export function ConvertTool() {
   }, [items, matte, quality]);
 
   function requeueAll() {
-    setUnlocked(false);
     setItems((s) => s.map((i) => ({ ...i, status: "pending", result: undefined, ms: undefined })));
   }
 
   function chooseGlobalTarget(f: CompressFormat) {
     setGlobalTarget(f);
-    setUnlocked(false);
     setItems((s) => s.map((i) => ({ ...i, target: f, status: "pending", result: undefined, ms: undefined })));
   }
 
   function chooseItemTarget(id: string, f: CompressFormat) {
-    setUnlocked(false);
     setItems((s) => s.map((i) => (i.id === id ? { ...i, target: f, status: "pending", result: undefined, ms: undefined } : i)));
   }
 
@@ -163,7 +155,6 @@ export function ConvertTool() {
   function clearAll() {
     setItems([]);
     setStep("upload");
-    setUnlocked(false);
   }
 
   function nameFor(it: Item) {
@@ -173,43 +164,13 @@ export function ConvertTool() {
 
   function downloadOne(it: Item) {
     if (!it.result) return;
-    if (!unlocked) {
-      pendingAction.current = { type: "one", id: it.id };
-      setShowAdGate(true);
-      return;
-    }
     downloadBlob(it.result.blob, nameFor(it));
   }
 
   async function downloadAll() {
-    const done = items.filter((i) => i.status === "done" && i.result);
-    if (done.length === 0) return;
-    if (!unlocked) {
-      pendingAction.current = { type: "all" };
-      setShowAdGate(true);
-      return;
-    }
-    for (const it of done) {
+    for (const it of items.filter((i) => i.status === "done" && i.result)) {
       downloadBlob(it.result!.blob, nameFor(it));
       await new Promise((r) => setTimeout(r, 200));
-    }
-  }
-
-  function onAdComplete() {
-    setShowAdGate(false);
-    setUnlocked(true);
-    const action = pendingAction.current;
-    pendingAction.current = null;
-    if (action?.type === "all") {
-      void (async () => {
-        for (const it of items.filter((i) => i.status === "done" && i.result)) {
-          downloadBlob(it.result!.blob, nameFor(it));
-          await new Promise((r) => setTimeout(r, 200));
-        }
-      })();
-    } else if (action?.type === "one") {
-      const it = items.find((i) => i.id === action.id);
-      if (it?.result) downloadBlob(it.result.blob, nameFor(it));
     }
   }
 
@@ -414,7 +375,7 @@ export function ConvertTool() {
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
-            {unlocked ? `Download all (${done.length})` : `Watch ad · download all (${done.length})`}
+            {`Download all (${done.length})`}
           </button>
         </div>
       </div>
@@ -422,15 +383,6 @@ export function ConvertTool() {
       <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && (
-        <AdGate
-          onComplete={onAdComplete}
-          onCancel={() => {
-            setShowAdGate(false);
-            pendingAction.current = null;
-          }}
-        />
-      )}
     </div>
   );
 }

@@ -2,8 +2,7 @@
  * bundle is dynamically imported so it only loads when the HEIC tool is
  * actually used, not on every page. Returns a PNG blob — a lossless
  * intermediate the caller loads as an <img> and re-encodes to the user's
- * chosen format, so the watermark-until-ad-unlocked preview still applies,
- * same as every other tool. */
+ * chosen format, same as every other tool. */
 export async function decodeHeic(file: Blob): Promise<Blob> {
   const heic2any = (await import("heic2any")).default;
   const out = await heic2any({ blob: file, toType: "image/png" });
