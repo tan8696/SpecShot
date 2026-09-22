@@ -65,8 +65,8 @@ export default function PrivacyPage() {
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Analytics and tracking</h2>
           <p>
             SpecShot uses Vercel Web Analytics to see how many people visit the site and which pages they land on —
-            aggregate traffic numbers, not individual behavior. It runs no other analytics, no tracking pixel, and no
-            session-recording script.
+            aggregate traffic numbers, not individual behavior. Apart from the Google AdSense advertising described
+            below, it runs no other analytics, no tracking pixel, and no session-recording script.
           </p>
           <p className="mt-3">
             Vercel Web Analytics sets no cookie and stores no IP address. Each page view is counted using a hash
