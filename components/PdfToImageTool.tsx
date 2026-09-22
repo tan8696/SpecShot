@@ -3,11 +3,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { pdfToCanvases } from "@/lib/engine/pdf";
 import { canvasToBlob } from "@/lib/engine/encode";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "rendering" | "configure";
@@ -19,7 +17,7 @@ const encode = (canvas: HTMLCanvasElement, format: Format, quality: number) =>
 
 /** One PDF -> a raster image per page. Renders every page once (pdfjs, the
  * expensive step), then encodes on demand so format/quality changes are
- * instant. One ad unlocks every page at the chosen format. */
+ * instant. */
 export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: Format }) {
   const [step, setStep] = useState<Step>("upload");
   const [name, setName] = useState("page");
@@ -29,8 +27,6 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
   const [quality, setQuality] = useState(92);
   const [progress, setProgress] = useState<{ page: number; total: number } | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -67,10 +63,6 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
     };
   }, [canvases, pageIdx, format, quality]);
 
-  useEffect(() => {
-    setUnlocked(false);
-  }, [format, quality]);
-
   useLayoutEffect(() => {
     if (!blob || !canvasRef.current) return;
     let cancelled = false;
@@ -81,21 +73,17 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
         URL.revokeObjectURL(url);
         return;
       }
-      const clean = document.createElement("canvas");
-      clean.width = preview.width;
-      clean.height = preview.height;
-      clean.getContext("2d")!.drawImage(preview, 0, 0);
       const c = canvasRef.current!;
       c.width = preview.width;
       c.height = preview.height;
-      c.getContext("2d")!.drawImage(unlocked ? clean : withWatermark(clean), 0, 0);
+      c.getContext("2d")!.drawImage(preview, 0, 0);
       URL.revokeObjectURL(url);
     };
     preview.src = url;
     return () => {
       cancelled = true;
     };
-  }, [blob, unlocked]);
+  }, [blob]);
 
   const ext = format === "jpeg" ? "jpg" : "png";
   const multi = canvases.length > 1;
@@ -117,17 +105,10 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
     }
   }
 
-  function onAdComplete() {
-    setShowAdGate(false);
-    setUnlocked(true);
-    downloadPage(pageIdx);
-  }
-
   function startOver() {
     setStep("upload");
     setCanvases([]);
     setBlob(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -245,14 +226,14 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
 
           <div className="space-y-2">
             <button
-              onClick={() => (unlocked ? downloadPage(pageIdx) : setShowAdGate(true))}
+              onClick={() => downloadPage(pageIdx)}
               disabled={!blob}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
-              {unlocked ? `Download page ${pageIdx + 1}` : "Watch ad to download — free"}
+              {`Download page ${pageIdx + 1}`}
             </button>
-            {unlocked && multi && (
+            {multi && (
               <button onClick={downloadAll} disabled={busy} className={`${btn} w-full`}>
                 <span className="material-symbols-outlined text-[16px]">download_for_offline</span>
                 {busy ? "Downloading…" : `Download all ${canvases.length} pages`}
@@ -264,7 +245,6 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
 
       <StudioPrivacyNote />
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

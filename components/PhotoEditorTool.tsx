@@ -6,12 +6,10 @@ import { compressToQuality, drawResized, formatFromMime, loadImageFile, type Com
 import { rotateCanvas, flipCanvas } from "@/lib/engine/rotate";
 import { buildFilterString, FILTER_PRESETS, type FilterPreset } from "@/lib/engine/editor";
 import { wrapText, drawTextBlock } from "@/lib/engine/textlayer";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage, takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
@@ -56,8 +54,6 @@ export function PhotoEditorTool() {
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -85,7 +81,6 @@ export function PhotoEditorTool() {
 
   useEffect(() => {
     if (!img) return;
-    setUnlocked(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setProcessing(true);
@@ -150,26 +145,20 @@ export function PhotoEditorTool() {
         URL.revokeObjectURL(url);
         return;
       }
-      const clean = document.createElement("canvas");
-      clean.width = result.width;
-      clean.height = result.height;
-      clean.getContext("2d")!.drawImage(preview, 0, 0);
       const c = canvasRef.current!;
       c.width = result.width;
       c.height = result.height;
-      c.getContext("2d")!.drawImage(unlocked ? clean : withWatermark(clean), 0, 0);
+      c.getContext("2d")!.drawImage(preview, 0, 0);
       URL.revokeObjectURL(url);
     };
     preview.src = url;
     return () => {
       cancelled = true;
     };
-  }, [result, unlocked]);
+  }, [result]);
 
-  function onAdComplete() {
+  function download() {
     if (!result || !file) return;
-    setShowAdGate(false);
-    setUnlocked(true);
     const ext = format === "jpeg" ? "jpg" : format;
     const base = file.name.replace(/\.[^.]+$/, "") || "photo";
     downloadBlob(result.blob, `${base}-edited.${ext}`);
@@ -190,7 +179,6 @@ export function PhotoEditorTool() {
     setImg(null);
     setResult(null);
     setEncodeMs(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -336,12 +324,12 @@ export function PhotoEditorTool() {
 
           <div className="space-y-2">
             <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+              onClick={download}
               disabled={!result || processing}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
-              {processing ? "Rendering…" : unlocked ? `Download again (${result ? formatKb(result.blob.size / 1024) : ""})` : "Watch ad to download — free"}
+              {processing ? "Rendering…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}
             </button>
             <button
               onClick={pipeToCompressor}
@@ -357,7 +345,6 @@ export function PhotoEditorTool() {
 
       <StudioPrivacyNote />
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

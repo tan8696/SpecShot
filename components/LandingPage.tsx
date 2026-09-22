@@ -25,7 +25,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How is it free?",
-    a: "One short ad unlocks a download. There's no account and no subscription, and the file you download has no watermark on it.",
+    a: "Ads on the site pay for it. Downloads are free and instant — there's no account and no subscription, and the file you download has no watermark on it.",
   },
 ];
 

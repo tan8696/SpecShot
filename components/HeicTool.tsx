@@ -3,11 +3,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { compressToQuality, drawResized, loadImageFile, type CompressResult } from "@/lib/engine/compress";
 import { decodeHeic, looksLikeHeic } from "@/lib/engine/heic";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "decoding" | "configure";
@@ -15,8 +13,8 @@ type Target = "jpeg" | "png";
 const LABELS: Record<Target, string> = { jpeg: "JPG", png: "PNG" };
 
 /** HEIC/HEIF -> JPG/PNG. Decodes the HEIC to a PNG via heic2any (WASM),
- * loads that as an image, then runs the same configure -> watermarked
- * preview -> ad-gate -> download flow as every other tool. */
+ * loads that as an image, then runs the same configure -> preview ->
+ * download flow as every other tool. */
 export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target }) {
   const [step, setStep] = useState<Step>("upload");
   const [name, setName] = useState("photo");
@@ -27,8 +25,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   async function onFile(f: File) {
@@ -54,7 +50,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
 
   useEffect(() => {
     if (!img) return;
-    setUnlocked(false);
     let cancelled = false;
     (async () => {
       setProcessing(true);
@@ -87,27 +82,20 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
         URL.revokeObjectURL(url);
         return;
       }
-      const clean = document.createElement("canvas");
-      clean.width = result.width;
-      clean.height = result.height;
-      clean.getContext("2d")!.drawImage(preview, 0, 0);
-
       const c = canvasRef.current!;
       c.width = result.width;
       c.height = result.height;
-      c.getContext("2d")!.drawImage(unlocked ? clean : withWatermark(clean), 0, 0);
+      c.getContext("2d")!.drawImage(preview, 0, 0);
       URL.revokeObjectURL(url);
     };
     preview.src = url;
     return () => {
       cancelled = true;
     };
-  }, [result, unlocked]);
+  }, [result]);
 
-  function onAdComplete() {
+  function download() {
     if (!result) return;
-    setShowAdGate(false);
-    setUnlocked(true);
     downloadBlob(result.blob, `${name}.${target === "jpeg" ? "jpg" : "png"}`);
   }
 
@@ -116,7 +104,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
     setImg(null);
     setResult(null);
     setEncodeMs(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -227,19 +214,18 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
           </div>
 
           <button
-            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            onClick={download}
             disabled={!result || processing}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
-            {processing ? "Converting…" : unlocked ? `Download again (${result ? formatKb(result.blob.size / 1024) : ""})` : "Watch ad to download — free"}
+            {processing ? "Converting…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}
           </button>
         </div>
       </div>
 
       <StudioPrivacyNote />
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

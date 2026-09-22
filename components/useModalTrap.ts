@@ -9,7 +9,7 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
  * focusable element on open, cycles Tab/Shift+Tab within the dialog instead
  * of leaking focus to the page behind it, and calls `onEscape` on the
  * Escape key. Pass `null` for onEscape to disable Escape at moments where
- * backing out shouldn't be possible (e.g. mid-ad in AdGate).
+ * backing out shouldn't be possible.
  */
 export function useModalTrap(onEscape: (() => void) | null) {
   const ref = useRef<HTMLDivElement>(null);

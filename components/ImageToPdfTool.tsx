@@ -5,7 +5,6 @@ import { imagesToPdf, type PageMode } from "@/lib/engine/pdf";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
@@ -14,17 +13,13 @@ const MODE_LABELS: Record<PageMode, string> = { image: "Fit to image", a4: "A4",
 const MAX_FILES = 50;
 
 /** Several images -> one PDF, one image per page. Multi-file, so it uses
- * UploadScreen's onFiles path. Nothing to watermark here — the source
- * images are the user's own; the gated deliverable is the assembled PDF,
- * which just isn't generated until the ad is watched. */
+ * UploadScreen's onFiles path. */
 export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
   const [step, setStep] = useState<Step>("upload");
   const [files, setFiles] = useState<File[]>([]);
   const [mode, setMode] = useState<PageMode>("image");
   const [pdf, setPdf] = useState<Blob | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,7 +28,6 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
 
   function reset(next: File[]) {
     setFiles(next);
-    setUnlocked(false);
     setPdf(null);
     setError(null);
   }
@@ -60,14 +54,12 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
     reset(files.filter((_, k) => k !== i));
   }
 
-  async function onAdComplete() {
-    setShowAdGate(false);
+  async function createPdf() {
     setGenerating(true);
     setError(null);
     try {
       const blob = pdf ?? (await imagesToPdf(files, mode));
       setPdf(blob);
-      setUnlocked(true);
       downloadBlob(blob, "images.pdf");
     } catch {
       setError("Could not build the PDF from those images.");
@@ -156,7 +148,6 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
                     key={m}
                     onClick={() => {
                       setMode(m);
-                      setUnlocked(false);
                       setPdf(null);
                     }}
                     className={`rounded px-2 py-1.5 text-xs font-medium transition-colors ${
@@ -190,19 +181,18 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
           </div>
 
           <button
-            onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+            onClick={createPdf}
             disabled={files.length === 0 || generating}
             className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-            {generating ? "Building PDF…" : unlocked ? "Download PDF again" : "Watch ad to create the PDF — free"}
+            {generating ? "Building PDF…" : pdf ? "Download PDF again" : "Create PDF"}
           </button>
         </div>
       </div>
 
       <StudioPrivacyNote />
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

@@ -10,12 +10,10 @@ import {
   type CompressFormat,
   type CompressResult,
 } from "@/lib/engine/compress";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type SizeMode = "quality" | "target";
@@ -39,8 +37,6 @@ export function CompressTool() {
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
 
   const [view, setView] = useState<ViewMode>("split");
   const [split, setSplit] = useState(50);
@@ -90,12 +86,9 @@ export function CompressTool() {
   }, [file]);
 
   // Recompresses whenever any control changes. Debounced so dragging the
-  // quality slider doesn't re-encode on every intermediate value. Any
-  // settings change re-locks the download — a previously-watched ad only
-  // covers the output it unlocked, not whatever you tweak it into next.
+  // quality slider doesn't re-encode on every intermediate value.
   useEffect(() => {
     if (!img) return;
-    setUnlocked(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setProcessing(true);
@@ -120,49 +113,19 @@ export function CompressTool() {
     };
   }, [img, format, sizeMode, quality, targetKb, resizeEnabled, maxDim]);
 
-  // The "after" side. Watermarked until this exact output has been unlocked
-  // with an ad — otherwise the preview could just be right-click-saved and the
-  // ad gate would be pointless.
+  // The "after" side.
   useEffect(() => {
     if (!result) {
       setCompressedUrl(null);
       return;
     }
-    let cancelled = false;
-    let objectUrl: string | null = null;
+    const url = URL.createObjectURL(result.blob);
+    setCompressedUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [result]);
 
-    if (unlocked) {
-      objectUrl = URL.createObjectURL(result.blob);
-      setCompressedUrl(objectUrl);
-    } else {
-      const srcUrl = URL.createObjectURL(result.blob);
-      const im = new Image();
-      im.onload = () => {
-        URL.revokeObjectURL(srcUrl);
-        if (cancelled) return;
-        const clean = document.createElement("canvas");
-        clean.width = result.width;
-        clean.height = result.height;
-        clean.getContext("2d")!.drawImage(im, 0, 0);
-        withWatermark(clean).toBlob((b) => {
-          if (cancelled || !b) return;
-          objectUrl = URL.createObjectURL(b);
-          setCompressedUrl(objectUrl);
-        }, "image/png");
-      };
-      im.src = srcUrl;
-    }
-
-    return () => {
-      cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [result, unlocked]);
-
-  function onAdComplete() {
+  function download() {
     if (!result || !file) return;
-    setShowAdGate(false);
-    setUnlocked(true);
     const ext = format === "jpeg" ? "jpg" : format;
     const base = file.name.replace(/\.[^.]+$/, "") || "photo";
     downloadBlob(result.blob, `${base}-compressed.${ext}`);
@@ -185,7 +148,6 @@ export function CompressTool() {
     setImg(null);
     setResult(null);
     setEncodeMs(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -489,12 +451,12 @@ export function CompressTool() {
           {/* Actions */}
           <div className="space-y-2">
             <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+              onClick={download}
               disabled={!result || processing}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
-              {processing ? "Compressing…" : unlocked ? `Download again (${formatKb(resultKb)})` : "Watch ad to download — free"}
+              {processing ? "Compressing…" : `Download (${formatKb(resultKb)})`}
             </button>
             <button
               onClick={resetParams}
@@ -510,7 +472,6 @@ export function CompressTool() {
       <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }

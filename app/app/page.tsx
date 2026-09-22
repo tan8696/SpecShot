@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
+import { AdSlot } from "@/components/AdSlot";
 
 export const metadata: Metadata = {
   title: "Compress a Photo & Clean a Signature — SpecShot",
@@ -26,6 +27,7 @@ export default function AppPage() {
       </Suspense>
 
       <div className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
+        <AdSlot />
         <div className="mt-16 space-y-10 border-t border-outline-variant/30 pt-12 text-sm leading-relaxed text-on-surface-variant">
           <section>
             <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">

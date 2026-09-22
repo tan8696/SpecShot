@@ -11,12 +11,10 @@ import {
 } from "@/lib/engine/compress";
 import { lockedDimension, dimensionsFromPercent, drawToSize } from "@/lib/engine/resize";
 import { upscaleCanvas } from "@/lib/engine/upscale";
-import { withWatermark } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { AdGate } from "./AdGate";
 import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
@@ -42,8 +40,6 @@ export function ResizeTool() {
   const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [unlocked, setUnlocked] = useState(false);
-  const [showAdGate, setShowAdGate] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,12 +90,9 @@ export function ResizeTool() {
   const scalePct = img ? Math.round((targetW / img.naturalWidth) * 100) : 100;
   const upscaling = img ? targetW > img.naturalWidth || targetH > img.naturalHeight : false;
 
-  // Re-render whenever the target size or format changes. Debounced; any
-  // change re-locks the download (a watched ad only covers the exact output
-  // it unlocked).
+  // Re-render whenever the target size or format changes. Debounced.
   useEffect(() => {
     if (!img || targetW < 1 || targetH < 1) return;
-    setUnlocked(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setProcessing(true);
@@ -125,47 +118,18 @@ export function ResizeTool() {
     };
   }, [img, targetW, targetH, format, upscaling, sharpen]);
 
-  // Preview — watermarked until this exact output has been unlocked with an ad.
   useEffect(() => {
     if (!result) {
       setPreviewUrl(null);
       return;
     }
-    let cancelled = false;
-    let objectUrl: string | null = null;
+    const url = URL.createObjectURL(result.blob);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [result]);
 
-    if (unlocked) {
-      objectUrl = URL.createObjectURL(result.blob);
-      setPreviewUrl(objectUrl);
-    } else {
-      const srcUrl = URL.createObjectURL(result.blob);
-      const im = new Image();
-      im.onload = () => {
-        URL.revokeObjectURL(srcUrl);
-        if (cancelled) return;
-        const clean = document.createElement("canvas");
-        clean.width = result.width;
-        clean.height = result.height;
-        clean.getContext("2d")!.drawImage(im, 0, 0);
-        withWatermark(clean).toBlob((b) => {
-          if (cancelled || !b) return;
-          objectUrl = URL.createObjectURL(b);
-          setPreviewUrl(objectUrl);
-        }, "image/png");
-      };
-      im.src = srcUrl;
-    }
-
-    return () => {
-      cancelled = true;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [result, unlocked]);
-
-  function onAdComplete() {
+  function download() {
     if (!result || !file) return;
-    setShowAdGate(false);
-    setUnlocked(true);
     const ext = format === "jpeg" ? "jpg" : format;
     const base = file.name.replace(/\.[^.]+$/, "") || "photo";
     downloadBlob(result.blob, `${base}-resized.${ext}`);
@@ -197,7 +161,6 @@ export function ResizeTool() {
     setImg(null);
     setResult(null);
     setEncodeMs(null);
-    setUnlocked(false);
     setError(null);
   }
 
@@ -434,12 +397,12 @@ export function ResizeTool() {
           {/* Actions */}
           <div className="space-y-2">
             <button
-              onClick={() => (unlocked ? onAdComplete() : setShowAdGate(true))}
+              onClick={download}
               disabled={!result || processing}
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
-              {processing ? "Resizing…" : unlocked ? `Download again (${formatKb(resultKb)})` : "Watch ad to download — free"}
+              {processing ? "Resizing…" : `Download (${formatKb(resultKb)})`}
             </button>
             <button
               onClick={pipeToCompressor}
@@ -463,7 +426,6 @@ export function ResizeTool() {
       <StudioPrivacyNote />
 
       {error && <Notice tone="error">{error}</Notice>}
-      {showAdGate && <AdGate onComplete={onAdComplete} onCancel={() => setShowAdGate(false)} />}
     </div>
   );
 }
