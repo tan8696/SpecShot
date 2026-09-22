@@ -161,7 +161,7 @@ npm run dev          # http://localhost:3000
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Production | Absolute base URL used for metadata, `sitemap.xml` and `robots.txt` |
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | Optional | AdSense publisher ID — no ad script loads when unset |
-| `NEXT_PUBLIC_ADSENSE_SLOT_ID` | Optional | AdSense ad unit slot ID |
+| `NEXT_PUBLIC_ADSENSE_SLOT_ID` | Optional | AdSense ad unit slot ID for the download ad — committed in `.env.production` |
 
 <details>
 <summary><b>📋 Pre-launch checklist</b></summary>

@@ -87,13 +87,16 @@ export function AdGate({ onComplete, onCancel }: { onComplete: () => void; onCan
               <span>Advertisement</span>
               <span aria-live="polite">{secondsLeft}s</span>
             </div>
-            {ADSENSE_CLIENT && ADSENSE_SLOT ? (
-              <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />
-            ) : (
-              <div className="flex h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-center text-sm text-outline">
+            {/* The message and the ad unit share one grid cell, the unit on
+                top. An empty unit — before AdSense approval, with no ad to
+                fill it, or behind an ad blocker — is transparent, so the
+                message shows through instead of a blank box. */}
+            <div className="grid">
+              <div className="col-start-1 row-start-1 flex min-h-56 items-center justify-center rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest text-center text-sm text-outline">
                 No ad to show right now. Your download still works the same.
               </div>
-            )}
+              {ADSENSE_CLIENT && ADSENSE_SLOT && <AdUnit client={ADSENSE_CLIENT} slot={ADSENSE_SLOT} />}
+            </div>
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
               <div
                 className="h-full bg-primary transition-all duration-1000 ease-linear"
@@ -130,14 +133,17 @@ function AdUnit({ client, slot }: { client: string; slot: string }) {
     try {
       ((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle ??= []).push({});
     } catch {
-      // Ad blocked or script not loaded yet — the box just stays empty.
+      // Ad blocked or script not loaded yet — the unit stays empty and the
+      // message behind it shows.
     }
   }, []);
 
+  // AdSense marks a unit it served data-ad-status="filled". The solid
+  // background then keeps the message from showing around a smaller ad.
   return (
     <ins
       ref={insRef}
-      className="adsbygoogle"
+      className="adsbygoogle col-start-1 row-start-1 data-[ad-status=filled]:bg-surface-container-lowest"
       style={{ display: "block", minHeight: 224 }}
       data-ad-client={client}
       data-ad-slot={slot}
