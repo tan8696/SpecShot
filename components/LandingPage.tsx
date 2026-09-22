@@ -48,9 +48,9 @@ const PROMISES: { icon: string; title: string; body: string }[] = [
   {
     icon: "person_off",
     title: "No account, ever",
-    // Was "no tracking cookies" — that stops being true the moment a visitor
-    // accepts the ad banner, so it now says what is actually guaranteed.
-    body: "No sign-up, no email, no password. Open a tool and use it — ads only set a cookie if you accept them.",
+    // No cookie promise here: AdSense loads on every page, and whether it
+    // sets a cookie depends on Google's consent rules for the visitor's region.
+    body: "No sign-up, no email, no password. Open a tool and use it.",
   },
 ];
 

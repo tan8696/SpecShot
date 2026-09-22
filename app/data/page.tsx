@@ -11,10 +11,10 @@ export const metadata: Metadata = {
 const ROWS: { icon: string; q: string; a: string; tone?: "good" }[] = [
   { icon: "photo_camera", q: "Your photos, signatures, PDFs", a: "Never leave your device. There is no upload button that sends them anywhere, because there is no server for them to go to.", tone: "good" },
   { icon: "account_circle", q: "Account information", a: "None exists — there's no sign-up, no login, no password, no email required to use any tool." },
-  { icon: "monitoring", q: "Analytics or tracking scripts", a: "One: an anonymous visit counter (Vercel Web Analytics) that sets no cookie and can't identify you — just aggregate traffic numbers. No pixel, no session recorder, no “how did you use this page” script." },
-  { icon: "fingerprint", q: "A profile of you across visits", a: "Not built. No accounts exist, and the visit counter above forgets you within 24 hours by design — there's nothing that links one visit to the next." },
-  { icon: "cookie", q: "Cookies", a: "None from SpecShot itself. Google AdSense may set one — only if you accept the banner on your first visit." },
-  { icon: "save", q: "Browser storage SpecShot does use", a: "Two small, functional things: a same-tab handoff when you move an image between tools (deleted the instant it's read), and your ad-cookie choice. Neither is ever sent anywhere — see the table below." },
+  { icon: "monitoring", q: "Analytics or tracking scripts", a: "Two: an anonymous visit counter (Vercel Web Analytics) that sets no cookie and can't identify you, and Google AdSense, which serves and measures the ads. No session recorder, no “how did you use this page” script." },
+  { icon: "fingerprint", q: "A profile of you across visits", a: "None built by SpecShot. No accounts exist, and the visit counter above forgets you within 24 hours. Google's ad cookies can recognize your browser across visits to personalize ads — you can switch that off in Google's Ads Settings." },
+  { icon: "cookie", q: "Cookies", a: "None from SpecShot itself. Google AdSense, which serves the ads, may set some — in the EEA, UK and Switzerland it asks for your consent first." },
+  { icon: "save", q: "Browser storage SpecShot does use", a: "One small, functional thing: a same-tab handoff when you move an image between tools (deleted the instant it's read). It's never sent anywhere — see the table below." },
 ];
 
 export default function DataPage() {
@@ -75,12 +75,6 @@ export default function DataPage() {
               <td className="p-2.5">Session storage</td>
               <td className="p-2.5 text-secondary">Never</td>
               <td className="p-2.5">Read once, or tab closed</td>
-            </tr>
-            <tr>
-              <td className="p-2.5">Ad-cookie choice</td>
-              <td className="p-2.5">Local storage</td>
-              <td className="p-2.5 text-secondary">Never</td>
-              <td className="p-2.5">You reset it, or clear browser data</td>
             </tr>
             <tr>
               <td className="p-2.5">App code / ML model files</td>

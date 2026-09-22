@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "The terms for using SpecShot's free, ad-supported, browser-based image tools.",
 };
 
-const LAST_UPDATED = "September 11, 2026";
+const LAST_UPDATED = "September 22, 2026";
 
 export default function TermsPage() {
   return (
@@ -62,8 +62,8 @@ export default function TermsPage() {
         <section>
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Advertising</h2>
           <p>
-            SpecShot is supported by advertising served through Google AdSense, shown only after you accept the
-            cookie banner. Declining means no ads or ad cookies load, and every tool still works the same way. See
+            SpecShot is supported by advertising served through Google AdSense. Every tool works the same way
+            whatever you choose about ad cookies. See
             the <Link href="/privacy/" className="text-primary underline hover:text-primary-fixed">Privacy Policy</Link>{" "}
             and <Link href="/cookies/" className="text-primary underline hover:text-primary-fixed">Cookie Policy</Link> for detail.
           </p>

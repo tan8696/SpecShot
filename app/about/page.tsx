@@ -90,9 +90,8 @@ export default function AboutPage() {
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">How it is paid for</h2>
           <p>
             SpecShot is free, with no paywall, no subscription and no watermark on your results. It is supported by
-            advertising, which loads only if you accept the cookie banner on your first visit. Declining means no ad
-            script loads and no advertising cookie is set &mdash; and every tool, including downloads, works exactly
-            the same either way.
+            advertising served through Google AdSense, and every tool, including downloads, works exactly the same
+            whatever you choose about ad cookies.
           </p>
         </section>
 
