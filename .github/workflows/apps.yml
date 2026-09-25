@@ -56,12 +56,27 @@ jobs:
           node scripts/gen-icons.mjs --android android/app/src/main/res
           # Camera for live ID-photo capture; storage so Android 9 and older can save to Documents.
           sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />#' android/app/src/main/AndroidManifest.xml
-      # ponytail: debug-signed with a key made fresh on each runner, so a new release
-      # can't install over an old one. Sign with a keystore from repo secrets once
-      # in-place updates matter.
-      - run: chmod +x gradlew && ./gradlew assembleDebug
+          # Android only installs a new APK over an old one if versionCode goes up;
+          # the run number always does. versionName is the tag without its "v".
+          VERSION=dev
+          [[ "$GITHUB_REF" == refs/tags/v* ]] && VERSION="${GITHUB_REF_NAME#v}"
+          sed -i -e "s/versionCode 1$/versionCode $GITHUB_RUN_NUMBER/" -e "s/versionName \"1.0\"/versionName \"$VERSION\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
+      # Signed with the release key from repo secrets, so every release installs
+      # over the last one. The password reaches apksigner by env var, never argv.
+      - name: Build and sign the APK
         working-directory: android
-      - run: mv android/app/build/outputs/apk/debug/app-debug.apk SpecShot.apk
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          chmod +x gradlew && ./gradlew assembleRelease
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
+          "$BT/zipalign" -c 4 "$UNSIGNED"
+          "$BT/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-pass env:ANDROID_KEYSTORE_PASSWORD --ks-key-alias specshot --out ../SpecShot.apk "$UNSIGNED"
+          "$BT/apksigner" verify --print-certs ../SpecShot.apk
       - uses: actions/upload-artifact@v4
         with:
           name: android
