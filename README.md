@@ -52,6 +52,7 @@ What started as an ID-photo checker grew into a complete **browser-based image s
 ### 🧩 Platform
 - **Tools chain together** — hand a crop or edit straight into the compressor without touching disk
 - **Installable PWA** — works offline after first load
+- **Windows & Android apps** — the same static export wrapped with Electron (`desktop/`) and Capacitor, built by GitHub Actions
 - **SEO spec pages** — every verified document gets its own page, cited to its government source
 - **Full legal set** — privacy, terms, cookies and data pages; EEA/UK/CH ad consent runs through Google's certified consent message, and declining never breaks a tool
 - **Static export** — ships as plain HTML/CSS/JS; deploys to any static host
@@ -162,6 +163,15 @@ npm run dev          # http://localhost:3000
 | `NEXT_PUBLIC_SITE_URL` | Production | Absolute base URL used for metadata, `sitemap.xml` and `robots.txt` |
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID` | Optional | AdSense publisher ID — no ad script loads when unset |
 | `NEXT_PUBLIC_ADSENSE_SLOT_ID` | Optional | AdSense ad unit slot ID for the download ad — committed in `.env.production` |
+| `NEXT_PUBLIC_NATIVE_APP` | Apps only | `windows` or `android`, set by `.github/workflows/apps.yml` — hides the "get the app" popup and analytics, and switches downloads to Android storage |
+
+### Releasing the apps
+
+Push a version tag and the **Apps** workflow builds `SpecShot-Setup.exe` (Windows) and `SpecShot.apk` (Android) and attaches them to a GitHub release. The site's download popup always links to the latest release.
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
 
 <details>
 <summary><b>📋 Pre-launch checklist</b></summary>

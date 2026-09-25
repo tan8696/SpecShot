@@ -70,15 +70,21 @@ function cornerAlpha(x, y, size, radius) {
   return Math.round(255 * (radius + 1 - dist) / 2);
 }
 
-function makeIcon(size) {
+/** `foreground`: an Android adaptive-icon layer — the letter alone on
+ * transparent, drawn inside the central 64 of 108dp so no launcher mask
+ * shape clips it. The indigo comes from the adaptive icon's background. */
+function makeIcon(size, { foreground = false } = {}) {
   const radius = Math.round(size * 0.22);
+  const inset = foreground ? (size * 22) / 108 : 0;
+  const grid = foreground ? (size * 64) / 108 : size;
   const raw = Buffer.alloc((size * 4 + 1) * size);
   let offset = 0;
   for (let y = 0; y < size; y++) {
     raw[offset++] = 0; // filter: none
     for (let x = 0; x < size; x++) {
-      const [r, g, b] = pixelIsLetter(x, y, size) ? WHITE : INDIGO;
-      const a = cornerAlpha(x, y, size, radius);
+      const letter = pixelIsLetter(x - inset, y - inset, grid);
+      const [r, g, b] = letter ? WHITE : INDIGO;
+      const a = foreground ? (letter ? 255 : 0) : cornerAlpha(x, y, size, radius);
       raw[offset++] = r;
       raw[offset++] = g;
       raw[offset++] = b;
@@ -101,10 +107,43 @@ function makeIcon(size) {
   return Buffer.concat([signature, chunk("IHDR", ihdr), chunk("IDAT", idat), chunk("IEND", Buffer.alloc(0))]);
 }
 
-const outDir = path.join(process.cwd(), "public");
-fs.mkdirSync(outDir, { recursive: true });
-for (const size of [192, 512]) {
-  const file = path.join(outDir, `icon-${size}.png`);
-  fs.writeFileSync(file, makeIcon(size));
-  console.log("wrote", file);
+// `--android <res dir>`: launcher icons and splash for the Capacitor APK
+// (.github/workflows/apps.yml), replacing the Capacitor placeholders.
+const androidRes = process.argv[2] === "--android" ? process.argv[3] : null;
+
+if (androidRes) {
+  // Legacy icons are 48dp, adaptive foregrounds 108dp, at each density.
+  const densities = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 };
+  for (const [density, k] of Object.entries(densities)) {
+    const dir = path.join(androidRes, `mipmap-${density}`);
+    fs.writeFileSync(path.join(dir, "ic_launcher.png"), makeIcon(48 * k));
+    fs.writeFileSync(path.join(dir, "ic_launcher_round.png"), makeIcon(48 * k));
+    fs.writeFileSync(path.join(dir, "ic_launcher_foreground.png"), makeIcon(108 * k, { foreground: true }));
+  }
+  const hex = "#" + INDIGO.map((c) => c.toString(16).padStart(2, "0")).join("");
+  fs.writeFileSync(
+    path.join(androidRes, "values", "ic_launcher_background.xml"),
+    `<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">${hex}</color>
+</resources>
+`
+  );
+  // Capacitor's splash is its own logo; launch onto the site's dark surface instead.
+  for (const dir of fs.readdirSync(androidRes)) fs.rmSync(path.join(androidRes, dir, "splash.png"), { force: true });
+  fs.writeFileSync(
+    path.join(androidRes, "drawable", "splash.xml"),
+    `<?xml version="1.0" encoding="utf-8"?>
+<color xmlns:android="http://schemas.android.com/apk/res/android" android:color="#131313" />
+`
+  );
+  console.log("wrote Android icons and splash into", androidRes);
+} else {
+  const outDir = path.join(process.cwd(), "public");
+  fs.mkdirSync(outDir, { recursive: true });
+  for (const size of [192, 512]) {
+    const file = path.join(outDir, `icon-${size}.png`);
+    fs.writeFileSync(file, makeIcon(size));
+    console.log("wrote", file);
+  }
 }

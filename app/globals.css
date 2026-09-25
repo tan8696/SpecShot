@@ -110,3 +110,37 @@ body {
   -webkit-font-smoothing: antialiased;
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
+
+/* Touchscreens: finger-sized targets. In the base layer so a component's own
+   size utilities still win where one is set deliberately. */
+@layer base {
+  @media (pointer: coarse) {
+    button,
+    select,
+    summary {
+      min-height: 2.5rem;
+    }
+    /* The track stays thin; only the grab area grows. */
+    input[type="range"] {
+      height: 2rem;
+    }
+  }
+}
+
+/* iOS zooms the page into any focused field under 16px and doesn't zoom back
+   out. Unlayered on purpose: it has to beat text-xs/text-sm utilities. */
+@media (pointer: coarse) {
+  input:not([type="range"], [type="checkbox"], [type="radio"], [type="color"], [type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* components/AppDownloadPrompt.tsx slides up from the bottom edge. */
+@keyframes app-prompt-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}

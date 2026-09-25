@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { PageBackground } from "@/components/PageBackground";
+import { AppDownloadPrompt } from "@/components/AppDownloadPrompt";
 import "./globals.css";
 
 // Geist for display type, Inter for body — used only by the landing page via
@@ -77,11 +78,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             pointer-transparent, so it never affects page layout. */}
         <PageBackground />
         {children}
+        <AppDownloadPrompt />
         {/* Vercel Web Analytics — cookieless, no IP storage, counts page
             views in aggregate only. See app/privacy/page.tsx for the
             disclosure. It needs no consent: it sets no cookie and can't
-            identify a visitor, so there's nothing to opt into or out of. */}
-        <Analytics />
+            identify a visitor, so there's nothing to opt into or out of.
+            Left out of the apps: they have no /_vercel endpoint to report to. */}
+        {!process.env.NEXT_PUBLIC_NATIVE_APP && <Analytics />}
       </body>
     </html>
   );
