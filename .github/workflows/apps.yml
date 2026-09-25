@@ -1,0 +1,82 @@
+# Builds the Windows installer and the Android APK from the same static export
+# the website serves. Push a tag like v1.0.0 to publish both to a GitHub
+# release under fixed names — the site's download popup
+# (components/AppDownloadPrompt.tsx) links to releases/latest/download/<name>.
+name: Apps
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: [".github/workflows/apps.yml", "desktop/**", "capacitor.config.json", "lib/download.ts", "scripts/gen-icons.mjs"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_NATIVE_APP: windows
+      - run: npm ci && npm run dist
+        working-directory: desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: desktop/dist/SpecShot-Setup.exe
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_NATIVE_APP: android
+      - name: Generate the Android project
+        run: |
+          npx cap add android
+          node scripts/gen-icons.mjs --android android/app/src/main/res
+          # Camera for live ID-photo capture; storage so Android 9 and older can save to Documents.
+          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />#' android/app/src/main/AndroidManifest.xml
+      # ponytail: debug-signed with a key made fresh on each runner, so a new release
+      # can't install over an old one. Sign with a keystore from repo secrets once
+      # in-place updates matter.
+      - run: chmod +x gradlew && ./gradlew assembleDebug
+        working-directory: android
+      - run: mv android/app/build/outputs/apk/debug/app-debug.apk SpecShot.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: SpecShot.apk
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            SpecShot-Setup.exe
+            SpecShot.apk

@@ -219,10 +219,18 @@ export function LandingPage() {
               </span>
               <div>
                 <p className="font-display text-base font-medium text-on-surface">
-                  {busy ? "Opening the editor…" : "Drop an image to start editing"}
+                  {busy ? (
+                    "Opening the editor…"
+                  ) : (
+                    <>
+                      <span className="pointer-coarse:hidden">Drop an image to start editing</span>
+                      <span className="hidden pointer-coarse:inline">Tap to pick a photo to edit</span>
+                    </>
+                  )}
                 </p>
                 <p className="mt-0.5 text-sm text-on-surface-variant">
-                  Or click to choose — it opens in the photo editor. Nothing is uploaded.
+                  <span className="pointer-coarse:hidden">Or click to choose — it opens</span>
+                  <span className="hidden pointer-coarse:inline">It opens</span> in the photo editor. Nothing is uploaded.
                 </p>
               </div>
             </div>

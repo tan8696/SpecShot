@@ -22,3 +22,9 @@ next-env.d.ts
 
 # /graphify knowledge-graph output + tooling cache
 /graphify-out/
+
+# app wrappers — android/ and assets/ are generated in CI (.github/workflows/apps.yml)
+/android/
+/assets/
+/desktop/node_modules/
+/desktop/dist/

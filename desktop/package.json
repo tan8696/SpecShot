@@ -1,0 +1,29 @@
+{
+  "name": "specshot-desktop",
+  "version": "1.0.0",
+  "description": "SpecShot for Windows",
+  "author": "SpecShot",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis --publish never"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "app.specshot.desktop",
+    "productName": "SpecShot",
+    "directories": { "output": "dist" },
+    "files": ["main.js"],
+    "extraResources": [{ "from": "../out", "to": "site" }],
+    "win": { "target": "nsis", "icon": "../public/icon-512.png" },
+    "nsis": {
+      "artifactName": "SpecShot-Setup.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

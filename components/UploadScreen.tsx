@@ -41,9 +41,9 @@ export function UploadScreen({
   }
 
   return (
-    <div className="flex flex-col items-center py-16 text-center">
+    <div className="flex flex-col items-center py-8 text-center sm:py-16">
       <h2 className="mb-2 font-display text-2xl font-semibold tracking-tight text-on-surface">{heading}</h2>
-      <p className="mb-10 max-w-md text-sm text-on-surface-variant">{subheading}</p>
+      <p className="mb-6 max-w-md text-sm text-on-surface-variant sm:mb-10">{subheading}</p>
 
       <label
         onDragOver={(e) => {
@@ -56,7 +56,7 @@ export function UploadScreen({
           setDragOver(false);
           handle(e.dataTransfer.files);
         }}
-        className={`flex w-full max-w-xl cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-10 py-16 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 ${
+        className={`flex w-full max-w-xl cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed px-6 py-10 transition-colors sm:px-10 sm:py-16 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary/40 ${
           dragOver
             ? "border-primary bg-primary/10"
             : "border-outline-variant/60 bg-surface-container-low hover:border-primary/60 hover:bg-surface-container"
@@ -67,7 +67,8 @@ export function UploadScreen({
         <span className="rounded-lg bg-primary-container px-5 py-2.5 text-sm font-semibold text-on-primary-container shadow-sm">
           {dragOver ? "Drop it" : selectLabel}
         </span>
-        <span className="text-sm text-on-surface-variant">or drag and drop {multiple ? "them" : "it"} here</span>
+        {/* No drag and drop on a touchscreen — don't offer it there. */}
+        <span className="text-sm text-on-surface-variant pointer-coarse:hidden">or drag and drop {multiple ? "them" : "it"} here</span>
         <span className="text-xs text-outline">{hint}</span>
 
         {/* sr-only, not hidden: display:none removes an input from the tab

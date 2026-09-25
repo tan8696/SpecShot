@@ -21,7 +21,8 @@ export function AppShell() {
   const [mode, setMode] = useState<Mode>(initialTool === "signature" ? "signature" : "compress");
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
+    // The apps bundle every file already; a worker there would only cache stale copies.
+    if ("serviceWorker" in navigator && !process.env.NEXT_PUBLIC_NATIVE_APP) {
       navigator.serviceWorker.register("/sw.js").catch(() => {
         // Offline support is a bonus, not a requirement — fail silently.
       });
@@ -32,12 +33,12 @@ export function AppShell() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <header className="mb-6 flex items-center justify-between gap-3 border-b border-outline-variant/30 pb-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container font-display text-sm font-bold text-on-primary-container">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-container font-display text-sm font-bold text-on-primary-container">
             S
           </div>
           <div>
             <h1 className="font-display text-xl font-semibold tracking-tight text-on-surface">SpecShot</h1>
-            <p className="mt-0.5 flex items-center gap-1.5 text-sm text-on-surface-variant">
+            <p className="mt-0.5 hidden items-center gap-1.5 text-sm text-on-surface-variant sm:flex">
               <span className="material-symbols-outlined text-[15px] text-secondary">lock</span>
               Runs in your browser — nothing is uploaded.
             </p>

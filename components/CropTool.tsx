@@ -429,7 +429,8 @@ export function CropTool() {
                             e.stopPropagation();
                             onHandleDown(h, e);
                           }}
-                          className={`absolute -translate-x-1/2 -translate-y-1/2 ${
+                          // before: widens the grab area to ~36px for fingers without changing the look.
+                          className={`absolute -translate-x-1/2 -translate-y-1/2 before:absolute before:-inset-3 before:content-[''] ${
                             isCorner ? "h-3 w-3 rounded-[3px] bg-primary" : "bg-secondary"
                           } ${h === "n" || h === "s" ? "h-1.5 w-5 rounded-full" : ""} ${
                             h === "e" || h === "w" ? "h-5 w-1.5 rounded-full" : ""
@@ -465,7 +466,7 @@ export function CropTool() {
                   step={0.5}
                   value={straighten}
                   onChange={(e) => setStraighten(Number(e.target.value))}
-                  className="h-1 w-24 accent-primary"
+                  className="h-1 w-24 accent-primary pointer-coarse:h-8"
                   aria-label="Straighten angle"
                 />
                 <span className="w-10 font-mono text-[11px] text-secondary">{straighten.toFixed(1)}°</span>
