@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS, type ToolCategory } from "@/lib/tools";
 import { stashHandoffImage } from "@/lib/handoff";
+import { APP_DOWNLOAD_URL } from "@/lib/site";
 
 type Filter = "all" | ToolCategory;
 
@@ -445,6 +446,15 @@ export function LandingPage() {
               <p className="mt-2 text-sm text-on-surface-variant">
                 Browser-based image tools. Nothing you open is uploaded.
               </p>
+              {!process.env.NEXT_PUBLIC_NATIVE_APP && (
+                <a
+                  href={APP_DOWNLOAD_URL}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm text-on-surface-variant transition-colors hover:text-on-surface"
+                >
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">download</span>
+                  Download the app
+                </a>
+              )}
             </div>
             <FooterCol
               title="Tools"

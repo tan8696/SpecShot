@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ToolNav } from "./ToolNav";
 import { CompressTool } from "./CompressTool";
 import { SignatureTool } from "./SignatureTool";
+import { APP_DOWNLOAD_URL } from "@/lib/site";
 
 type Mode = "compress" | "signature";
 
@@ -93,6 +94,14 @@ export function AppShell() {
         <Link href="/terms" className="transition-colors hover:text-on-surface">
           Terms
         </Link>
+        {!process.env.NEXT_PUBLIC_NATIVE_APP && (
+          <>
+            <span>·</span>
+            <a href={APP_DOWNLOAD_URL} className="transition-colors hover:text-on-surface">
+              Download the app
+            </a>
+          </>
+        )}
       </footer>
     </div>
   );
