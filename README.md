@@ -173,6 +173,8 @@ Push a version tag and the **Apps** workflow builds `SpecShot-Setup.exe` (Window
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
+The APK is signed with a release key (alias `specshot`) held in the `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEYSTORE_PASSWORD` repo secrets. Keep an offline backup of that keystore: without it, no future APK can install as an update over the one people already have.
+
 <details>
 <summary><b>📋 Pre-launch checklist</b></summary>
 
