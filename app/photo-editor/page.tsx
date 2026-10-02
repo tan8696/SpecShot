@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { PhotoEditorTool } from "@/components/PhotoEditorTool";
 
 export const metadata: Metadata = {
-  title: "Photo Editor — Free Online Image Editor, No Upload — SpecShot",
-  description: "Adjust brightness, contrast and colour, apply filters, add a border or caption, rotate and flip. Runs entirely in your browser.",
+  alternates: { canonical: "/photo-editor/" },
+  title: "Free Online Photo Editor — No Upload | SpecShot",
+  description: "Edit photos online free: brightness, contrast, filters, borders, captions, rotate and flip. Runs in your browser — no upload, no sign-up.",
 };
 
 export default function PhotoEditorPage() {

@@ -5,11 +5,12 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy/" },
   title: "Privacy Policy — SpecShot",
   description: "Exactly what SpecShot does and doesn't collect: your photos, browser storage, cookies, and advertising data.",
 };
 
-const LAST_UPDATED = "September 22, 2026";
+const LAST_UPDATED = "October 2, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -65,8 +66,9 @@ export default function PrivacyPage() {
           <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Analytics and tracking</h2>
           <p>
             SpecShot uses Vercel Web Analytics to see how many people visit the site and which pages they land on —
-            aggregate traffic numbers, not individual behavior. Apart from the Google AdSense advertising described
-            below, it runs no other analytics, no tracking pixel, and no session-recording script.
+            aggregate traffic numbers, not individual behavior — and Google Analytics 4 to understand which pages and
+            searches bring people in. Apart from those two and the Google AdSense advertising described below, it
+            runs no other analytics, no tracking pixel, and no session-recording script.
           </p>
           <p className="mt-3">
             Vercel Web Analytics sets no cookie and stores no IP address. Each page view is counted using a hash
@@ -76,6 +78,17 @@ export default function PrivacyPage() {
             precise location), and general device/browser type. None of it can be linked to your photos, files, or
             anything you do inside a tool — those never leave your device regardless. Because it can&rsquo;t identify
             anyone, this runs for every visitor and needs no consent.
+          </p>
+          <p className="mt-3">
+            Google Analytics sets first-party cookies (<span className="font-mono">_ga</span>,{" "}
+            <span className="font-mono">_ga_*</span>) to tell repeat visits from new ones, and records the pages you
+            view, how you arrived, and your device type and approximate location. Google truncates IP addresses and
+            doesn&rsquo;t log them. In the EEA, UK and Switzerland these cookies are only set after you accept in
+            Google&rsquo;s consent message. You can block it anywhere with Google&rsquo;s{" "}
+            <a href="https://tools.google.com/dlpage/gaoptout" className="text-primary underline hover:text-primary-fixed">
+              opt-out add-on
+            </a>
+            . Like everything else here, it never sees your photos or files.
           </p>
         </section>
 

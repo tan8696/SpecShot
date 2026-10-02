@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { ConvertTool } from "@/components/ConvertTool";
 
 export const metadata: Metadata = {
-  title: "Convert Image — JPG, PNG, WebP — Free, No Upload — SpecShot",
-  description: "Convert an image between JPG, PNG, and WebP. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/convert-image/" },
+  title: "Convert Image to JPG, PNG or WebP Free | SpecShot",
+  description: "Free image converter: change JPG to PNG, PNG to JPG, or WebP to JPG in seconds. Runs in your browser — no upload, no sign-up, no watermark.",
 };
 
 export default function ConvertImagePage() {

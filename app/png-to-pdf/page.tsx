@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { ImageToPdfTool } from "@/components/ImageToPdfTool";
 
 export const metadata: Metadata = {
-  title: "PNG to PDF — Combine Images into a PDF Free, No Upload — SpecShot",
-  description: "Combine several PNG images into a single PDF, one per page. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/png-to-pdf/" },
+  title: "PNG to PDF Converter — Free, No Upload | SpecShot",
+  description: "Combine one or many PNG images into a single PDF free. Reorder pages, then download — runs in your browser, nothing is uploaded.",
 };
 
 export default function PngToPdfPage() {

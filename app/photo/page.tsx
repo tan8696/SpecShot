@@ -5,8 +5,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "ID Photo Requirements by Country & Document — SpecShot",
-  description: "Exact, government-sourced photo dimensions for passports, visas, and ID documents by country.",
+  alternates: { canonical: "/photo/" },
+  title: "Passport & Visa Photo Size by Country | SpecShot",
+  description: "Official passport, visa and ID photo sizes by country — dimensions in mm and pixels, head height and file size, sourced from government sites.",
 };
 
 export default function SpecIndexPage() {

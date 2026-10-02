@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { HeicTool } from "@/components/HeicTool";
 
 export const metadata: Metadata = {
-  title: "HEIC to PNG — Convert iPhone Photos Free, No Upload — SpecShot",
-  description: "Convert an iPhone HEIC/HEIF photo to a lossless PNG. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/heic-to-png/" },
+  title: "HEIC to PNG Converter — Free, No Upload | SpecShot",
+  description: "Convert iPhone HEIC photos to lossless PNG free, in your browser. No upload, no sign-up and no watermark.",
 };
 
 export default function HeicToPngPage() {

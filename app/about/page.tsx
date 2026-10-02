@@ -4,7 +4,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "About SpecShot — Why It Exists and How It Works",
+  alternates: { canonical: "/about/" },
+  title: "About SpecShot — Private, In-Browser Photo Tools",
   description:
     "SpecShot measures ID photos against published government specifications and runs every tool on your own device. What it does, how it works, and what is verified so far.",
 };

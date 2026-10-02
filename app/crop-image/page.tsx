@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { CropTool } from "@/components/CropTool";
 
 export const metadata: Metadata = {
-  title: "Crop Image Online — Free, No Upload — SpecShot",
-  description: "Drag a selection rectangle to crop any photo, with aspect-ratio presets or exact numbers. Runs entirely in your browser.",
+  alternates: { canonical: "/crop-image/" },
+  title: "Crop Image Online Free — No Upload | SpecShot",
+  description: "Crop a photo online with free aspect-ratio presets (1:1, 4:3, 16:9) or exact pixel sizes. Runs in your browser — no upload, no sign-up, no watermark.",
 };
 
 export default function CropImagePage() {

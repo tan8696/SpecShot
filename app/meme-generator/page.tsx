@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { MemeTool } from "@/components/MemeTool";
 
 export const metadata: Metadata = {
-  title: "Meme Generator — Caption Any Image Free, No Upload — SpecShot",
-  description: "Add classic top and bottom captions to any image. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/meme-generator/" },
+  title: "Meme Generator — Free, No Watermark | SpecShot",
+  description: "Make a meme from any image: add classic top and bottom captions and download free with no watermark. Runs in your browser, nothing uploaded.",
 };
 
 export default function MemeGeneratorPage() {

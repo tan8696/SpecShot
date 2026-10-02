@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { WatermarkTool } from "@/components/WatermarkTool";
 
 export const metadata: Metadata = {
-  title: "Watermark Image Online — Free, No Upload — SpecShot",
-  description: "Stamp your own text or logo onto a photo, with adjustable position and opacity. Runs entirely in your browser.",
+  alternates: { canonical: "/watermark-image/" },
+  title: "Add Watermark to Photo Online Free | SpecShot",
+  description: "Add a text or logo watermark to photos, tiled or single, with adjustable position and opacity. Free, runs in your browser — nothing uploaded.",
 };
 
 export default function WatermarkImagePage() {

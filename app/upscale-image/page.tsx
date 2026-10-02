@@ -6,9 +6,10 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { UpscaleTool } from "@/components/UpscaleTool";
 
 export const metadata: Metadata = {
-  title: "Upscale Image Online — Enlarge & Sharpen, No Upload — SpecShot",
+  alternates: { canonical: "/upscale-image/" },
+  title: "Upscale Image 2x, 4x Free — No Upload | SpecShot",
   description:
-    "Enlarge a photo 2×, 3× or 4× with a stepped resample and an unsharp mask, so it stays as crisp as an enlargement can be. Runs entirely in your browser — nothing is uploaded.",
+    "Enlarge a photo 2×, 3× or 4× and sharpen it so it stays crisp. Free image upscaler that runs in your browser — nothing is uploaded.",
 };
 
 export default function UpscaleImagePage() {

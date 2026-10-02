@@ -23,15 +23,15 @@ const LINKS: [label: string, href: string][] = [
 export function SiteFooter() {
   return (
     <footer className="mt-16 border-t border-outline-variant/30 pt-8 text-sm text-on-surface-variant">
-      <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2">
+      <nav aria-label="Footer" className="flex flex-wrap gap-x-5">
         {LINKS.map(([label, href]) => (
-          <Link key={href} href={href} className="transition-colors hover:text-on-surface">
+          <Link key={href} href={href} className="inline-block py-1.5 transition-colors hover:text-on-surface">
             {label}
           </Link>
         ))}
         {/* Hidden inside the apps themselves (NEXT_PUBLIC_NATIVE_APP). */}
         {!process.env.NEXT_PUBLIC_NATIVE_APP && (
-          <a href={APP_DOWNLOAD_URL} className="transition-colors hover:text-on-surface">
+          <a href={APP_DOWNLOAD_URL} className="inline-block py-1.5 transition-colors hover:text-on-surface">
             Download the app
           </a>
         )}

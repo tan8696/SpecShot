@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/business/" },
   title: "SpecShot API for Visa Consultancies & Exam Coaching Centres",
   description: "Bulk ID photo compliance checking and cropping via API — for firms processing photos for many clients at once.",
 };

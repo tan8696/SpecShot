@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { RotateTool } from "@/components/RotateTool";
 
 export const metadata: Metadata = {
-  title: "Rotate Image Online — Free, No Upload — SpecShot",
-  description: "Rotate a photo in 90° steps, or flip it horizontally/vertically. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/rotate-image/" },
+  title: "Rotate Image Online — Rotate & Flip Free | SpecShot",
+  description: "Rotate a photo 90°, 180° or 270°, or flip it horizontally or vertically. Free, runs in your browser — no upload, no sign-up.",
 };
 
 export default function RotateImagePage() {

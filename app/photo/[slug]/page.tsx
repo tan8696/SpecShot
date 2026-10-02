@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const spec = findSpec(slug);
   if (!spec) return {};
 
-  const title = `${spec.country} ${spec.document} Photo Size — Exact Dimensions & Free Tool — SpecShot`;
+  const title = `${spec.country} ${spec.document} Photo Size & Requirements | SpecShot`;
   const description = `Official ${spec.country} ${spec.document.toLowerCase()} photo requirements: ${spec.print.width_mm}×${spec.print.height_mm}mm, head ${spec.head.height_mm_min}–${spec.head.height_mm_max}mm. Crop, measure, and verify your photo free in your browser — nothing uploaded.`;
 
-  return { title, description };
+  return { title, description, alternates: { canonical: `/photo/${slug}/` } };
 }
 
 function mmToIn(mm: number) {
