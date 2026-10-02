@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { APP_DOWNLOAD_URL } from "@/lib/site";
 
 // Stable asset names (set in .github/workflows/apps.yml) so "latest" always
 // resolves to the newest release without touching this file.
-const RELEASES = "https://github.com/tan8696/SpecShot/releases/latest/download";
+const RELEASES = `${APP_DOWNLOAD_URL}/download`;
 const APPS = {
   windows: { href: `${RELEASES}/SpecShot-Setup.exe`, label: "Windows", icon: "laptop_windows" },
   android: { href: `${RELEASES}/SpecShot.apk`, label: "Android", icon: "android" },
@@ -85,7 +86,7 @@ export function AppDownloadPrompt() {
                   : "border border-outline-variant/50 text-on-surface hover:bg-surface-container-high"
               }`}
             >
-              <span className="material-symbols-outlined text-[18px]">{app.icon}</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">{app.icon}</span>
               {app.label}
             </a>
           );

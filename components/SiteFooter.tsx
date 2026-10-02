@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CONTACT_EMAIL } from "@/lib/site";
+import { APP_DOWNLOAD_URL, CONTACT_EMAIL } from "@/lib/site";
 
 /**
  * Shared footer for every page that isn't the landing page — the landing page
@@ -29,6 +29,12 @@ export function SiteFooter() {
             {label}
           </Link>
         ))}
+        {/* Hidden inside the apps themselves (NEXT_PUBLIC_NATIVE_APP). */}
+        {!process.env.NEXT_PUBLIC_NATIVE_APP && (
+          <a href={APP_DOWNLOAD_URL} className="transition-colors hover:text-on-surface">
+            Download the app
+          </a>
+        )}
       </nav>
       <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-outline">
         <p>

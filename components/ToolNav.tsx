@@ -26,7 +26,7 @@ export function ToolNav() {
         <summary className="flex cursor-pointer list-none items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-1.5 font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">
           {/* Wrapped: the icon font's own CSS sets display and would beat sm:hidden. */}
           <span className="flex items-center gap-1 sm:hidden">
-            <span className="material-symbols-outlined text-[20px]">menu</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">menu</span>
             Tools
           </span>
           <span className="hidden sm:inline">More tools ▾</span>
