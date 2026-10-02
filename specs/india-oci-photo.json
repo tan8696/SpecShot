@@ -41,5 +41,8 @@
   ],
   "source_url": "https://ociservices.gov.in/Photo-Spec-FINAL.pdf",
   "verified": false,
-  "verified_on": null
+  "verified_on": null,
+  "research_notes": [
+    "2026-10-02: rendered the PDF page as an image. The eye-height sentence is truncated in the source itself ('1-1/8 inches to 1-3.') and the diagram's fractions are too low-resolution to read. Head-height conflict with the FAQ's '80% coverage' is still unresolved."
+  ]
 }

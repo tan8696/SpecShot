@@ -39,5 +39,8 @@
   ],
   "source_url": "https://mportal.passportindia.gov.in/pdf/Guidelines_for_ICAO_Compliant_Photographs_for_Passport_Applications.pdf",
   "verified": false,
-  "verified_on": null
+  "verified_on": null,
+  "research_notes": [
+    "2026-10-02: re-read the mportal PDF. It gives 630x810px, face 80-85% of the frame, white background, and 'Photos should be unaltered by computer software'. No mm print size or mm head height is published, so the head range here remains derived."
+  ]
 }
