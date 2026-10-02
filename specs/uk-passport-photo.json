@@ -2,20 +2,47 @@
   "slug": "uk-passport-photo",
   "country": "United Kingdom",
   "document": "Passport",
-  "aliases": ["UK passport photo", "British passport photo"],
-  "print": { "width_mm": 35, "height_mm": 45, "dpi": 300 },
-  "digital": { "width_px": 413, "height_px": 531, "format": "jpeg" },
-  "head": { "height_mm_min": 29, "height_mm_max": 34 },
-  "eye_line": { "from_bottom_pct_min": 30, "from_bottom_pct_max": 60 },
-  "background": { "color": "#FFFFFF", "tolerance": 25 },
+  "aliases": [
+    "UK passport photo",
+    "British passport photo"
+  ],
+  "print": {
+    "width_mm": 35,
+    "height_mm": 45,
+    "dpi": 300
+  },
+  "digital": {
+    "width_px": 413,
+    "height_px": 531,
+    "format": "jpeg"
+  },
+  "head": {
+    "height_mm_min": 29,
+    "height_mm_max": 34
+  },
+  "eye_line": {
+    "from_bottom_pct_min": 30,
+    "from_bottom_pct_max": 60
+  },
+  "background": {
+    "color": "#FFFFFF",
+    "tolerance": 25
+  },
   "rules": [
     "Neutral expression, mouth closed, eyes open and clearly visible",
     "No head covering except for religious or medical reasons",
     "Plain background in a light colour (white, cream, ivory, or light grey)",
     "No shadows on the face or background",
-    "Photo must be less than 1 month old"
+    "Photo must be less than 1 month old",
+    "Colour only — black and white photos are rejected",
+    "If you print it, use good-quality matte photo paper — glossy or textured paper is rejected",
+    "Glasses are allowed only if both eyes are fully visible with no glare or reflection",
+    "No mirror images — some phone front cameras flip selfies left to right"
   ],
   "source_url": "https://www.gov.uk/government/publications/photographic-standards/photo-standards-accessible",
   "verified": true,
-  "verified_on": "2026-09-05"
+  "verified_on": "2026-10-02",
+  "research_notes": [
+    "2026-10-02: re-read HMPO 'Photo standards' v51.0 (updated 4 March 2026). Confirmed 35x45mm, head 29-34mm crown to chin, eyes in the top 40-70% band (= 30-60% from bottom), any plain light background, last month. Background editing to remove shadows/marks is explicitly accepted if the likeness is unaffected; home-taken photos and selfies accepted. Added colour-only, matte paper, glasses and mirror-image rules from the same page. SpecShot's camera saves the unmirrored frame (components/CameraCapture.tsx)."
+  ]
 }
