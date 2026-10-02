@@ -29,6 +29,43 @@ const ON_DEVICE =
   "Every step happens inside your browser tab using Canvas and WebAssembly. The file is never uploaded, so there is no server copy to delete and no account to create.";
 
 export const TOOL_CONTENT: Record<string, ToolContent> = {
+  compress: {
+    lede: "Shrink a photo to fit an upload limit. Pick a visual quality, or type an exact size in kilobytes and the compressor searches for the highest quality that still fits under it — the usual requirement for exam, visa, job and government forms that cap uploads at 20KB, 50KB or 100KB.",
+    steps: [
+      "Choose a photo from your device, or drop it onto the page.",
+      "Pick an output format. JPG suits photos and works everywhere; WebP is smaller still where it is accepted.",
+      "Choose Exact KB and type the limit the form gives you, or use Visual quality and judge the preview yourself.",
+      "If the file still won't fit, turn on resize and lower the longest side — fewer pixels is the only way below a certain size.",
+      "Download the compressed file. The original on your device is left untouched.",
+    ],
+    faqs: [
+      {
+        q: "How do I compress a photo to exactly 20KB, 50KB or 100KB?",
+        a: "Switch to Exact KB and enter the number. The tool re-encodes the image at different quality levels, narrowing in on the highest one whose file is still under your limit, so you get the best-looking result that fits rather than an arbitrarily low setting.",
+      },
+      {
+        q: "Why can't I hit my KB target?",
+        a: "Quality only goes so low before an image turns to blocks. A large photo — say 4000 × 3000 from a phone camera — simply holds too many pixels to fit in 20KB at any quality. Turn on resize and cap the longest side (600–1000px is typical for forms); with fewer pixels the target becomes easy.",
+      },
+      {
+        q: "Why is Exact KB disabled for PNG?",
+        a: "PNG is lossless — it has no quality setting to trade against size, so there is nothing to search over. Choose JPG or WebP when you need to hit a file-size limit.",
+      },
+      {
+        q: "Does compressing change the dimensions of my photo?",
+        a: "No, not unless you turn on resize. Compression changes how much data describes each pixel, not how many pixels there are, so a 600 × 600 photo stays 600 × 600 — which matters when a form checks dimensions and file size separately.",
+      },
+      {
+        q: "What does the Signature tool do?",
+        a: "It takes a photo or scan of a signature on paper and lifts the ink off the background, leaving a clean signature you can then compress to the small file size that application portals ask for.",
+      },
+      {
+        q: "Is my photo uploaded anywhere?",
+        a: ON_DEVICE,
+      },
+    ],
+    note: "Re-compressing a JPG that was already compressed loses quality twice. If a portal rejects your file, go back to the original photo and compress that again to the new limit rather than shrinking the rejected copy.",
+  },
   "resize-image": {
     lede: "Set an exact width and height in pixels, or scale the whole image by a percentage. The aspect-ratio lock keeps the proportions intact so nothing ends up stretched, and you can switch it off when a target size demands exact dimensions.",
     steps: [

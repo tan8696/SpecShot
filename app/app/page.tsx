@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
-import { AdSlot } from "@/components/AdSlot";
+import { ToolPageSections } from "@/components/ToolPageSections";
+import { TOOL_CONTENT } from "@/lib/toolContent";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/app/" },
@@ -28,8 +29,8 @@ export default function AppPage() {
       </Suspense>
 
       <div className="mx-auto max-w-6xl px-4 pb-12 sm:px-6 lg:px-8">
-        <AdSlot />
-        <div className="mt-16 space-y-10 border-t border-outline-variant/30 pt-12 text-sm leading-relaxed text-on-surface-variant">
+        <ToolPageSections content={TOOL_CONTENT.compress} howTo="compress a photo to an exact size in KB" />
+        <div className="mt-12 space-y-10 border-t border-outline-variant/30 pt-12 text-sm leading-relaxed text-on-surface-variant">
           <section>
             <h2 className="mb-2 font-display text-xl font-semibold tracking-tight text-on-surface">
               What this does
