@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { PdfToImageTool } from "@/components/PdfToImageTool";
 
 export const metadata: Metadata = {
-  title: "PDF to JPG — Convert PDF Pages to Images Free, No Upload — SpecShot",
-  description: "Turn every page of a PDF into a JPG image. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/pdf-to-jpg/" },
+  title: "PDF to JPG Converter — Free, No Upload | SpecShot",
+  description: "Convert every page of a PDF to a high-quality JPG image free. Runs in your browser — your PDF is never uploaded. No sign-up.",
 };
 
 export default function PdfToJpgPage() {

@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact/" },
   title: "Contact SpecShot",
   description:
     "Get in touch about a document specification, a bug, a privacy question or business use of SpecShot.",

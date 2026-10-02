@@ -6,9 +6,10 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { AdSlot } from "@/components/AdSlot";
 
 export const metadata: Metadata = {
-  title: "Compress a Photo & Clean a Signature — SpecShot",
+  alternates: { canonical: "/app/" },
+  title: "Compress Image to KB (20KB, 50KB, 100KB) Free | SpecShot",
   description:
-    "Compress a photo to an exact file size in KB, or clean up a scanned signature for a form upload — all in your browser, nothing uploaded.",
+    "Compress a photo to an exact size in KB — 20KB, 50KB, 100KB or any target — for exam, visa and job forms. Free, and nothing is uploaded.",
 };
 
 export default function AppPage() {

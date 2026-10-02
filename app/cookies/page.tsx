@@ -5,11 +5,12 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/cookies/" },
   title: "Cookie Policy — SpecShot",
   description: "What SpecShot stores in your browser, which cookies Google AdSense may set, and how to control them.",
 };
 
-const LAST_UPDATED = "September 22, 2026";
+const LAST_UPDATED = "October 2, 2026";
 
 export default function CookiesPage() {
   return (
@@ -26,8 +27,9 @@ export default function CookiesPage() {
             SpecShot itself sets no cookies at all. The only thing it puts in your browser — session storage for
             passing an image between tools — isn&rsquo;t a cookie and isn&rsquo;t sent to anyone. Separately, an
             anonymous, cookie-free visit counter (Vercel Web Analytics) runs for every visitor — it can&rsquo;t
-            identify you, so there&rsquo;s nothing to consent to. The only real cookies come from Google AdSense,
-            which serves the ads — see below for when it asks first and how to opt out.
+            identify you, so there&rsquo;s nothing to consent to. The only real cookies come from Google — Google
+            Analytics, which measures traffic, and Google AdSense, which serves the ads. See below for when Google
+            asks first and how to opt out.
           </p>
         </section>
 
@@ -66,6 +68,20 @@ export default function CookiesPage() {
               Privacy Policy
             </Link>
             .
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-2 font-display text-base font-semibold text-on-surface">Analytics cookies</h2>
+          <p>
+            Google Analytics 4 sets <span className="font-mono">_ga</span> (2 years) and{" "}
+            <span className="font-mono">_ga_*</span> (2 years) to count unique and returning visitors and see which
+            pages people find useful. In the EEA, UK and Switzerland they&rsquo;re only set after you accept in
+            Google&rsquo;s consent message; elsewhere you can block them with Google&rsquo;s{" "}
+            <a href="https://tools.google.com/dlpage/gaoptout" className="text-primary underline hover:text-primary-fixed">
+              opt-out add-on
+            </a>{" "}
+            or your browser&rsquo;s cookie settings. Blocking them never breaks a tool.
           </p>
         </section>
 

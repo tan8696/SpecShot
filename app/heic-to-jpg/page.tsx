@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { HeicTool } from "@/components/HeicTool";
 
 export const metadata: Metadata = {
-  title: "HEIC to JPG — Convert iPhone Photos Free, No Upload — SpecShot",
-  description: "Convert an iPhone HEIC/HEIF photo to a JPG that anything can open. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/heic-to-jpg/" },
+  title: "HEIC to JPG Converter — Free, No Upload | SpecShot",
+  description: "Convert iPhone HEIC photos to JPG free, in your browser. Keeps full quality — no upload, no sign-up and no watermark.",
 };
 
 export default function HeicToJpgPage() {

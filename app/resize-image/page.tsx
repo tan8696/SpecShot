@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { ResizeTool } from "@/components/ResizeTool";
 
 export const metadata: Metadata = {
-  title: "Resize Image Online — Free, No Upload — SpecShot",
-  description: "Resize an image by exact pixels or by percent, with an aspect-ratio lock. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/resize-image/" },
+  title: "Resize Image Online — Pixels or % Free | SpecShot",
+  description: "Resize an image to exact pixel dimensions or by percent, with aspect-ratio lock. Free, runs in your browser — no upload, no watermark.",
 };
 
 export default function ResizeImagePage() {

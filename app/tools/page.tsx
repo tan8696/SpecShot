@@ -5,8 +5,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CATEGORY_ACCENT, CATEGORY_LABELS, TOOLS } from "@/lib/tools";
 
 export const metadata: Metadata = {
-  title: "All Tools — SpecShot",
-  description: "Every free, browser-based photo tool SpecShot offers — ID photos, resize, crop, rotate, convert, compress, watermark, and signature cleanup.",
+  alternates: { canonical: "/tools/" },
+  title: "Free Online Image Tools — No Upload | SpecShot",
+  description: "Every free SpecShot tool: passport photos, compress to KB, resize, crop, rotate, convert, HEIC, PDF, watermark and more. Nothing uploaded.",
 };
 
 export default function ToolsIndexPage() {

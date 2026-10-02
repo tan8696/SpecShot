@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms/" },
   title: "Terms of Service — SpecShot",
   description: "The terms for using SpecShot's free, ad-supported, browser-based image tools.",
 };

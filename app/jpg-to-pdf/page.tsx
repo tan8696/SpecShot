@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { ImageToPdfTool } from "@/components/ImageToPdfTool";
 
 export const metadata: Metadata = {
-  title: "JPG to PDF — Combine Photos into a PDF Free, No Upload — SpecShot",
-  description: "Combine several JPG photos into a single PDF, one per page. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/jpg-to-pdf/" },
+  title: "JPG to PDF Converter — Free, No Upload | SpecShot",
+  description: "Combine one or many JPG images into a single PDF free. Reorder pages, then download — runs in your browser, nothing is uploaded.",
 };
 
 export default function JpgToPdfPage() {

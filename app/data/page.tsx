@@ -4,7 +4,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
-  title: "Your Data — What SpecShot Collects (Nothing Personal) — SpecShot",
+  alternates: { canonical: "/data/" },
+  title: "Your Data — What SpecShot Collects | SpecShot",
   description: "A plain-language breakdown of exactly what SpecShot does and doesn't do with your photos and data.",
 };
 

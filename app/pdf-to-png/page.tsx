@@ -6,8 +6,9 @@ import { TOOL_CONTENT } from "@/lib/toolContent";
 import { PdfToImageTool } from "@/components/PdfToImageTool";
 
 export const metadata: Metadata = {
-  title: "PDF to PNG — Convert PDF Pages to Images Free, No Upload — SpecShot",
-  description: "Turn every page of a PDF into a lossless PNG image. Runs entirely in your browser — nothing is uploaded.",
+  alternates: { canonical: "/pdf-to-png/" },
+  title: "PDF to PNG Converter — Free, No Upload | SpecShot",
+  description: "Convert every page of a PDF to a lossless PNG image free. Runs in your browser — your PDF is never uploaded. No sign-up.",
 };
 
 export default function PdfToPngPage() {
