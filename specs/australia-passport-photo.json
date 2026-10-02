@@ -38,5 +38,8 @@
   ],
   "source_url": "https://www.passports.gov.au/help/passport-photos",
   "verified": false,
-  "verified_on": null
+  "verified_on": null,
+  "research_notes": [
+    "2026-10-02: re-read passports.gov.au: size, head 32-36mm, background, age, glasses all match. NOT published because (1) no eye-line figure is published, and (2) the source lists an 'edited' background as unacceptable, says it does not recommend online photo services or apps, and requires dye-sublimation prints on 200gsm glossy paper. SpecShot's ID-photo pipeline replaces the background, so its output would be rejected. Publish only with a crop-only flow and a 'get it printed professionally' notice."
+  ]
 }

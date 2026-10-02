@@ -15,7 +15,8 @@ export type Spec = {
     format: "jpeg" | "png";
   };
   head: { height_mm_min: number; height_mm_max: number };
-  eye_line: { from_bottom_pct_min: number; from_bottom_pct_max: number };
+  /** `note` replaces the bare range on the spec page when the source doesn't publish both bounds. */
+  eye_line: { from_bottom_pct_min: number; from_bottom_pct_max: number; note?: string };
   background: { color: string; tolerance: number };
   rules: string[];
   source_url: string;

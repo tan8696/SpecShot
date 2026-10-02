@@ -57,7 +57,7 @@ export default async function SpecPage({ params }: { params: Promise<{ slug: str
           <Row label="Print size" value={`${spec.print.width_mm} × ${spec.print.height_mm} mm (${mmToIn(spec.print.width_mm)} × ${mmToIn(spec.print.height_mm)} in)`} />
           <Row label="Digital size" value={`${spec.digital.width_px} × ${spec.digital.height_px} px at ${spec.print.dpi} DPI`} />
           <Row label="Head height" value={`${spec.head.height_mm_min}–${spec.head.height_mm_max} mm, crown to chin`} />
-          <Row label="Eye line" value={`${spec.eye_line.from_bottom_pct_min}–${spec.eye_line.from_bottom_pct_max}% up from the bottom of the frame`} />
+          <Row label="Eye line" value={spec.eye_line.note ?? `${spec.eye_line.from_bottom_pct_min}–${spec.eye_line.from_bottom_pct_max}% up from the bottom of the frame`} />
           <Row label="Background" value={`Plain, ${spec.background.color}`} />
           <Row label="File format" value={spec.digital.format.toUpperCase()} />
           <Row label="File size" value={fileSize} />

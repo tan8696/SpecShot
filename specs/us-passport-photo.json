@@ -37,5 +37,8 @@
   ],
   "source_url": "https://travel.state.gov/content/travel/en/passports/how-apply/photos.html",
   "verified": false,
-  "verified_on": null
+  "verified_on": null,
+  "research_notes": [
+    "2026-10-02: travel.state.gov still behind a Cloudflare challenge in a real browser. 22 CFR 51.26 only says photos must be 'as prescribed by the Department'; it gives no dimensions."
+  ]
 }
