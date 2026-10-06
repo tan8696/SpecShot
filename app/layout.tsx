@@ -4,6 +4,7 @@ import { Geist, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { PageBackground } from "@/components/PageBackground";
 import { AppDownloadPrompt } from "@/components/AppDownloadPrompt";
+import { AndroidBackButton } from "@/components/AndroidBackButton";
 import "./globals.css";
 
 // Geist for display type, Inter for body — used only by the landing page via
@@ -22,8 +23,10 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://specshot.example"
 const DESCRIPTION = "Turn a selfie into an ID photo that meets an exact spec. Processed entirely in your browser.";
 // Unset until an AdSense account is approved — see README "Before you go
 // live". No ad script loads at all until then, so there's nothing to review
-// or accidentally serve broken/unapproved ad calls with.
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+// or accidentally serve broken/unapproved ad calls with. Never in the apps:
+// AdSense is for websites only (a local APK build would otherwise pick it up
+// from .env.local).
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_NATIVE_APP ? undefined : process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 // Google Analytics 4 measurement ID (G-XXXXXXXXXX) and the Search Console
 // "HTML tag" verification token. Both unset = nothing loads/renders.
 const GA_ID = /^G-[A-Z0-9]+$/.test(process.env.NEXT_PUBLIC_GA_ID ?? "") ? process.env.NEXT_PUBLIC_GA_ID : undefined;
@@ -64,13 +67,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     // there's no theme toggle or first-paint theme script any more.
     <html lang="en" className={`dark ${geist.variable} ${inter.variable}`}>
       <head>
-        {/* Axes pinned to the one setting globals.css uses (.material-symbols-outlined):
-            the full variable range is a ~4 MB font, this is ~320 KB. */}
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block"
-        />
+        {/* The icon font is self-hosted (app/globals.css) so icons still render
+            offline — in the apps especially. Preloaded: icons sit above the fold. */}
+        <link rel="preload" href="/material-symbols-outlined.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         {/* AdSense's snippet as-is, on every page. A plain <script>, not
             next/script, so it sits in the static HTML exactly as AdSense
             gives it (next/script would inject it after hydration). Consent
@@ -103,6 +102,7 @@ gtag('js',new Date());gtag('config','${GA_ID}');`,
         <PageBackground />
         {children}
         <AppDownloadPrompt />
+        {process.env.NEXT_PUBLIC_NATIVE_APP === "android" && <AndroidBackButton />}
         {/* Vercel Web Analytics — cookieless, no IP storage, counts page
             views in aggregate only. See app/privacy/page.tsx for the
             disclosure. It needs no consent: it sets no cookie and can't

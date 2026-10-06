@@ -59,8 +59,15 @@ jobs:
         run: |
           npx cap add android
           node scripts/gen-icons.mjs --android android/app/src/main/res
-          # Camera for live ID-photo capture; storage so Android 9 and older can save to Documents.
-          sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />#' android/app/src/main/AndroidManifest.xml
+          # Camera for live ID-photo capture. Storage so Android 10 and older can save
+          # to Documents: the Filesystem plugin asks for READ and WRITE together and an
+          # undeclared one is auto-denied (failing the save), and Android 10 also needs
+          # the legacy-storage flag. Android 11+ needs neither.
+          sed -i -e 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />#' -e 's#<application#& android:requestLegacyExternalStorage="true"#' android/app/src/main/AndroidManifest.xml
+          # The strips behind the status and navigation bars show the window background,
+          # which is white on a light-theme phone. Paint them the app's surface; the
+          # light bar icons come from SystemBars in capacitor.config.json.
+          sed -i 's|<item name="android:background">@null</item>|&\n        <item name="android:windowBackground">#131313</item>|' android/app/src/main/res/values/styles.xml
           # Android only installs a new APK over an old one if versionCode goes up;
           # the run number always does. versionName is the tag without its "v".
           VERSION=dev

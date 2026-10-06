@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 
 // Both set in production — the slot is committed in .env.production. Without
-// both, nothing renders.
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+// both, nothing renders. Never in the apps: AdSense is for websites only.
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_NATIVE_APP ? undefined : process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 const ADSENSE_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT_ID;
 
 /** One standard AdSense display unit in the page flow, above each tool's

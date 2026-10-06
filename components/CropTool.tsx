@@ -383,12 +383,16 @@ export function CropTool() {
         <div className="space-y-3 lg:col-span-8">
           <div
             ref={imgBoxRef}
-            className="relative mx-auto block max-w-full touch-none select-none overflow-hidden rounded-xl bg-black"
+            className="relative mx-auto block touch-none select-none overflow-hidden rounded-xl bg-black"
+            // Cap the height (62vh) through the width, so the canvas is never
+            // letterboxed: the overlay maps 1:1 onto it via displayScale, which
+            // assumes the picture fills the box. Tall photos broke that.
+            style={working ? { maxWidth: `min(100%, ${(62 * working.width) / working.height}vh)` } : undefined}
             onPointerMove={onHandleMove}
             onPointerUp={onHandleUp}
             onPointerCancel={onHandleUp}
           >
-            <canvas ref={stageCanvasRef} className="block max-h-[62vh] w-full object-contain" aria-label="Crop stage" role="img" />
+            <canvas ref={stageCanvasRef} className="block w-full" aria-label="Crop stage" role="img" />
 
             {rect && displayScale > 0 && (
               <>
