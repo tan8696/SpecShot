@@ -243,7 +243,9 @@ export function CompressTool() {
                 onPointerMove={(e) => draggingRef.current && moveSplit(e.clientX)}
                 onPointerUp={() => (draggingRef.current = false)}
                 onPointerCancel={() => (draggingRef.current = false)}
-                className="relative h-[360px] cursor-ew-resize touch-none select-none sm:h-[460px]"
+                // pan-y, not none: the divider only moves sideways, so a vertical
+                // swipe across this half-screen preview should still scroll the page.
+                className="relative h-[360px] cursor-ew-resize touch-pan-y select-none sm:h-[460px]"
               >
                 {compressedUrl && (
                   // eslint-disable-next-line @next/next/no-img-element

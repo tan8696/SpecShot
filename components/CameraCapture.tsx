@@ -52,7 +52,7 @@ export function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) 
       } catch (err) {
         setError(
           err instanceof DOMException && err.name === "NotAllowedError"
-            ? "Camera access was denied. Allow camera access in your browser, or upload a photo instead."
+            ? "Camera access was denied. Allow it in your browser or phone settings, or upload a photo instead."
             : "Could not access your camera. Try uploading a photo instead."
         );
       }

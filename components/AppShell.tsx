@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ToolNav } from "./ToolNav";
@@ -17,9 +17,11 @@ const TABS: { id: Mode; label: string; shortLabel: string }[] = [
 
 export function AppShell() {
   const searchParams = useSearchParams();
-  // Deep link from ToolNav's "Compress"/"Signature" entries: /?tool=compress
-  const initialTool = searchParams.get("tool");
-  const [mode, setMode] = useState<Mode>(initialTool === "signature" ? "signature" : "compress");
+  // Deep link from ToolNav's "Compress"/"Signature" entries: /app/?tool=signature
+  // The URL is the only state: following one of those links while already on
+  // this page changes just the query, which doesn't remount the shell.
+  const mode: Mode = searchParams.get("tool") === "signature" ? "signature" : "compress";
+  const setMode = (m: Mode) => history.replaceState(null, "", m === "signature" ? "?tool=signature" : location.pathname);
 
   useEffect(() => {
     // The apps bundle every file already; a worker there would only cache stale copies.

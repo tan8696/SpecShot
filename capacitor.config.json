@@ -2,5 +2,8 @@
   "appId": "app.specshot.android",
   "appName": "SpecShot",
   "webDir": "out",
-  "backgroundColor": "#131313"
+  "backgroundColor": "#131313",
+  "plugins": {
+    "SystemBars": { "style": "DARK" }
+  }
 }

@@ -95,12 +95,27 @@ body {
   color: var(--color-on-surface);
 }
 
-/* Material Symbols base rule — the stylesheet <link> in app/layout.tsx pulls
-   the font file; this maps the class components use for icons. */
+/* Material Symbols, self-hosted so icons render offline. The file is Google
+   Fonts' build with the axes pinned to the one setting used below
+   (opsz 24, wght 400, FILL 0, GRAD 0) — ~320 KB instead of ~4 MB. */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(/material-symbols-outlined.woff2) format("woff2");
+}
+
+/* Unlayered, like the Google stylesheet it replaces, so it renders the same:
+   it still beats Tailwind's layered utilities (text-[15px], hidden, …). */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
   font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  text-transform: none;
+  word-wrap: normal;
   line-height: 1;
   letter-spacing: normal;
   white-space: nowrap;
