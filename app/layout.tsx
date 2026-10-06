@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Geist, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { PageBackground } from "@/components/PageBackground";
 import { AppDownloadPrompt } from "@/components/AppDownloadPrompt";
 import { AndroidBackButton } from "@/components/AndroidBackButton";
 import "./globals.css";
@@ -97,9 +96,6 @@ gtag('js',new Date());gtag('config','${GA_ID}');`,
         )}
       </head>
       <body className="min-h-screen bg-surface font-body text-on-surface antialiased">
-        {/* The topographic contour field every page sits on. Fixed and
-            pointer-transparent, so it never affects page layout. */}
-        <PageBackground />
         {children}
         <AppDownloadPrompt />
         {process.env.NEXT_PUBLIC_NATIVE_APP === "android" && <AndroidBackButton />}

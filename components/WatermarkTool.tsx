@@ -6,7 +6,7 @@ import { applyWatermark, type WatermarkPosition } from "@/lib/engine/watermark";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -29,7 +29,6 @@ export function WatermarkTool() {
   const [opacity, setOpacity] = useState(50);
   const [position, setPosition] = useState<WatermarkPosition>("bottom-right");
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -70,10 +69,7 @@ export function WatermarkTool() {
       try {
         const base = drawResized(img);
         const marked = applyWatermark(base, { text, logo: logo ?? undefined, opacity: opacity / 100, position });
-        const t0 = performance.now();
-        const r = await compressToQuality(marked, format, 92);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+        setResult(await compressToQuality(marked, format, 92));
       } catch {
         setError("Could not watermark that image.");
       } finally {
@@ -120,19 +116,13 @@ export function WatermarkTool() {
     setImg(null);
     setLogo(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Watermark a photo"
-          subheading="Stamp your own text or logo onto an image — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -145,19 +135,6 @@ export function WatermarkTool() {
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Choose a different photo
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">branding_watermark</span>
-          <h2 className="font-display text-base font-semibold">Watermark</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{logo ? "LOGO" : "TEXT"}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -250,7 +227,7 @@ export function WatermarkTool() {
           <button
             onClick={download}
             disabled={!result || processing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {processing ? "Applying…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}

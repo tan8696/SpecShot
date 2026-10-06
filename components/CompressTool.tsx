@@ -14,7 +14,7 @@ import { downloadBlob } from "@/lib/download";
 import { takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type SizeMode = "quality" | "target";
 type Step = "upload" | "configure";
@@ -34,7 +34,6 @@ export function CompressTool() {
   const [maxDim, setMaxDim] = useState(1920);
 
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,13 +94,11 @@ export function CompressTool() {
       setError(null);
       try {
         const canvas = drawResized(img, resizeEnabled ? maxDim : undefined);
-        const t0 = performance.now();
-        const r =
+        setResult(
           sizeMode === "quality"
             ? await compressToQuality(canvas, format, quality)
-            : await compressToTargetKb(canvas, format, targetKb);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+            : await compressToTargetKb(canvas, format, targetKb)
+        );
       } catch {
         setError("Could not compress that image.");
       } finally {
@@ -147,7 +144,6 @@ export function CompressTool() {
     setFile(null);
     setImg(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
@@ -171,7 +167,7 @@ export function CompressTool() {
         <UploadScreen
           onFile={onFile}
           heading="Compress your photo"
-          subheading="Reduce file size or hit an exact KB target — no upload, it happens right in your browser."
+          subheading="Reduce file size or hit an exact KB target."
           hint="Any JPEG, PNG, or WebP"
         />
         {error && <Notice tone="error">{error}</Notice>}
@@ -181,40 +177,26 @@ export function CompressTool() {
 
   return (
     <div className={STUDIO_FRAME}>
-      <button
-        onClick={startOver}
-        className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface"
-      >
-        ← Choose a different photo
-      </button>
-
-      {/* Telemetry / control bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">compress</span>
-          <h2 className="font-display text-base font-semibold">Compressor</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
-            {format === "jpeg" ? "JPG" : format.toUpperCase()}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="savings" label="Saved" value={result ? (bigger ? `+${-reduction}%` : `−${reduction}%`) : "—"} tone={bigger ? "warn" : "secondary"} />
-          <StatPill icon="download" label="Output" value={result ? formatKb(resultKb) : "—"} tone="primary" />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-          <div className="flex rounded-lg bg-surface-container p-0.5">
-            {(["split", "dual"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setView(m)}
-                className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                  view === m ? "bg-primary/20 text-primary-fixed" : "text-on-surface-variant hover:text-on-surface"
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">{m === "split" ? "compare" : "view_column"}</span>
-                {m === "split" ? "Split" : "Dual"}
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <button
+          onClick={startOver}
+          className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface"
+        >
+          ← Choose a different photo
+        </button>
+        <div className="flex rounded-lg bg-surface-container p-0.5">
+          {(["split", "dual"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setView(m)}
+              className={`flex items-center gap-1 rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                view === m ? "bg-primary/20 text-primary-fixed" : "text-on-surface-variant hover:text-on-surface"
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">{m === "split" ? "compare" : "view_column"}</span>
+              {m === "split" ? "Split" : "Dual"}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -455,7 +437,7 @@ export function CompressTool() {
             <button
               onClick={download}
               disabled={!result || processing}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               {processing ? "Compressing…" : `Download (${formatKb(resultKb)})`}

@@ -87,7 +87,7 @@ flowchart LR
 | **Styling** | Tailwind CSS v4, Geist + Inter via `next/font`, Material Symbols |
 | **Computer vision** | MediaPipe Tasks Vision (face landmarks), `@imgly/background-removal` (WASM) |
 | **Documents** | `pdf-lib` (write), `pdfjs-dist` (render), `heic2any` (HEIC decode) |
-| **Graphics** | Canvas 2D pipeline, `ogl` (WebGL landing background) |
+| **Graphics** | Canvas 2D pipeline |
 | **Testing** | Vitest (14 suites covering the image engine) |
 | **Delivery** | Service worker (PWA), code-split heavy WASM/PDF libraries loaded only on use |
 | **Analytics** | Vercel Web Analytics — cookieless, no IP storage, aggregate-only. See `/privacy` |

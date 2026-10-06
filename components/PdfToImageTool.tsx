@@ -6,7 +6,7 @@ import { canvasToBlob } from "@/lib/engine/encode";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "rendering" | "configure";
 type Format = "jpeg" | "png";
@@ -117,8 +117,6 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
       <>
         <UploadScreen
           onFile={onFile}
-          heading="PDF to images"
-          subheading="Turn every page of a PDF into a JPG or PNG — entirely in your browser."
           hint="A .pdf file"
           accept="application/pdf,.pdf"
           selectLabel="Select a PDF"
@@ -149,26 +147,12 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
         ← Choose a different file
       </button>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">auto_stories</span>
-          <h2 className="font-display text-base font-semibold">PDF → Images</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
-            {canvases.length} {canvases.length === 1 ? "page" : "pages"}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Page" value={pageDims} tone="primary" />
-          <StatPill icon="download" label="This page" value={blob ? formatKb(blob.size / 1024) : "—"} />
-        </div>
-      </div>
-
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <div className="overflow-hidden rounded-xl bg-black">
             <div className="flex items-center justify-between bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
               <span className="truncate">{name}</span>
-              <span className="shrink-0 font-mono text-outline">page {pageIdx + 1} / {canvases.length}</span>
+              <span className="shrink-0 font-mono text-outline">page {pageIdx + 1} / {canvases.length} · {pageDims}</span>
             </div>
             <div className="relative flex items-center justify-center p-3 min-h-[200px]">
               <CanvasLoading show={!blob} />
@@ -228,10 +212,10 @@ export function PdfToImageTool({ defaultFormat = "jpeg" }: { defaultFormat?: For
             <button
               onClick={() => downloadPage(pageIdx)}
               disabled={!blob}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
-              {`Download page ${pageIdx + 1}`}
+              {`Download page ${pageIdx + 1}${blob ? ` (${formatKb(blob.size / 1024)})` : ""}`}
             </button>
             {multi && (
               <button onClick={downloadAll} disabled={busy} className={`${btn} w-full`}>

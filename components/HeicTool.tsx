@@ -6,7 +6,7 @@ import { decodeHeic, looksLikeHeic } from "@/lib/engine/heic";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "decoding" | "configure";
 type Target = "jpeg" | "png";
@@ -22,7 +22,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
   const [target, setTarget] = useState<Target>(defaultTarget);
   const [quality, setQuality] = useState(92);
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -56,10 +55,8 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
       setError(null);
       try {
         const canvas = drawResized(img);
-        const t0 = performance.now();
         const r = await compressToQuality(canvas, target, quality);
         if (cancelled) return;
-        setEncodeMs(Math.round(performance.now() - t0));
         setResult(r);
       } catch {
         if (!cancelled) setError("Could not convert that image.");
@@ -103,7 +100,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
     setStep("upload");
     setImg(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
@@ -112,8 +108,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
       <>
         <UploadScreen
           onFile={onFile}
-          heading="Convert HEIC"
-          subheading="Turn an iPhone HEIC/HEIF photo into a JPG or PNG anything can open — entirely in your browser."
           hint="A .heic or .heif file"
           accept="image/heic,image/heif,.heic,.heif"
         />
@@ -140,19 +134,6 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Choose a different file
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">phone_iphone</span>
-          <h2 className="font-display text-base font-semibold">HEIC Converter</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">→ {LABELS[target]}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -216,7 +197,7 @@ export function HeicTool({ defaultTarget = "jpeg" }: { defaultTarget?: Target })
           <button
             onClick={download}
             disabled={!result || processing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {processing ? "Converting…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}

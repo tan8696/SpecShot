@@ -152,7 +152,7 @@ export function LandingPage() {
           </nav>
           <Link
             href="/app/"
-            className="inline-flex items-center rounded-lg bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container shadow-[0_0_20px_-6px_rgba(192,193,255,0.45)] transition-colors hover:bg-primary"
+            className="inline-flex items-center rounded-lg bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container transition-colors hover:bg-primary"
           >
             Open the tools
           </Link>
@@ -162,15 +162,8 @@ export function LandingPage() {
       <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <section className="flex flex-col items-center py-20 text-center sm:py-28">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-outline-variant/40 bg-surface-container-high/70 px-3.5 py-1.5 text-xs text-on-surface-variant backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
-            No uploads &nbsp;·&nbsp; Works offline &nbsp;·&nbsp; No account
-          </div>
           <h1 className="max-w-3xl font-display text-4xl font-semibold leading-[1.08] tracking-tight text-on-surface sm:text-6xl">
-            Every image tool you need —{" "}
-            <span className="bg-gradient-to-r from-primary via-secondary to-tertiary bg-clip-text text-transparent">
-              without the upload
-            </span>
+            Every image tool you need — without the upload
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-on-surface-variant sm:text-lg">
             Compress to an exact file size, resize, upscale, crop, convert, watermark, and move
@@ -178,23 +171,7 @@ export function LandingPage() {
             on your device.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="#tools"
-              onClick={scrollToTools}
-              className="inline-flex items-center justify-center rounded-xl bg-primary-container px-6 py-3 text-sm font-semibold text-on-primary-container shadow-xl transition-colors hover:bg-primary"
-            >
-              Browse the tools
-            </a>
-            <Link
-              href="/app/"
-              className="inline-flex items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container/60 px-6 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-high"
-            >
-              Compress a photo
-            </Link>
-          </div>
-
-          {/* Drop-to-edit bar */}
+          {/* Drop-to-edit bar — the one call to action; the tool grid is right below it. */}
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
@@ -208,7 +185,7 @@ export function LandingPage() {
               setDragging(false);
               handleFiles(e.dataTransfer.files);
             }}
-            className={`group mt-12 w-full max-w-2xl rounded-2xl border border-dashed p-6 text-left backdrop-blur-xl transition-colors ${
+            className={`group mt-10 w-full max-w-2xl rounded-2xl border border-dashed p-6 text-left backdrop-blur-xl transition-colors ${
               dragging
                 ? "border-primary bg-primary/10"
                 : "border-outline-variant/50 bg-surface-container/60 hover:border-primary/60 hover:bg-surface-container-high/70"
@@ -243,20 +220,6 @@ export function LandingPage() {
               onChange={(e) => handleFiles(e.target.files)}
             />
           </button>
-
-          <dl className="mt-12 grid grid-cols-2 gap-x-10 gap-y-4 text-left sm:grid-cols-4">
-            {[
-              ["13", "browser tools"],
-              ["0", "bytes uploaded"],
-              ["—", "file-size limit"],
-              ["Free", "ad-supported"],
-            ].map(([n, label]) => (
-              <div key={label}>
-                <dt className="font-display text-2xl font-semibold text-on-surface">{n}</dt>
-                <dd className="text-xs text-on-surface-variant">{label}</dd>
-              </div>
-            ))}
-          </dl>
         </section>
 
         {/* Filter + search */}
@@ -303,23 +266,18 @@ export function LandingPage() {
             </p>
           ) : (
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {tools.map((t, i) => (
+              {tools.map((t) => (
                 <Link
                   key={t.id}
                   href={t.href}
                   className={`group flex flex-col justify-between rounded-2xl border border-outline-variant/25 bg-surface-container-low/70 p-5 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-surface-container/80 ${CATEGORY_ACCENT[t.category].border}`}
                 >
                   <div>
-                    <div className="flex items-start justify-between">
-                      <span
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl ${CATEGORY_ACCENT[t.category].bg} ${CATEGORY_ACCENT[t.category].text}`}
-                      >
-                        <span className="material-symbols-outlined text-[22px]">{t.icon}</span>
-                      </span>
-                      <span className="font-mono text-xs text-outline">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    </div>
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${CATEGORY_ACCENT[t.category].bg} ${CATEGORY_ACCENT[t.category].text}`}
+                    >
+                      <span className="material-symbols-outlined text-[22px]">{t.icon}</span>
+                    </span>
                     <h3 className={`mt-4 font-display text-base font-semibold text-on-surface transition-colors ${CATEGORY_ACCENT[t.category].hoverText}`}>
                       {t.label}
                     </h3>
@@ -407,34 +365,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="pb-24">
-          <div className="relative overflow-hidden rounded-3xl border border-outline-variant/25 bg-surface-container/80 p-10 text-center backdrop-blur-xl sm:p-16">
-            <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
-            <div className="relative">
-              <h2 className="font-display text-3xl font-semibold tracking-tight text-on-surface">
-                Ready when you are
-              </h2>
-              <p className="mx-auto mt-3 max-w-md text-on-surface-variant">
-                No install, no sign-up, no credits. Pick a tool and go.
-              </p>
-              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <a
-                  href="#tools"
-                  className="inline-flex items-center justify-center rounded-xl bg-primary-container px-6 py-3 text-sm font-semibold text-on-primary-container shadow-xl transition-colors hover:bg-primary"
-                >
-                  Browse the tools
-                </a>
-                <Link
-                  href="/app/"
-                  className="inline-flex items-center justify-center rounded-xl border border-outline-variant/50 bg-surface-container-high px-6 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-highest"
-                >
-                  Compress a photo
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}

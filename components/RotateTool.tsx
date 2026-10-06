@@ -6,7 +6,7 @@ import { rotateCanvas, flipCanvas, type Rotation } from "@/lib/engine/rotate";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -31,7 +31,6 @@ export function RotateTool() {
   const [original, setOriginal] = useState<HTMLCanvasElement | null>(null);
   const [working, setWorking] = useState<HTMLCanvasElement | null>(null);
   const [blob, setBlob] = useState<Blob | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,12 +59,9 @@ export function RotateTool() {
     let cancelled = false;
     setProcessing(true);
     setError(null);
-    const t0 = performance.now();
     compressToQuality(working, format, OUTPUT_QUALITY)
       .then((r) => {
-        if (cancelled) return;
-        setBlob(r.blob);
-        setEncodeMs(Math.round(performance.now() - t0));
+        if (!cancelled) setBlob(r.blob);
       })
       .catch(() => {
         if (!cancelled) setError("Could not process that image.");
@@ -99,19 +95,13 @@ export function RotateTool() {
     setOriginal(null);
     setWorking(null);
     setBlob(null);
-    setEncodeMs(null);
     setError(null);
   }
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Rotate an image"
-          subheading="Rotate in 90° steps or flip horizontally/vertically — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -126,18 +116,6 @@ export function RotateTool() {
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Choose a different photo
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">rotate_90_degrees_cw</span>
-          <h2 className="font-display text-base font-semibold">Rotate &amp; Flip</h2>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={blob ? formatKb(blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -196,7 +174,7 @@ export function RotateTool() {
           <button
             onClick={download}
             disabled={!blob || processing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {processing ? "Processing…" : `Download (${blob ? formatKb(blob.size / 1024) : ""})`}

@@ -17,7 +17,7 @@ import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type Handle = "move" | "nw" | "ne" | "sw" | "se" | "n" | "s" | "e" | "w";
@@ -91,7 +91,6 @@ export function CropTool() {
   const [guide, setGuide] = useState<Guide>("thirds");
 
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -259,10 +258,7 @@ export function CropTool() {
       setError(null);
       try {
         const canvas = cropToCanvas(working, rect);
-        const t0 = performance.now();
-        const r = await compressToQuality(canvas, format, 92);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+        setResult(await compressToQuality(canvas, format, 92));
       } catch {
         setError("Could not crop that image.");
       } finally {
@@ -307,19 +303,13 @@ export function CropTool() {
     setWorking(null);
     setRect(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Crop an image"
-          subheading="Drag the selection, or type exact numbers — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -343,40 +333,12 @@ export function CropTool() {
 
   const gw = working?.width ?? 0;
   const gh = working?.height ?? 0;
-  const outW = result?.width ?? Math.round(rect?.w ?? 0);
-  const outH = result?.height ?? Math.round(rect?.h ?? 0);
 
   return (
     <div className={STUDIO_FRAME}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
-          ← Choose a different photo
-        </button>
-        <button
-          onClick={resetBounds}
-          className="flex items-center gap-1.5 rounded-lg bg-surface-container px-3 py-1.5 text-xs font-medium text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface"
-        >
-          <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-          Reset bounds
-        </button>
-      </div>
-
-      {/* Telemetry bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">crop</span>
-          <h2 className="font-display text-base font-semibold">Cropper</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
-            {preset === "free" ? "FREE" : preset}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Crop" value={`${outW}×${outH}`} tone="primary" />
-          <StatPill icon="aspect_ratio" label="Ratio" value={outH ? (outW / outH).toFixed(2) : "—"} tone="secondary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
+      <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
+        ← Choose a different photo
+      </button>
 
       <div className="grid gap-4 lg:grid-cols-12">
         {/* Stage */}
@@ -584,7 +546,7 @@ export function CropTool() {
             <button
               onClick={download}
               disabled={!result || processing}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">crop</span>
               {processing ? "Cropping…" : `Download (${formatKb((result?.blob.size ?? 0) / 1024)})`}

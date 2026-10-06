@@ -13,7 +13,7 @@ import type { CompressResult } from "@/lib/engine/compress";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -118,18 +118,6 @@ export function SignatureTool() {
         ← Choose a different photo
       </button>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">draw</span>
-          <h2 className="font-display text-base font-semibold">Signature Cleaner</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">{background === "transparent" ? "PNG" : "JPG"}</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-        </div>
-      </div>
-
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <div className="overflow-hidden rounded-xl bg-black">
@@ -226,7 +214,7 @@ export function SignatureTool() {
           <button
             onClick={download}
             disabled={!result || processing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {processing ? "Cleaning…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}

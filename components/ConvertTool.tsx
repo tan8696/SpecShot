@@ -12,7 +12,7 @@ import {
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "queue";
 type Matte = "white" | "black";
@@ -180,8 +180,6 @@ export function ConvertTool() {
         <UploadScreen
           onFiles={addFiles}
           accept="image/png,image/jpeg,image/webp"
-          heading="Convert images"
-          subheading="Batch-convert between JPG, PNG, and WebP — every file stays in your browser."
           hint="Drop several at once · JPG, PNG, or WebP"
           selectLabel="Select images"
         />
@@ -195,29 +193,12 @@ export function ConvertTool() {
   const totalOut = done.reduce((n, i) => n + (i.result?.blob.size ?? 0), 0);
   const savedPct = totalOrig && totalOut ? Math.round((1 - totalOut / totalOrig) * 100) : 0;
   const anyJpegTarget = items.some((i) => i.target === "jpeg");
-  const allDone = items.length > 0 && items.every((i) => i.status === "done" || i.status === "error");
 
   return (
     <div className={STUDIO_FRAME}>
       <button onClick={clearAll} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Start over
       </button>
-
-      {/* Telemetry */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">sync_alt</span>
-          <h2 className="font-display text-base font-semibold">Converter</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
-            {items.length} {items.length === 1 ? "file" : "files"}
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="task_alt" label="Done" value={`${done.length}/${items.length}`} tone={allDone ? "secondary" : "neutral"} />
-          <StatPill icon="savings" label="Saved" value={done.length ? `${savedPct}%` : "—"} tone={savedPct >= 0 ? "secondary" : "warn"} />
-          <StatPill icon="folder_zip" label="Total out" value={done.length ? formatKb(totalOut / 1024) : "—"} tone="primary" />
-        </div>
-      </div>
 
       {/* Master controls */}
       <div className="grid gap-4 rounded-xl bg-surface-container-low p-4 lg:grid-cols-12">
@@ -372,7 +353,7 @@ export function ConvertTool() {
           <button
             onClick={downloadAll}
             disabled={done.length === 0}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {`Download all (${done.length})`}

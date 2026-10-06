@@ -6,7 +6,7 @@ import { wrapText, drawTextBlock } from "@/lib/engine/textlayer";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -23,7 +23,6 @@ export function MemeTool() {
   const [strokePct, setStrokePct] = useState(8);
   const [allCaps, setAllCaps] = useState(true);
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,10 +71,7 @@ export function MemeTool() {
         if (top.trim()) drawTextBlock(ctx, wrapText(measure, cap(top), maxWidth), canvas.width / 2, canvas.height, { ...shared, anchor: "top" });
         if (bottom.trim()) drawTextBlock(ctx, wrapText(measure, cap(bottom), maxWidth), canvas.width / 2, canvas.height, { ...shared, anchor: "bottom" });
 
-        const t0 = performance.now();
-        const r = await compressToQuality(canvas, format, 92);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+        setResult(await compressToQuality(canvas, format, 92));
       } catch {
         setError("Could not build that meme.");
       } finally {
@@ -121,19 +117,13 @@ export function MemeTool() {
     setFile(null);
     setImg(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Meme generator"
-          subheading="Add top and bottom captions to any image, classic meme style — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -148,18 +138,6 @@ export function MemeTool() {
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Choose a different photo
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">sentiment_very_satisfied</span>
-          <h2 className="font-display text-base font-semibold">Meme Generator</h2>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -218,7 +196,7 @@ export function MemeTool() {
           <button
             onClick={download}
             disabled={!result || processing}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
             {processing ? "Rendering…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}

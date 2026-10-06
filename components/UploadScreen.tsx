@@ -21,8 +21,10 @@ export function UploadScreen({
   onFile?: (file: File) => void;
   // For the Image -> PDF tool, which takes several images at once.
   onFiles?: (files: File[]) => void;
-  heading: string;
-  subheading: string;
+  // Optional: a tool page that already has its own h1 + lede leaves these out
+  // rather than saying the same thing twice.
+  heading?: string;
+  subheading?: string;
   hint: string;
   extraAction?: ReactNode;
   // HEIC files often don't match "image/*" in a non-Apple OS file picker,
@@ -42,8 +44,8 @@ export function UploadScreen({
 
   return (
     <div className="flex flex-col items-center py-8 text-center sm:py-16">
-      <h2 className="mb-2 font-display text-2xl font-semibold tracking-tight text-on-surface">{heading}</h2>
-      <p className="mb-6 max-w-md text-sm text-on-surface-variant sm:mb-10">{subheading}</p>
+      {heading && <h2 className="mb-2 font-display text-2xl font-semibold tracking-tight text-on-surface">{heading}</h2>}
+      {subheading && <p className="mb-6 max-w-md text-sm text-on-surface-variant sm:mb-10">{subheading}</p>}
 
       <label
         onDragOver={(e) => {

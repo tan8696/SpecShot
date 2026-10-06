@@ -4,13 +4,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { compressToQuality, drawResized, formatFromMime, loadImageFile, type CompressFormat, type CompressResult } from "@/lib/engine/compress";
 import { rotateCanvas, flipCanvas } from "@/lib/engine/rotate";
-import { buildFilterString, FILTER_PRESETS, type FilterPreset } from "@/lib/engine/editor";
+import { autoAdjust, buildFilterString, FILTER_PRESETS, type FilterPreset } from "@/lib/engine/editor";
 import { wrapText, drawTextBlock } from "@/lib/engine/textlayer";
 import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage, takeHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, CanvasLoading, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 type TextPos = "top" | "center" | "bottom";
@@ -51,7 +51,6 @@ export function PhotoEditorTool() {
   const [textPct, setTextPct] = useState(7);
 
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -120,10 +119,7 @@ export function PhotoEditorTool() {
           });
         }
 
-        const t0 = performance.now();
-        const r = await compressToQuality(out, format, 92);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+        setResult(await compressToQuality(out, format, 92));
       } catch {
         setError("Could not apply those edits.");
       } finally {
@@ -164,6 +160,17 @@ export function PhotoEditorTool() {
     downloadBlob(result.blob, `${base}-edited.${ext}`);
   }
 
+  // Stats from a small sample: a few hundred px reads the histogram just as
+  // well as the full photo and keeps the click instant.
+  function autoFix() {
+    if (!img) return;
+    const sample = drawResized(img, 256);
+    const a = autoAdjust(sample.getContext("2d")!.getImageData(0, 0, sample.width, sample.height).data);
+    setBrightness(a.brightness);
+    setContrast(a.contrast);
+    setSaturation(a.saturation);
+  }
+
   async function pipeToCompressor() {
     if (!result) return;
     const ext = format === "jpeg" ? "jpg" : format;
@@ -178,19 +185,13 @@ export function PhotoEditorTool() {
     setFile(null);
     setImg(null);
     setResult(null);
-    setEncodeMs(null);
     setError(null);
   }
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Photo editor"
-          subheading="Adjust light and colour, add a border or a caption, rotate — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -205,18 +206,6 @@ export function PhotoEditorTool() {
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Choose a different photo
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">tune</span>
-          <h2 className="font-display text-base font-semibold">Photo Editor</h2>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="crop_free" label="Size" value={dims} tone="primary" />
-          <StatPill icon="download" label="Output" value={result ? formatKb(result.blob.size / 1024) : "—"} />
-          <StatPill icon="timer" label="Encoded" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -256,6 +245,16 @@ export function PhotoEditorTool() {
               </div>
             </div>
 
+            <div className="flex items-center justify-between border-t border-outline-variant/30 pt-3">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-outline">Adjust</span>
+              <button
+                onClick={autoFix}
+                className="flex items-center gap-1 rounded-lg bg-surface-container px-2.5 py-1 text-xs font-medium text-on-surface transition-colors hover:bg-surface-container-high"
+              >
+                <span className="material-symbols-outlined text-[16px]">auto_fix_high</span>
+                Auto
+              </button>
+            </div>
             <Slider id="ed-b" label="Brightness" value={brightness} set={setBrightness} />
             <Slider id="ed-c" label="Contrast" value={contrast} set={setContrast} />
             <Slider id="ed-s" label="Saturation" value={saturation} set={setSaturation} />
@@ -326,7 +325,7 @@ export function PhotoEditorTool() {
             <button
               onClick={download}
               disabled={!result || processing}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               {processing ? "Rendering…" : `Download (${result ? formatKb(result.blob.size / 1024) : ""})`}

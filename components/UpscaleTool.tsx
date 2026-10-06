@@ -14,7 +14,7 @@ import { downloadBlob } from "@/lib/download";
 import { stashHandoffImage } from "@/lib/handoff";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, formatKb, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -31,7 +31,6 @@ export function UpscaleTool() {
   const [sharpen, setSharpen] = useState(60);
 
   const [result, setResult] = useState<CompressResult | null>(null);
-  const [encodeMs, setEncodeMs] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -75,11 +74,8 @@ export function UpscaleTool() {
       setProcessing(true);
       setError(null);
       try {
-        const t0 = performance.now();
         const canvas = upscaleCanvas(img, targetW, targetH, sharpen / 100);
-        const r = await compressToQuality(canvas, format, 92);
-        setEncodeMs(Math.round(performance.now() - t0));
-        setResult(r);
+        setResult(await compressToQuality(canvas, format, 92));
       } catch {
         setError("Could not upscale that image — try a smaller scale factor.");
       } finally {
@@ -129,23 +125,16 @@ export function UpscaleTool() {
     setFile(null);
     setImg(null);
     setResult(null);
-    setEncodeMs(null);
     setComparing(false);
     setError(null);
   }
 
   const resultKb = result ? result.blob.size / 1024 : 0;
-  const megapixels = (targetW * targetH) / 1_000_000;
 
   if (step === "upload") {
     return (
       <>
-        <UploadScreen
-          onFile={onFile}
-          heading="Upscale an image"
-          subheading="Enlarge a photo 2×, 3× or 4× and sharpen it back up — entirely in your browser."
-          hint="Any JPEG, PNG, or WebP"
-        />
+        <UploadScreen onFile={onFile} hint="Any JPEG, PNG, or WebP" />
         {error && <Notice tone="error">{error}</Notice>}
       </>
     );
@@ -159,28 +148,6 @@ export function UpscaleTool() {
       >
         ← Choose a different photo
       </button>
-
-      {/* Telemetry bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">hd</span>
-          <h2 className="font-display text-base font-semibold">Upscaler</h2>
-          <span className="rounded bg-surface-container px-1.5 py-0.5 font-mono text-[11px] text-secondary">
-            {effectiveScale}×
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill
-            icon="crop_free"
-            label="New"
-            value={result ? `${result.width}×${result.height}` : `${targetW}×${targetH}`}
-            tone="primary"
-          />
-          <StatPill icon="grain" label="Pixels" value={`${megapixels.toFixed(1)} MP`} tone={capped ? "warn" : "secondary"} />
-          <StatPill icon="download" label="Output" value={result ? formatKb(resultKb) : "—"} />
-          <StatPill icon="timer" label="Rendered" value={encodeMs != null ? `${encodeMs} ms` : "—"} />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         {/* Viewport */}
@@ -313,7 +280,7 @@ export function UpscaleTool() {
             <button
               onClick={download}
               disabled={!result || processing}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               {processing ? "Upscaling…" : `Download (${formatKb(resultKb)})`}

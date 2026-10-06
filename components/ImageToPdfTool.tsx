@@ -5,7 +5,7 @@ import { imagesToPdf, type PageMode } from "@/lib/engine/pdf";
 import { downloadBlob } from "@/lib/download";
 import { Notice } from "./Notice";
 import { UploadScreen } from "./UploadScreen";
-import { StatPill, StudioPrivacyNote, STUDIO_FRAME } from "./studioUi";
+import { StudioPrivacyNote, STUDIO_FRAME } from "./studioUi";
 
 type Step = "upload" | "configure";
 
@@ -78,8 +78,6 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
       <>
         <UploadScreen
           onFiles={onFiles}
-          heading="Images to PDF"
-          subheading="Combine several photos into a single PDF, one per page — entirely in your browser."
           hint="Pick several JPG or PNG files at once"
           accept={accept}
           selectLabel="Select photos"
@@ -94,17 +92,6 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
       <button onClick={startOver} className="text-sm font-medium text-on-surface-variant transition-colors hover:text-on-surface">
         ← Start over
       </button>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-container-low p-3">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">picture_as_pdf</span>
-          <h2 className="font-display text-base font-semibold">Images → PDF</h2>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <StatPill icon="description" label="Pages" value={String(files.length)} tone="primary" />
-          <StatPill icon="aspect_ratio" label="Size" value={MODE_LABELS[mode]} tone="secondary" />
-        </div>
-      </div>
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="lg:col-span-8">
@@ -183,7 +170,7 @@ export function ImageToPdfTool({ accept = "image/jpeg" }: { accept?: string }) {
           <button
             onClick={createPdf}
             disabled={files.length === 0 || generating}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shadow-[0_0_20px_-4px_rgba(192,193,255,0.5)] transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container hover:text-on-primary-container disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
             {generating ? "Building PDF…" : pdf ? "Download PDF again" : "Create PDF"}
