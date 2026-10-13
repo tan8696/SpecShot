@@ -1,5 +1,4 @@
 import { describe, it, expect } from "vitest";
-// @ts-expect-error — build-time validator helper, plain JS with no types
 import { crownFit } from "../scripts/crown-fit.mjs";
 
 describe("crownFit", () => {
